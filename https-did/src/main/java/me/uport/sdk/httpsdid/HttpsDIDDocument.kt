@@ -33,14 +33,14 @@ data class HttpsDIDDocument(
     /**
      * Serializes this [HttpsDIDDocument] into a JSON string
      */
-    fun toJson(): String = Json.stringify(HttpsDIDDocument.serializer(), this)
+    fun toJson(): String = Json.stringify(serializer(), this)
 
     companion object {
 
         /**
          * Attempts to deserialize a given [json] string into a [HttpsDIDDocument]
          */
-        fun fromJson(json: String) = Json.nonstrict.parse(HttpsDIDDocument.serializer(), json)
+        fun fromJson(json: String) = Json.nonstrict.parse(serializer(), json)
     }
 
 }
