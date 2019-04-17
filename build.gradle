@@ -19,9 +19,9 @@ buildscript {
         bivrost_version = "v0.7.1"
         kmnid_version = "0.2.1"
         kethereum_version = "0.74.8"
-        uport_kotlin_common_version = "0.0.1"
 
-        current_release_version = "v0.4.2"
+        uport_kotlin_common_version = "0.0.1"
+        current_release_version = "0.0.1"
     }
 
     repositories {
@@ -74,7 +74,7 @@ allprojects {
         jcenter()
         maven { url 'https://jitpack.io' }
         maven { url "https://kotlin.bintray.com/kotlinx" }
-        mavenLocal()
+//        mavenLocal()
     }
 
 //address warnings about multiple kotlin runtimes in classpath
@@ -93,16 +93,6 @@ allprojects {
                 details.useVersion kotlin_version
             }
         }
-    }
-}
-
-subprojects { subproject ->
-
-    afterEvaluate {
-
-//        if (subproject.plugins.hasPlugin("com.android.application") || subproject.plugins.hasPlugin("com.android.library")) {
-//            subproject.android.packagingOptions.exclude("META-INF/main.kotlin_module")
-//        }
     }
 }
 

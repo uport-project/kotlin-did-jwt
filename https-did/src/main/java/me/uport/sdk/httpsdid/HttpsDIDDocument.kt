@@ -1,3 +1,5 @@
+@file:Suppress("EXPERIMENTAL_API_USAGE")
+
 package me.uport.sdk.httpsdid
 
 import kotlinx.serialization.SerialName

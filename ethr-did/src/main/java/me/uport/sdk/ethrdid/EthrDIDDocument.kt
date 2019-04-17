@@ -1,3 +1,5 @@
+@file:Suppress("EXPERIMENTAL_API_USAGE", "unused")
+
 package me.uport.sdk.ethrdid
 
 import kotlinx.serialization.SerialName
@@ -28,8 +30,6 @@ data class EthrDIDDocument(
         @SerialName("@context")
         override val context: String = "https://w3id.org/did/v1"
 ) : DIDDocument {
-
-    override fun toString(): String = Json.indented.stringify(serializer(), this)
 
     /**
      * serialize this [EthrDIDDocument] to a JSON string

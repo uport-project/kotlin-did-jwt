@@ -1,3 +1,5 @@
+@file:Suppress("EXPERIMENTAL_API_USAGE")
+
 package me.uport.sdk.uportdid
 
 import kotlinx.serialization.SerialName
@@ -85,23 +87,19 @@ data class UportIdentityDocument(
         return "did:uport:$mnid"
     }
 
-    /**
-     * serialize to a json string
-     */
-    fun toJson(): String = Json.stringify(UportIdentityDocument.serializer(), this)
-
     companion object {
 
         /**
          * Attempts to deserialize a json string into a profile document
          */
-        fun fromJson(json: String): UportIdentityDocument? = Json.nonstrict.parse(UportIdentityDocument.serializer(), json)
+        fun fromJson(json: String): UportIdentityDocument? = Json.parse(serializer(), json)
     }
 }
 
 /**
  * encapsulates a profile picture field of a profile document
  */
+@Suppress("unused")
 @Serializable
 class ProfilePicture(
         @SerialName("@type")

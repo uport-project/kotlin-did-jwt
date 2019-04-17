@@ -1,8 +1,9 @@
+@file:Suppress("EXPERIMENTAL_API_USAGE", "unused")
+
 package me.uport.sdk.uportdid
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import me.uport.sdk.universaldid.AuthenticationEntry
 import me.uport.sdk.universaldid.DIDDocument
@@ -31,7 +32,6 @@ data class UportDIDDocument(
     /**
      * Serializes this DID document to a JSON string
      */
-    @UnstableDefault
     fun toJson(): String = Json.stringify(serializer(), this)
 
     companion object {
@@ -39,7 +39,6 @@ data class UportDIDDocument(
         /**
          * Attempts to deserialize a given [json] string into a [UportDIDDocument]
          */
-        @UnstableDefault
         fun fromJson(json: String) = Json.nonstrict.parse(serializer(), json)
     }
 }
