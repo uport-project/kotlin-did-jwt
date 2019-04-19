@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package me.uport.sdk.jwt
 
 import kotlinx.coroutines.runBlocking

@@ -57,8 +57,6 @@ class JWTTools(
         private val timeProvider: ITimeProvider = SystemTimeProvider,
         preferredNetwork: EthNetwork? = null
 ) {
-    private val notEmpty: (String) -> Boolean = { !it.isEmpty() }
-
     init {
 
         // blank did declarations
@@ -138,9 +136,9 @@ class JWTTools(
     fun decode(token: String): Triple<JwtHeader, JwtPayload, ByteArray> {
         //Split token by . from jwtUtils
         val (encodedHeader, encodedPayload, encodedSignature) = splitToken(token)
-        if (!notEmpty(encodedHeader))
+        if (encodedHeader.isEmpty())
             throw InvalidJWTException("Header cannot be empty")
-        else if (!notEmpty(encodedPayload))
+        else if (encodedPayload.isEmpty())
             throw InvalidJWTException("Payload cannot be empty")
         //Decode the pieces
         val headerString = String(encodedHeader.decodeBase64())
@@ -148,15 +146,11 @@ class JWTTools(
         val signatureBytes = encodedSignature.decodeBase64()
 
         //Parse Json
-        if (headerString[0] != '{' || payloadString[0] != '{')
-            throw InvalidJWTException("Invalid JSON format, should start with {")
-        else {
-            val header = JwtHeader.fromJson(headerString)
-                    ?: throw InvalidJWTException("unable to parse the JWT header for $token")
-            val payload = jwtPayloadAdapter.fromJson(payloadString)
-                    ?: throw InvalidJWTException("unable to parse the JWT payload for $token")
-            return Triple(header, payload, signatureBytes)
-        }
+        val header = JwtHeader.fromJson(headerString)
+                ?: throw InvalidJWTException("unable to parse the JWT header for $token")
+        val payload = jwtPayloadAdapter.fromJson(payloadString)
+                ?: throw InvalidJWTException("unable to parse the JWT payload for $token")
+        return Triple(header, payload, signatureBytes)
     }
 
     /**
@@ -167,9 +161,9 @@ class JWTTools(
     fun decodeRaw(token: String): Triple<JwtHeader, Map<String, Any?>, ByteArray> {
         //Split token by . from jwtUtils
         val (encodedHeader, encodedPayload, encodedSignature) = splitToken(token)
-        if (!notEmpty(encodedHeader))
+        if (encodedHeader.isEmpty())
             throw InvalidJWTException("Header cannot be empty")
-        else if (!notEmpty(encodedPayload))
+        else if (encodedPayload.isEmpty())
             throw InvalidJWTException("Payload cannot be empty")
         //Decode the pieces
         val headerString = String(encodedHeader.decodeBase64())
@@ -177,18 +171,14 @@ class JWTTools(
         val signatureBytes = encodedSignature.decodeBase64()
 
         //Parse Json
-        if (headerString[0] != '{' || payloadString[0] != '{')
-            throw InvalidJWTException("Invalid JSON format, should start with {")
-        else {
-            val header = JwtHeader.fromJson(headerString)
-                    ?: throw InvalidJWTException("unable to parse the JWT header for $token")
-            val mapAdapter = moshi.mapAdapter<String, Any>(String::class.java, Any::class.java)
+        val header = JwtHeader.fromJson(headerString)
+                ?: throw InvalidJWTException("unable to parse the JWT header for $token")
+        val mapAdapter = moshi.mapAdapter<String, Any>(String::class.java, Any::class.java)
 
-            val payload = mapAdapter.fromJson(payloadString)
-                    ?: throw InvalidJWTException("unable to parse the JWT payload for $token")
+        val payload = mapAdapter.fromJson(payloadString)
+                ?: throw InvalidJWTException("unable to parse the JWT payload for $token")
 
-            return Triple(header, payload, signatureBytes)
-        }
+        return Triple(header, payload, signatureBytes)
     }
 
 

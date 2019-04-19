@@ -1,3 +1,5 @@
+@file:Suppress("MoveVariableDeclarationIntoWhen", "MatchingDeclarationName")
+
 package me.uport.sdk.jwt
 
 import me.uport.sdk.core.getUncompressedPublicKeyWithPrefix

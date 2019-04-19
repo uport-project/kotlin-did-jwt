@@ -1,6 +1,5 @@
 package me.uport.sdk.jwt
 
-import assertk.assert
 import assertk.assertThat
 import assertk.assertions.isTrue
 import org.junit.Test
