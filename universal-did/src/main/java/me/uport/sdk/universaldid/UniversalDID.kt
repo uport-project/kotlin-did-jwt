@@ -83,26 +83,3 @@ object UniversalDID : DIDResolver {
     //language=RegExp
     private val didPattern = "^did:(.*?):(.+)".toRegex()
 }
-
-/**
- * Abstraction of various methods of resolving DIDs
- *
- * Each resolver should know the [method] it is supposed to resolve
- * and implement a [resolve] coroutine to eventually return a [DIDDocument] or throw an error
- */
-interface DIDResolver {
-    /**
-     * The DID method that a particular implementation can resolve
-     */
-    val method: String
-
-    /**
-     * Resolve a given [did] in a coroutine and return the [DIDDocument] or throw an error
-     */
-    suspend fun resolve(did: String): DIDDocument
-
-    /**
-     * Check if the [potentialDID] can be resolved by this resolver.
-     */
-    fun canResolve(potentialDID: String): Boolean
-}
