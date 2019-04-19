@@ -3,8 +3,8 @@
 // bintray_username
 
 
-def gitUrl = "https://github.com/uport-project/did-resolver-k.git"
-def groupID = "com.github.uport-project.did-resolver-k"
+def gitUrl = "https://github.com/uport-project/kotlin-did-jwt.git"
+def groupID = "com.github.uport-project.kotlin-did-jwt"
 def siteUrl = "https://developer.uport.me"
 def sdkDescription = "DID resolver logic for uPort DID types"
 
