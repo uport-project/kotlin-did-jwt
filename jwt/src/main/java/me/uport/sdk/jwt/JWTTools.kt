@@ -1,6 +1,8 @@
 package me.uport.sdk.jwt
 
 import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonDataException
+import com.squareup.moshi.JsonEncodingException
 import me.uport.sdk.core.EthNetwork
 import me.uport.sdk.core.ITimeProvider
 import me.uport.sdk.core.Networks
@@ -145,12 +147,18 @@ class JWTTools(
         val payloadString = String(encodedPayload.decodeBase64())
         val signatureBytes = encodedSignature.decodeBase64()
 
-        //Parse Json
-        val header = JwtHeader.fromJson(headerString)
-                ?: throw InvalidJWTException("unable to parse the JWT header for $token")
-        val payload = jwtPayloadAdapter.fromJson(payloadString)
-                ?: throw InvalidJWTException("unable to parse the JWT payload for $token")
-        return Triple(header, payload, signatureBytes)
+        try {
+            //Parse Json
+            val header = JwtHeader.fromJson(headerString)
+                    ?: throw InvalidJWTException("unable to parse the JWT header for $token")
+            val payload = jwtPayloadAdapter.fromJson(payloadString)
+                    ?: throw InvalidJWTException("unable to parse the JWT payload for $token")
+            return Triple(header, payload, signatureBytes)
+        } catch (ex: JsonDataException) {
+            throw JWTEncodingException("cannot parse the JWT($token)", ex)
+        } catch (ex: JsonEncodingException) {
+            throw JWTEncodingException("cannot parse the JWT($token)", ex)
+        }
     }
 
     /**
@@ -170,15 +178,19 @@ class JWTTools(
         val payloadString = String(encodedPayload.decodeBase64())
         val signatureBytes = encodedSignature.decodeBase64()
 
-        //Parse Json
-        val header = JwtHeader.fromJson(headerString)
-                ?: throw InvalidJWTException("unable to parse the JWT header for $token")
-        val mapAdapter = moshi.mapAdapter<String, Any>(String::class.java, Any::class.java)
+        try {
+            //Parse Json
+            val header = JwtHeader.fromJson(headerString)
+                    ?: throw InvalidJWTException("unable to parse the JWT header for $token")
+            val mapAdapter = moshi.mapAdapter<String, Any>(String::class.java, Any::class.java)
 
-        val payload = mapAdapter.fromJson(payloadString)
-                ?: throw InvalidJWTException("unable to parse the JWT payload for $token")
+            val payload = mapAdapter.fromJson(payloadString)
+                    ?: throw InvalidJWTException("unable to parse the JWT payload for $token")
 
-        return Triple(header, payload, signatureBytes)
+            return Triple(header, payload, signatureBytes)
+        } catch (ex: JsonDataException) {
+            throw JWTEncodingException("cannot parse the JWT($token)", ex)
+        }
     }
 
 
