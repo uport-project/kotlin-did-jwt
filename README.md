@@ -1,9 +1,8 @@
-# did-resolver-k
+# kotlin-did-jwt
 [![](https://jitpack.io/v/uport-project/kotlin-did-jwt.svg)](https://jitpack.io/#uport-project/kotlin-did-jwt)
 [![Twitter Follow](https://img.shields.io/twitter/follow/uport_me.svg?style=social&label=Follow)](https://twitter.com/uport_me)
 
-Kotlin DID resolver logic for uPort DID types
-
+This is the Kotlin implementation of the basic JWT methods for DID-JWTs
 
 # did-jwt
 
