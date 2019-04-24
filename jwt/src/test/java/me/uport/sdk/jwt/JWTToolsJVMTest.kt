@@ -315,7 +315,7 @@ class JWTToolsJVMTest {
 
         val tested = JWTTools(TestTimeProvider(12345678000L))
 
-        val payload = mapOf<String, Any>(
+        val payload = mapOf(
                 "claims" to mapOf("name" to "R Daneel Olivaw")
         )
 
