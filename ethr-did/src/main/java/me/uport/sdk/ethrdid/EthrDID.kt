@@ -120,7 +120,7 @@ class EthrDID(
                 //FIXME: allow overriding the gas price
                 gasPrice = networkPrice,
                 nonce = nonce,
-                input = encodedCall.hexToByteArray().toList(),
+                input = encodedCall.hexToByteArray(),
                 value = BigInteger.ZERO
         )
 

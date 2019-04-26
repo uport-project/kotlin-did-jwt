@@ -17,10 +17,10 @@ buildscript {
         okhttp_version = "3.14.1"
 
         bivrost_version = "v0.7.1"
-        kmnid_version = "0.2.1"
-        kethereum_version = "0.74.8"
+        kmnid_version = "0.3"
+        kethereum_version = "0.75.0"
 
-        uport_kotlin_common_version = "0.0.2"
+        uport_kotlin_common_version = "0.0.4"
         current_release_version = "0.0.2"
     }
 
@@ -80,8 +80,8 @@ allprojects {
 //address warnings about multiple kotlin runtimes in classpath
     configurations.all {
         resolutionStrategy.dependencySubstitution {
-            substitute module("org.jetbrains.kotlin:kotlin-stdlib-jre7") because "warning about multiple runtimes in the classpath" with module("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version")
-            substitute module("org.jetbrains.kotlin:kotlin-stdlib-jre8") because "warning about multiple runtimes in the classpath" with module("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version")
+            substitute module("org.jetbrains.kotlin:kotlin-stdlib-jre7") because "warning about multiple runtimes in the classpath" with module("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
+            substitute module("org.jetbrains.kotlin:kotlin-stdlib-jre8") because "warning about multiple runtimes in the classpath" with module("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
 
         }
         resolutionStrategy.eachDependency { DependencyResolveDetails details ->
@@ -91,6 +91,16 @@ allprojects {
                     'kotlin-stdlib-jdk7', 'kotlin-stdlib-jdk8',
             ]) {
                 details.useVersion kotlin_version
+            }
+        }
+    }
+}
+
+subprojects { subproject ->
+    afterEvaluate {
+        subproject.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+            kotlinOptions {
+                jvmTarget = "1.8"
             }
         }
     }
