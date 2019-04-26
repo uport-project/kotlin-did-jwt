@@ -19,9 +19,9 @@ buildscript {
         bivrost_version = "v0.7.1"
         kmnid_version = "0.3"
         kethereum_version = "0.75.0"
-
         uport_kotlin_common_version = "0.0.4"
-        current_release_version = "0.0.2"
+
+        current_release_version = "0.0.3"
     }
 
     repositories {
