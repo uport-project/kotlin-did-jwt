@@ -51,7 +51,7 @@ allprojects {
 In your application `build.gradle` file, add:
 
 ```groovy
-def did_jwt_version = "0.0.4"
+def did_jwt_version = "0.1.0"
 dependencies {
     //...
     implementation "com.github.uport-project.kotlin-did-jwt:jwt:$did_jwt_version"
@@ -81,7 +81,7 @@ val token = jwt.createJWT(payload, issuerDID, signer)
 
 ### 2. Decode a did-JWT
 
-Try decoding the JWT.  You can also do this using [jwt.io](jwt.io)
+Try decoding the JWT.  You can also do this using [jwt.io](https://jwt.io)
 
 ```kotlin
 val (header, payload, sig) = jwt.decodeRaw("eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJjbGFpbXMiOnsibmFtZSI6IlIgRGFuZWVsIE9saXZhdyJ9LCJpYXQiOjEyMzQ1Njc4LCJleHAiOjEyMzQ1OTc4LCJpc3MiOiJkaWQ6ZXRocjoweDQxMjNjYmQxNDNiNTVjMDZlNDUxZmYyNTNhZjA5Mjg2YjY4N2E5NTAifQ.o6eDKYjHJnak1ylkpe9g8krxvK9UEhKf-1T0EYhH8pGyb8MjOEepRJi8DYlVEnZno0DkVYXQCf3u1i_HThBKtAA")
