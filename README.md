@@ -1,5 +1,6 @@
 # kotlin-did-jwt
 [![](https://jitpack.io/v/uport-project/kotlin-did-jwt.svg)](https://jitpack.io/#uport-project/kotlin-did-jwt)
+[![CircleCI](https://circleci.com/gh/uport-project/kotlin-did-jwt.svg?style=svg)](https://circleci.com/gh/uport-project/kotlin-did-jwt)
 [![Twitter Follow](https://img.shields.io/twitter/follow/uport_me.svg?style=social&label=Follow)](https://twitter.com/uport_me)
 
 This is the Kotlin implementation of the basic JWT methods for DID-JWTs
@@ -51,7 +52,7 @@ allprojects {
 In your application `build.gradle` file, add:
 
 ```groovy
-def did_jwt_version = "0.1.0"
+def did_jwt_version = "0.1.1"
 dependencies {
     //...
     implementation "com.github.uport-project.kotlin-did-jwt:jwt:$did_jwt_version"
@@ -117,3 +118,9 @@ key associated with the issuer DID (`iss` field).
 
 This association is resolved by a DID resolver, which can produce a `DIDDocument`
 listing various public keys and service endpoints for a given DID.
+
+
+## CHANGELOG
+
+* 0.1.1
+    - initial stable release isolating the did-jwt implementation in kotlin along with resolvers
