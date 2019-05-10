@@ -20,6 +20,7 @@ dependencies {
     api project(":uport-did")
     api project(":ethr-did")
     api project(":https-did")
+    implementation "com.madgag.spongycastle:core:$spongycastle_version"
 
     testImplementation "junit:junit:$junit_version"
     testImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"

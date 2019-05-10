@@ -18,8 +18,8 @@ import io.mockk.spyk
 import kotlinx.coroutines.runBlocking
 import me.uport.sdk.core.HttpClient
 import me.uport.sdk.core.Networks
-import me.uport.sdk.core.hexToBytes32
-import me.uport.sdk.core.utf8
+import me.uport.sdk.signer.hexToBytes32
+import me.uport.sdk.signer.utf8
 import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDOwnerChanged
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jsonrpc.JsonRpcLogItem

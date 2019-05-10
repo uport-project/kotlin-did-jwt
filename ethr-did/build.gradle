@@ -13,13 +13,13 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$kotlin_serialization_version"
 
     implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$bivrost_version"
+    implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
 
     api "com.github.komputing.KEthereum:extensions:$kethereum_version"
     api "com.github.komputing.KEthereum:model:$kethereum_version"
-    api "com.github.komputing.KEthereum:base58:$kethereum_version"
 
     api "com.github.uport-project.kotlin-common:jsonrpc:$uport_kotlin_common_version"
-    api "com.github.uport-project.kotlin-common:core:$uport_kotlin_common_version"
+    api "com.github.uport-project.kotlin-common:signer-common:$uport_kotlin_common_version"
     api project(":universal-did")
 
     testImplementation "junit:junit:$junit_version"

@@ -3,7 +3,7 @@
 buildscript {
 
     ext {
-        kotlin_version = '1.3.30'
+        kotlin_version = '1.3.31'
         kotlin_serialization_version = '0.11.0'
         coroutines_version = "1.2.0"
 
@@ -17,9 +17,10 @@ buildscript {
         okhttp_version = "3.14.1"
 
         bivrost_version = "v0.7.1"
-        kmnid_version = "0.3"
-        kethereum_version = "0.75.0"
-        uport_kotlin_common_version = "0.0.5"
+        kmnid_version = "0.3.2"
+        kethereum_version = "0.75.1"
+        spongycastle_version = "1.58.0.0"
+        uport_kotlin_common_version = "0.1.1"
 
         current_release_version = "0.0.4"
     }

@@ -6,13 +6,9 @@ import com.squareup.moshi.JsonEncodingException
 import me.uport.sdk.core.EthNetwork
 import me.uport.sdk.core.ITimeProvider
 import me.uport.sdk.core.Networks
-import me.uport.sdk.core.Signer
 import me.uport.sdk.core.SystemTimeProvider
 import me.uport.sdk.core.decodeBase64
-import me.uport.sdk.core.decodeJose
-import me.uport.sdk.core.normalize
 import me.uport.sdk.core.toBase64UrlSafe
-import me.uport.sdk.core.utf8
 import me.uport.sdk.ethrdid.EthrDIDResolver
 import me.uport.sdk.httpsdid.HttpsDIDResolver
 import me.uport.sdk.jsonrpc.JsonRPC
@@ -21,6 +17,10 @@ import me.uport.sdk.jwt.model.JwtHeader
 import me.uport.sdk.jwt.model.JwtHeader.Companion.ES256K
 import me.uport.sdk.jwt.model.JwtHeader.Companion.ES256K_R
 import me.uport.sdk.jwt.model.JwtPayload
+import me.uport.sdk.signer.Signer
+import me.uport.sdk.signer.decodeJose
+import me.uport.sdk.signer.normalize
+import me.uport.sdk.signer.utf8
 import me.uport.sdk.universaldid.DIDDocument
 import me.uport.sdk.universaldid.DIDResolver
 import me.uport.sdk.universaldid.PublicKeyEntry

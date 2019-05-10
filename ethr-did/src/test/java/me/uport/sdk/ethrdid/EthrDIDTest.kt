@@ -8,7 +8,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import me.uport.sdk.core.KPSigner
+import me.uport.sdk.signer.KPSigner
 import me.uport.sdk.jsonrpc.JsonRPC
 import org.junit.Test
 import org.walleth.khex.prepend0xPrefix

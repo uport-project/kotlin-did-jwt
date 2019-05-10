@@ -8,11 +8,11 @@ import io.mockk.coEvery
 import io.mockk.mockkObject
 import io.mockk.spyk
 import kotlinx.coroutines.runBlocking
-import me.uport.sdk.core.KPSigner
 import me.uport.sdk.ethrdid.EthrDIDDocument
 import me.uport.sdk.ethrdid.EthrDIDResolver
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jwt.model.JwtPayload
+import me.uport.sdk.signer.KPSigner
 import me.uport.sdk.testhelpers.TestTimeProvider
 import me.uport.sdk.testhelpers.coAssert
 import me.uport.sdk.universaldid.UniversalDID

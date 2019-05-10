@@ -2,7 +2,7 @@
 
 package me.uport.sdk.jwt
 
-import me.uport.sdk.core.getUncompressedPublicKeyWithPrefix
+import me.uport.sdk.signer.getUncompressedPublicKeyWithPrefix
 import org.kethereum.hashes.sha256
 import org.kethereum.model.PublicKey
 import org.kethereum.model.SignatureData

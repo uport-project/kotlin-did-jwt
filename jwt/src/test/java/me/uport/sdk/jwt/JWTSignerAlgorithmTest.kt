@@ -3,7 +3,7 @@ package me.uport.sdk.jwt
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import kotlinx.coroutines.runBlocking
-import me.uport.sdk.core.KPSigner
+import me.uport.sdk.signer.KPSigner
 import me.uport.sdk.core.decodeBase64
 import me.uport.sdk.jwt.model.JwtHeader.Companion.ES256K
 import me.uport.sdk.jwt.model.JwtHeader.Companion.ES256K_R

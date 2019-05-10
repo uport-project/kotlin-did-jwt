@@ -1,9 +1,9 @@
 package me.uport.sdk.jwt
 
-import me.uport.sdk.core.Signer
-import me.uport.sdk.core.getJoseEncoded
-import me.uport.sdk.core.signJWT
-import me.uport.sdk.core.utf8
+import me.uport.sdk.signer.Signer
+import me.uport.sdk.signer.getJoseEncoded
+import me.uport.sdk.signer.signJWT
+import me.uport.sdk.signer.utf8
 import me.uport.sdk.jwt.model.JwtHeader
 
 /**

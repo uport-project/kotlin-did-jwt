@@ -3,12 +3,12 @@
 package me.uport.sdk.ethrdid
 
 import me.uport.sdk.core.ITimeProvider
-import me.uport.sdk.core.Signer
+import me.uport.sdk.signer.Signer
 import me.uport.sdk.core.SystemTimeProvider
-import me.uport.sdk.core.bytes32ToString
-import me.uport.sdk.core.hexToBytes32
+import me.uport.sdk.signer.bytes32ToString
+import me.uport.sdk.signer.hexToBytes32
 import me.uport.sdk.core.toBase64
-import me.uport.sdk.core.utf8
+import me.uport.sdk.signer.utf8
 import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDAttributeChanged
 import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDDelegateChanged
 import me.uport.sdk.jsonrpc.JsonRPC

@@ -3,8 +3,8 @@
 package me.uport.sdk.jwt
 
 import kotlinx.coroutines.runBlocking
-import me.uport.sdk.core.KPSigner
-import me.uport.sdk.core.signJWT
+import me.uport.sdk.signer.KPSigner
+import me.uport.sdk.signer.signJWT
 import org.junit.Assert.assertEquals
 import org.kethereum.crypto.publicKeyFromPrivate
 import org.kethereum.extensions.hexToBigInteger

@@ -2,8 +2,8 @@
 
 package me.uport.sdk.ethrdid
 
-import me.uport.sdk.core.Signer
-import me.uport.sdk.core.signRawTx
+import me.uport.sdk.signer.Signer
+import me.uport.sdk.signer.signRawTx
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.universaldid.PublicKeyType
 import org.kethereum.extensions.hexToBigInteger
