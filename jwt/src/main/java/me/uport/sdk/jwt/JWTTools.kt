@@ -215,8 +215,8 @@ class JWTTools(
                     throw InvalidJWTException("JWT audience is required but your app address has not been configured")
                 }
 
-                if (!aud.equals(payload.aud)) {
-                    throw InvalidJWTException("JWT audience does not match your DID: aud: ${payload.aud} !== yours: ${aud}")
+                if (aud != payload.aud) {
+                    throw InvalidJWTException("JWT audience does not match your DID: aud: ${payload.aud} != yours: ${aud}")
                 }
             }
             else {
@@ -224,8 +224,8 @@ class JWTTools(
                     throw InvalidJWTException("JWT audience matching your callback url is required but one wasn\'t passed in")
                 }
 
-                if (!callbackUrl.equals(payload.aud)) {
-                    throw InvalidJWTException("JWT audience does not match the callback url: aud: ${payload.aud} !== url: ${callbackUrl}")
+                if (callbackUrl != payload.aud) {
+                    throw InvalidJWTException("JWT audience does not match the callback url: aud: ${payload.aud} != url: ${callbackUrl}")
                 }
             }
         }
