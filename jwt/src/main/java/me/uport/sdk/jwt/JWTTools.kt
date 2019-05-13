@@ -3,12 +3,7 @@ package me.uport.sdk.jwt
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
-import me.uport.sdk.core.EthNetwork
-import me.uport.sdk.core.ITimeProvider
-import me.uport.sdk.core.Networks
-import me.uport.sdk.core.SystemTimeProvider
-import me.uport.sdk.core.decodeBase64
-import me.uport.sdk.core.toBase64UrlSafe
+import me.uport.sdk.core.*
 import me.uport.sdk.ethrdid.EthrDIDResolver
 import me.uport.sdk.httpsdid.HttpsDIDResolver
 import me.uport.sdk.jsonrpc.JsonRPC
@@ -201,7 +196,7 @@ class JWTTools(
      *          when no public key matches are found in the DID document
      * @return a [JwtPayload] if the verification is successful and `null` if it fails
      */
-    suspend fun verify(token: String, auth: Boolean = false): JwtPayload {
+    suspend fun verify(token: String, auth: Boolean = false, aud: String? = null, callbackUrl: String? = null): JwtPayload {
         val (header, payload, signatureBytes) = decode(token)
 
         if (payload.iat != null && payload.iat > (timeProvider.nowMs() / 1000 + TIME_SKEW)) {
@@ -210,6 +205,29 @@ class JWTTools(
 
         if (payload.exp != null && payload.exp <= (timeProvider.nowMs() / 1000 - TIME_SKEW)) {
             throw InvalidJWTException("JWT has expired: exp: ${payload.exp}")
+        }
+
+        if (payload.aud != null) {
+
+            if (UniversalDID.canResolve(payload.aud)) {
+
+                if (aud == null) {
+                    throw InvalidJWTException("JWT audience is required but your app address has not been configured")
+                }
+
+                if (!aud.equals(payload.aud)) {
+                    throw InvalidJWTException("JWT audience does not match your DID: aud: ${payload.aud} !== yours: ${aud}")
+                }
+            }
+            else {
+                if (callbackUrl == null) {
+                    throw InvalidJWTException("JWT audience matching your callback url is required but one wasn\'t passed in")
+                }
+
+                if (!callbackUrl.equals(payload.aud)) {
+                    throw InvalidJWTException("JWT audience does not match the callback url: aud: ${payload.aud} !== url: ${callbackUrl}")
+                }
+            }
         }
 
         val publicKeys = resolveAuthenticator(header.alg, payload.iss, auth)
@@ -224,10 +242,10 @@ class JWTTools(
 
         if (signatureIsValid) {
             return payload
-        } else {
+        }
+        else {
             throw InvalidJWTException("Signature invalid for JWT. DID document for ${payload.iss} does not have any matching public keys")
         }
-
     }
 
     /**
@@ -305,7 +323,8 @@ class JWTTools(
 
         val authenticationKeys: List<String> = if (auth) {
             doc.authentication.map { it.publicKey }
-        } else {
+        }
+        else {
             emptyList() // return an empty list
         }
 
