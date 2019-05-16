@@ -90,12 +90,12 @@ data class UportIdentityDocument(
 
     companion object {
 
+        fun fromJson(json: String): UportIdentityDocument? = jsonParser.parse(serializer(), json)
+
         /**
          * Attempts to deserialize a json string into a profile document
          */
         private val jsonParser = Json(JsonConfiguration(encodeDefaults = false, strictMode = false))
-
-        fun fromJson(json: String): UportIdentityDocument? = jsonParser.parse(serializer(), json)
     }
 }
 
