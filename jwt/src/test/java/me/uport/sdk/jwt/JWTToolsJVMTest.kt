@@ -362,7 +362,21 @@ class JWTToolsJVMTest {
         val jwt = tested.createJWT(payload, issuerDID, signer)
         assertThat(jwt)
                 .isEqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJjbGFpbXMiOnsibmFtZSI6IlIgRGFuZWVsIE9saXZhdyJ9LCJpYXQiOjEyMzQ1Njc4LCJleHAiOjEyMzQ1OTc4LCJpc3MiOiJkaWQ6ZXRocjoweDQxMjNjYmQxNDNiNTVjMDZlNDUxZmYyNTNhZjA5Mjg2YjY4N2E5NTAifQ.o6eDKYjHJnak1ylkpe9g8krxvK9UEhKf-1T0EYhH8pGyb8MjOEepRJi8DYlVEnZno0DkVYXQCf3u1i_HThBKtAA")
+    }
 
+    @Test
+    fun `can normalize dids`() {
+        val uportDID = "did:uport:2oeXufHGDpU51bfKBsZDdu7Je9weJ3r7sVG"
+        val mnid = "2oeXufHGDpU51bfKBsZDdu7Je9weJ3r7sVG"
+        val ethrDID = "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4"
+        val ethrAddress = "0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4"
+        val invalidDID = "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9"
+
+        assertThat(normalize(uportDID)).isEqualTo(uportDID)
+        assertThat(normalize(mnid)).isEqualTo(uportDID)
+        assertThat(normalize(ethrDID)).isEqualTo(ethrDID)
+        assertThat(normalize(ethrAddress)).isEqualTo(ethrDID)
+        assertThat(invalidDID).isEqualTo(invalidDID)
     }
 }
 

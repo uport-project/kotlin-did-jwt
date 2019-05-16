@@ -209,14 +209,15 @@ class JWTTools(
 
         if (payload.aud != null) {
 
-            if (UniversalDID.canResolve(payload.aud)) {
+            val payloadAudience = normalize(payload.aud)
+            if (UniversalDID.canResolve(payloadAudience)) {
 
                 if (aud == null) {
                     throw InvalidJWTException("JWT audience is required but your app address has not been configured")
                 }
 
-                if (aud != payload.aud) {
-                    throw InvalidJWTException("JWT audience does not match your DID: aud: ${payload.aud} != yours: ${aud}")
+                if (aud != payloadAudience) {
+                    throw InvalidJWTException("JWT audience does not match your DID: aud: ${payloadAudience} != yours: ${aud}")
                 }
             }
             else {
@@ -224,8 +225,8 @@ class JWTTools(
                     throw InvalidJWTException("JWT audience matching your callback url is required but one wasn\'t passed in")
                 }
 
-                if (callbackUrl != payload.aud) {
-                    throw InvalidJWTException("JWT audience does not match the callback url: aud: ${payload.aud} != url: ${callbackUrl}")
+                if (callbackUrl != payloadAudience) {
+                    throw InvalidJWTException("JWT audience does not match the callback url: aud: ${payloadAudience} != url: ${callbackUrl}")
                 }
             }
         }
