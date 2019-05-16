@@ -5,6 +5,7 @@ package me.uport.sdk.uportdid
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import me.uport.sdk.universaldid.AuthenticationEntry
 import me.uport.sdk.universaldid.DIDDocument
 import me.uport.sdk.universaldid.PublicKeyEntry
@@ -92,7 +93,9 @@ data class UportIdentityDocument(
         /**
          * Attempts to deserialize a json string into a profile document
          */
-        fun fromJson(json: String): UportIdentityDocument? = Json.parse(serializer(), json)
+        private val jsonParser = Json(JsonConfiguration(encodeDefaults = false, strictMode = false))
+
+        fun fromJson(json: String): UportIdentityDocument? = jsonParser.parse(serializer(), json)
     }
 }
 
