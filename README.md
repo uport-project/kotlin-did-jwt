@@ -52,7 +52,7 @@ allprojects {
 In your application `build.gradle` file, add:
 
 ```groovy
-def did_jwt_version = "0.1.1"
+def did_jwt_version = "0.1.2"
 dependencies {
     //...
     implementation "com.github.uport-project.kotlin-did-jwt:jwt:$did_jwt_version"
@@ -122,5 +122,8 @@ listing various public keys and service endpoints for a given DID.
 
 ## CHANGELOG
 
+* 0.1.2
+    - add audience checking for JWT verification
+    - fix crash when parsing legacy identity document 
 * 0.1.1
     - initial stable release isolating the did-jwt implementation in kotlin along with resolvers
