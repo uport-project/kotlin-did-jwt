@@ -8,24 +8,29 @@ import org.junit.Test
 
 
 class JWTDecodeTest {
-    private val validShareReqToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJpc3MiOiIyb2VYdWZIR0RwVTUxYmZLQnNaRGR1N0plOXdlSjNyN3NWRyIsImlhdCI6MTUyMDM2NjQzMiwicmVxdWVzdGVkIjpbIm5hbWUiLCJwaG9uZSIsImNvdW50cnkiLCJhdmF0YXIiXSwicGVybWlzc2lvbnMiOlsibm90aWZpY2F0aW9ucyJdLCJjYWxsYmFjayI6Imh0dHBzOi8vY2hhc3F1aS51cG9ydC5tZS9hcGkvdjEvdG9waWMvWG5IZnlldjUxeHNka0R0dSIsIm5ldCI6IjB4NCIsImV4cCI6MTUyMDM2NzAzMiwidHlwZSI6InNoYXJlUmVxIn0.C8mPCCtWlYAnroduqysXYRl5xvrOdx1r4iq3A3SmGDGZu47UGTnjiZCOrOQ8A5lZ0M9JfDpZDETCKGdJ7KUeWQ"
+    private val validShareReqToken =
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJpc3MiOiIyb2VYdWZIR0RwVTUxYmZLQnNaRGR1N0plOXdlSjNyN3NWRyIsImlhdCI6MTUyMDM2NjQzMiwicmVxdWVzdGVkIjpbIm5hbWUiLCJwaG9uZSIsImNvdW50cnkiLCJhdmF0YXIiXSwicGVybWlzc2lvbnMiOlsibm90aWZpY2F0aW9ucyJdLCJjYWxsYmFjayI6Imh0dHBzOi8vY2hhc3F1aS51cG9ydC5tZS9hcGkvdjEvdG9waWMvWG5IZnlldjUxeHNka0R0dSIsIm5ldCI6IjB4NCIsImV4cCI6MTUyMDM2NzAzMiwidHlwZSI6InNoYXJlUmVxIn0.C8mPCCtWlYAnroduqysXYRl5xvrOdx1r4iq3A3SmGDGZu47UGTnjiZCOrOQ8A5lZ0M9JfDpZDETCKGdJ7KUeWQ"
     private val validTokenHeader = validShareReqToken.split('.')[0]
     private val validShareReqTokenPayload = validShareReqToken.split('.')[1]
     private val validShareReqTokenSignature = validShareReqToken.split('.')[2]
 
-    private val validVerificationToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJjbGFpbSI6eyJuYW1lIjoiQm9iIiwiZ2VuZGVyIjoibWFsZSJ9LCJpYXQiOjE1NDk5MDg0MjQsImV4cCI6MTU0OTkwODcyNCwiaXNzIjoiZGlkOmV0aHI6MHhjZjAzZGQwYTg5NGVmNzljYjViNjAxYTQzYzRiMjVlM2FlNGM2N2VkIn0.ffjGFzoSfX-fS50GHhYkwA8It5034Rw8BczWslUcbfGI51uJSGbmhfJSfeGdEaPlFFgVrnRj1YBoG_oHrnEiBQA"
+    private val validVerificationToken =
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJjbGFpbSI6eyJuYW1lIjoiQm9iIiwiZ2VuZGVyIjoibWFsZSJ9LCJpYXQiOjE1NDk5MDg0MjQsImV4cCI6MTU0OTkwODcyNCwiaXNzIjoiZGlkOmV0aHI6MHhjZjAzZGQwYTg5NGVmNzljYjViNjAxYTQzYzRiMjVlM2FlNGM2N2VkIn0.ffjGFzoSfX-fS50GHhYkwA8It5034Rw8BczWslUcbfGI51uJSGbmhfJSfeGdEaPlFFgVrnRj1YBoG_oHrnEiBQA"
 
     private val invalidTokenOnlyHeader = "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ."
-    private val invalidTokenEmptyPayload = "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ..C8mPCCtWlYAnroduqysXYRl5xvrOdx1r4iq3A3SmGDGZu47UGTnjiZCOrOQ8A5lZ0M9JfDpZDETCKGdJ7KUeWQ"
-    private val invalidTokenEmptyHeader = ".eyJpc3MiOiIyb2VYdWZIR0RwVTUxYmZLQnNaRGR1N0plOXdlSjNyN3NWRyIsImlhdCI6MTUyMDM2NjQzMiwicmVxdWVzdGVkIjpbIm5hbWUiLCJwaG9uZSIsImNvdW50cnkiLCJhdmF0YXIiXSwicGVybWlzc2lvbnMiOlsibm90aWZpY2F0aW9ucyJdLCJjYWxsYmFjayI6Imh0dHBzOi8vY2hhc3F1aS51cG9ydC5tZS9hcGkvdjEvdG9waWMvWG5IZnlldjUxeHNka0R0dSIsIm5ldCI6IjB4NCIsImV4cCI6MTUyMDM2NzAzMiwidHlwZSI6InNoYXJlUmVxIn0.C8mPCCtWlYAnroduqysXYRl5xvrOdx1r4iq3A3SmGDGZu47UGTnjiZCOrOQ8A5lZ0M9JfDpZDETCKGdJ7KUeWQ"
+    private val invalidTokenEmptyPayload =
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ..C8mPCCtWlYAnroduqysXYRl5xvrOdx1r4iq3A3SmGDGZu47UGTnjiZCOrOQ8A5lZ0M9JfDpZDETCKGdJ7KUeWQ"
+    private val invalidTokenEmptyHeader =
+        ".eyJpc3MiOiIyb2VYdWZIR0RwVTUxYmZLQnNaRGR1N0plOXdlSjNyN3NWRyIsImlhdCI6MTUyMDM2NjQzMiwicmVxdWVzdGVkIjpbIm5hbWUiLCJwaG9uZSIsImNvdW50cnkiLCJhdmF0YXIiXSwicGVybWlzc2lvbnMiOlsibm90aWZpY2F0aW9ucyJdLCJjYWxsYmFjayI6Imh0dHBzOi8vY2hhc3F1aS51cG9ydC5tZS9hcGkvdjEvdG9waWMvWG5IZnlldjUxeHNka0R0dSIsIm5ldCI6IjB4NCIsImV4cCI6MTUyMDM2NzAzMiwidHlwZSI6InNoYXJlUmVxIn0.C8mPCCtWlYAnroduqysXYRl5xvrOdx1r4iq3A3SmGDGZu47UGTnjiZCOrOQ8A5lZ0M9JfDpZDETCKGdJ7KUeWQ"
 
     @Test
     fun `can split complete token`() {
         val parts = splitToken(validShareReqToken)
         val expected = Triple(
-                validTokenHeader,
-                validShareReqTokenPayload,
-                validShareReqTokenSignature)
+            validTokenHeader,
+            validShareReqTokenPayload,
+            validShareReqTokenSignature
+        )
 
         assertThat(parts).isEqualTo(expected)
     }
@@ -33,13 +38,13 @@ class JWTDecodeTest {
     @Test
     fun `throws when splitting empty token`() {
         assertThat { splitToken("") }
-                .thrownError { isInstanceOf(IllegalArgumentException::class) }
+            .thrownError { isInstanceOf(IllegalArgumentException::class) }
     }
 
     @Test
     fun `throws when splitting incomplete token`() {
         assertThat { splitToken(invalidTokenOnlyHeader) }
-                .thrownError { isInstanceOf(IllegalArgumentException::class) }
+            .thrownError { isInstanceOf(IllegalArgumentException::class) }
     }
 
     @Test
@@ -62,34 +67,34 @@ class JWTDecodeTest {
     @Test
     fun `throws when decoding incomplete token`() {
         assertThat { JWTTools().decode((invalidTokenEmptyPayload)) }
-                .thrownError {
-                    isInstanceOf(InvalidJWTException::class)
-                    hasMessage("Payload cannot be empty")
-                }
+            .thrownError {
+                isInstanceOf(InvalidJWTException::class)
+                hasMessage("Payload cannot be empty")
+            }
 
         assertThat { JWTTools().decode((invalidTokenEmptyHeader)) }
-                .thrownError {
-                    isInstanceOf(InvalidJWTException::class)
-                    hasMessage("Header cannot be empty")
-                }
+            .thrownError {
+                isInstanceOf(InvalidJWTException::class)
+                hasMessage("Header cannot be empty")
+            }
     }
 
     @Test
     fun `throws on random token parts`() {
         assertThat { JWTTools().decode("blahhh.blahhh.blahhh") }
-                .thrownError {
-                    isInstanceOf(InvalidJWTException::class)
-                }
+            .thrownError {
+                isInstanceOf(InvalidJWTException::class)
+            }
 
         assertThat { JWTTools().decode("$validTokenHeader.blahhh.blahhh") }
-                .thrownError {
-                    isInstanceOf(InvalidJWTException::class)
-                }
+            .thrownError {
+                isInstanceOf(InvalidJWTException::class)
+            }
 
         assertThat { JWTTools().decode("blahhh.$validShareReqTokenPayload.blahhh") }
-                .thrownError {
-                    isInstanceOf(InvalidJWTException::class)
-                }
+            .thrownError {
+                isInstanceOf(InvalidJWTException::class)
+            }
 
     }
 

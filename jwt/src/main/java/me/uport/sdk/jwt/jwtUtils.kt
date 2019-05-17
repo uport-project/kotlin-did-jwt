@@ -1,5 +1,7 @@
 package me.uport.sdk.jwt
 
+import me.uport.mnid.MNID
+
 /**
  * convenience method used during token processing.
  * Splits JWT into parts.
@@ -12,4 +14,25 @@ fun splitToken(token: String): Triple<String, String, String> {
     } else {
         throw IllegalArgumentException("Token must have 3 parts: Header, Payload, and Signature")
     }
+}
+
+/**
+ * convenience method used during token verification.
+ * It normalizes uport and ethr DIDs.
+ * It returns the inital string if it is unable to normalize it
+ */
+fun normalize(did: String): String {
+    if (did.startsWith("did:")) {
+        return did
+    }
+    if (MNID.isMNID(did)) {
+        return "did:uport:$did"
+    }
+
+    val ethrAddressPattern = "(0x[0-9a-fA-F]{40})".toRegex()
+    if (ethrAddressPattern.matches(did)) {
+        return "did:ethr:$did"
+    }
+
+    return did
 }

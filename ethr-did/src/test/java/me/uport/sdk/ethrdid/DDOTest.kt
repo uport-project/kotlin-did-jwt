@@ -10,9 +10,7 @@ class DDOTest {
     fun `can serialize minimal doc`() {
         val doc = EthrDIDDocument("hello")
         val docText = doc.toJson()
-        assertThat(docText).isEqualTo("""
-            {"id":"hello","publicKey":[],"authentication":[],"service":[],"@context":"https://w3id.org/did/v1"}
-        """.trimIndent())
+        assertThat(docText).isEqualTo("""{"id":"hello","publicKey":[],"authentication":[],"service":[],"@context":"https://w3id.org/did/v1"}""".trimIndent())
     }
 
     @Test

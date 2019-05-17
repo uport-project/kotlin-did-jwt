@@ -62,22 +62,22 @@ class UniversalDIDTest {
     }
 
     private val validDIDs = listOf(
-            "did:generic:0x0011223344556677889900112233445566778899",
-            "did:generic:01234",
-            "did:generic:has spaces",
-            "did:generic:more:colons",
-            "did:generic:01234#fragment-attached",
-            "did:generic:01234?key=value",
-            "did:generic:01234?key=value&other-key=other-value"
+        "did:generic:0x0011223344556677889900112233445566778899",
+        "did:generic:01234",
+        "did:generic:has spaces",
+        "did:generic:more:colons",
+        "did:generic:01234#fragment-attached",
+        "did:generic:01234?key=value",
+        "did:generic:01234?key=value&other-key=other-value"
     )
 
     private val invalidDIDs = listOf(
-            "",
-            "0x0011223344556677889900112233445566778899",
-            "ethr:0x0011223344556677889900112233445566778899",
-            "did:ethr",
-            "did::something",
-            "did:ethr:"
+        "",
+        "0x0011223344556677889900112233445566778899",
+        "ethr:0x0011223344556677889900112233445566778899",
+        "did:ethr",
+        "did::something",
+        "did:ethr:"
     )
 
     @Test

@@ -60,12 +60,12 @@ object UniversalDID : DIDResolver {
                 it.canResolve(did)
             }
             return resolver?.resolve(did)
-                    ?: throw IllegalArgumentException("The provided did ($did) could not be resolved by any of the ${resolvers.size} registered resolvers")
+                ?: throw IllegalArgumentException("The provided did ($did) could not be resolved by any of the ${resolvers.size} registered resolvers")
         }  //no else clause, carry on
 
         if (resolvers.containsKey(method)) {
             return resolvers[method]?.resolve(did)
-                    ?: throw IllegalStateException("There DIDResolver for '$method' failed to resolve '$did' for an unknown reason.")
+                ?: throw IllegalStateException("There DIDResolver for '$method' failed to resolve '$did' for an unknown reason.")
         } else {
             throw IllegalStateException("There is no DIDResolver registered to resolve '$method' DIDs and none of the other ${resolvers.size} registered ones can do it.")
         }
