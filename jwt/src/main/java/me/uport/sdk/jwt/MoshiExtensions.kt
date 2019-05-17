@@ -20,8 +20,9 @@ inline fun <reified E> Moshi.listAdapter(elementType: Type = E::class.java): Jso
  * @hide
  */
 inline fun <reified K, reified V> Moshi.mapAdapter(
-        keyType: Type = K::class.java,
-        valueType: Type = V::class.java): JsonAdapter<Map<K, V>> {
+    keyType: Type = K::class.java,
+    valueType: Type = V::class.java
+): JsonAdapter<Map<K, V>> {
     return adapter(Types.newParameterizedType(Map::class.java, keyType, valueType))
 }
 

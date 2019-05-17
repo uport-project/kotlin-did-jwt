@@ -1,11 +1,6 @@
 package me.uport.sdk.universaldid
 
-import kotlinx.serialization.Decoder
-import kotlinx.serialization.Encoder
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Serializer
+import kotlinx.serialization.*
 
 
 /**
@@ -22,41 +17,41 @@ interface DIDDocument {
 
 @Serializable
 data class PublicKeyEntry(
-        @SerialName("id")
-        val id: String,
+    @SerialName("id")
+    val id: String,
 
-        @SerialName("type")
-        val type: PublicKeyType,
+    @SerialName("type")
+    val type: PublicKeyType,
 
-        @SerialName("owner")
-        val owner: String,
+    @SerialName("owner")
+    val owner: String,
 
-        @SerialName("ethereumAddress")
-        val ethereumAddress: String? = null,
+    @SerialName("ethereumAddress")
+    val ethereumAddress: String? = null,
 
-        @SerialName("publicKeyHex")
-        val publicKeyHex: String? = null,
+    @SerialName("publicKeyHex")
+    val publicKeyHex: String? = null,
 
-        @SerialName("publicKeyBase64")
-        val publicKeyBase64: String? = null,
+    @SerialName("publicKeyBase64")
+    val publicKeyBase64: String? = null,
 
-        @SerialName("publicKeyBase58")
-        val publicKeyBase58: String? = null,
+    @SerialName("publicKeyBase58")
+    val publicKeyBase58: String? = null,
 
-        @SerialName("value")
-        val value: String? = null
+    @SerialName("value")
+    val value: String? = null
 )
 
 @Serializable
 data class AuthenticationEntry(
-        val type: PublicKeyType,
-        val publicKey: String
+    val type: PublicKeyType,
+    val publicKey: String
 )
 
 @Serializable
 data class ServiceEntry(
-        val type: String,
-        val serviceEndpoint: String
+    val type: String,
+    val serviceEndpoint: String
 )
 
 /**
@@ -74,10 +69,10 @@ data class PublicKeyType(val name: String) {
     companion object : KSerializer<PublicKeyType> {
 
         override fun serialize(encoder: Encoder, obj: PublicKeyType) =
-                encoder.encodeString(obj.name)
+            encoder.encodeString(obj.name)
 
         override fun deserialize(decoder: Decoder): PublicKeyType =
-                PublicKeyType(decoder.decodeString())
+            PublicKeyType(decoder.decodeString())
 
 
         //////////////////////////////

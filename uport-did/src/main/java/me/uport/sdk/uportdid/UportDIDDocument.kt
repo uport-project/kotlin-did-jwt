@@ -16,16 +16,16 @@ import me.uport.sdk.universaldid.ServiceEntry
  */
 @Serializable
 data class UportDIDDocument(
-        override val id: String,
-        override val publicKey: List<PublicKeyEntry>,
-        override val authentication: List<AuthenticationEntry>,
-        override val service: List<ServiceEntry> = emptyList(),
+    override val id: String,
+    override val publicKey: List<PublicKeyEntry>,
+    override val authentication: List<AuthenticationEntry>,
+    override val service: List<ServiceEntry> = emptyList(),
 
-        @SerialName("@context")
-        override val context: String = "https://w3id.org/did/v1",
+    @SerialName("@context")
+    override val context: String = "https://w3id.org/did/v1",
 
-        @Suppress("DEPRECATION")
-        val uportProfile: UportIdentityDocument
+    @Suppress("DEPRECATION")
+    val uportProfile: UportIdentityDocument
 
 ) : DIDDocument {
 

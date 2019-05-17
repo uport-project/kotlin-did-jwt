@@ -19,28 +19,32 @@ import java.io.IOException
 
 class HttpsDIDResolverTest {
 
-    private val exampleDidDoc = HttpsDIDDocument(context = "https://w3id.org/did/v1",
-            id = "did:https:example.com",
-            publicKey = listOf(
-                    PublicKeyEntry(id = "did:https:example.com",
-                            type = PublicKeyType.Secp256k1VerificationKey2018,
-                            owner = "did:https:example.com",
-                            ethereumAddress = "0x3c7d65d6daf5df62378874d35fa3626100af9d85"
-                    )
-            ),
-            authentication = listOf(
-                    AuthenticationEntry(type = PublicKeyType.Secp256k1SignatureAuthentication2018,
-                            publicKey = "did:https:example.com#owner")
-            ),
-            service = emptyList()
+    private val exampleDidDoc = HttpsDIDDocument(
+        context = "https://w3id.org/did/v1",
+        id = "did:https:example.com",
+        publicKey = listOf(
+            PublicKeyEntry(
+                id = "did:https:example.com",
+                type = PublicKeyType.Secp256k1VerificationKey2018,
+                owner = "did:https:example.com",
+                ethereumAddress = "0x3c7d65d6daf5df62378874d35fa3626100af9d85"
+            )
+        ),
+        authentication = listOf(
+            AuthenticationEntry(
+                type = PublicKeyType.Secp256k1SignatureAuthentication2018,
+                publicKey = "did:https:example.com#owner"
+            )
+        ),
+        service = emptyList()
     )
 
 
     @Test
     fun `can resolve valid dids`() {
         listOf(
-                "did:https:example.com",
-                "did:https:example.ngrok.com#owner"
+            "did:https:example.com",
+            "did:https:example.ngrok.com#owner"
         ).forEach {
             assertThat(HttpsDIDResolver().canResolve(it))
         }
@@ -50,8 +54,8 @@ class HttpsDIDResolverTest {
     @Test
     fun `fails on invalid dids`() {
         listOf(
-                "did:something:example.com", //different method
-                "example.com"
+            "did:something:example.com", //different method
+            "example.com"
         ).forEach {
             assertThat(HttpsDIDResolver().canResolve(it)).isFalse()
         }
@@ -66,7 +70,14 @@ class HttpsDIDResolverTest {
         coAssert {
             tested.resolve("did:https:example.com")
         }.thrownError {
-            isInstanceOf(listOf(IllegalArgumentException::class, IOException::class, SerializationException::class, DidResolverError::class))
+            isInstanceOf(
+                listOf(
+                    IllegalArgumentException::class,
+                    IOException::class,
+                    SerializationException::class,
+                    DidResolverError::class
+                )
+            )
         }
     }
 

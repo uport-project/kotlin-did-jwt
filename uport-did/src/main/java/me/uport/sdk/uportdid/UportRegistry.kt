@@ -15,16 +15,17 @@ class UportRegistry {
         private const val METHOD_ID: String = "447885f0"
 
         fun encode(
-                registrationIdentifier: Solidity.Bytes32,
-                issuer: Solidity.Address,
-                subject: Solidity.Address
+            registrationIdentifier: Solidity.Bytes32,
+            issuer: Solidity.Address,
+            subject: Solidity.Address
         ): String {
 
             return "0x$METHOD_ID${SolidityBase
-                    .encodeFunctionArguments(
-                            registrationIdentifier,
-                            issuer,
-                            subject)}"
+                .encodeFunctionArguments(
+                    registrationIdentifier,
+                    issuer,
+                    subject
+                )}"
         }
 
     }
