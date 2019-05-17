@@ -34,7 +34,10 @@ class JWTToolsJVMTest {
         coEvery { UniversalDID.resolve("did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4") }.returns(EthrDIDDocument.fromJson("""{"id":"did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4","publicKey":[{"id":"did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4#owner","type":"Secp256k1VerificationKey2018","owner":"did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4","ethereumAddress":"0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4","publicKeyHex":null,"publicKeyBase64":null,"publicKeyBase58":null,"value":null}],"authentication":[{"type":"Secp256k1SignatureAuthentication2018","publicKey":"did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4#owner"}],"service":[],"@context":"https://w3id.org/did/v1"}"""))
 
         tokens.forEach { token ->
-            val payload = JWTTools(TestTimeProvider(1535102500000L)).verify(token)
+            val payload = JWTTools(TestTimeProvider(1535102500000L)).verify(
+                    token = token,
+                    aud = "did:ethr:0xa9e3232b61bdb672712b9ae33195069d8d651c1a"
+            )
             assertThat(payload).isNotNull()
         }
     }
@@ -74,6 +77,40 @@ class JWTToolsJVMTest {
         }
     }
 
+    @Test
+    fun `throws error when aud is not available`() = runBlocking {
+        mockkObject(UniversalDID)
+
+        val token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1MzUwMTY3MDIsImV4cCI6MTUzNTEwMzEwMiwiYXVkIjoiZGlkOmV0aHI6MHhhOWUzMjMyYjYxYmRiNjcyNzEyYjlhZTMzMTk1MDY5ZDhkNjUxYzFhIiwidHlwZSI6InNoYXJlUmVzcCIsIm5hZCI6IjJvZHpqVGFpOFJvNFYzS3hrbTNTblppdjlXU1l1Tm9aNEFoIiwib3duIjp7Im5hbWUiOiJ1UG9ydCBVc2VyIn0sInJlcSI6ImV5SjBlWEFpT2lKS1YxUWlMQ0poYkdjaU9pSkZVekkxTmtzdFVpSjkuZXlKcFlYUWlPakUxTXpVd01UWTJPREVzSW1WNGNDSTZNVFV6TlRBeE56STRNU3dpY21WeGRXVnpkR1ZrSWpwYkltNWhiV1VpTENKd2FHOXVaU0lzSW1OdmRXNTBjbmtpWFN3aWNHVnliV2x6YzJsdmJuTWlPbHNpYm05MGFXWnBZMkYwYVc5dWN5SmRMQ0pqWVd4c1ltRmpheUk2SW1oMGRIQnpPaTh2WTJoaGMzRjFhUzUxY0c5eWRDNXRaUzloY0drdmRqRXZkRzl3YVdNdmJVVXpTbVpXZWxOMFNuUnFhbnBvWWpSYVRFRnhkeUlzSW1GamRDSTZJbXRsZVhCaGFYSWlMQ0owZVhCbElqb2ljMmhoY21WU1pYRWlMQ0pwYzNNaU9pSmthV1E2WlhSb2Nqb3dlR0U1WlRNeU16SmlOakZpWkdJMk56STNNVEppT1dGbE16TXhPVFV3Tmpsa09HUTJOVEZqTVdFaWZRLnVScUdGd01XNnpWSDR4OWFmTDAtS29qSEYwVF9GbW9QWnR6OG5uSjRFXzhNY2cxejBBZ21aMnplOE5iS05wVUNnRHRwTU9RNzVGSjU4WmhzbWFxQUxBRSIsImNhcGFiaWxpdGllcyI6WyJleUowZVhBaU9pSktWMVFpTENKaGJHY2lPaUpGVXpJMU5rc3RVaUo5LmV5SnBZWFFpT2pFMU16VXdNVFkzTURFc0ltVjRjQ0k2TVRVek5qTXhNamN3TVN3aVlYVmtJam9pWkdsa09tVjBhSEk2TUhoaE9XVXpNak15WWpZeFltUmlOamN5TnpFeVlqbGhaVE16TVRrMU1EWTVaRGhrTmpVeFl6RmhJaXdpZEhsd1pTSTZJbTV2ZEdsbWFXTmhkR2x2Ym5NaUxDSjJZV3gxWlNJNkltRnlianBoZDNNNmMyNXpPblZ6TFhkbGMzUXRNam94TVRNeE9UWXlNVFkxTlRnNlpXNWtjRzlwYm5RdlIwTk5MM1ZRYjNKMEx6UXpNRGsxTWpZMkxUSmhPR1F0TTJFMFpTMWlaRFV3TFRka01USm1ZVE00TWpRNFlpSXNJbWx6Y3lJNkltUnBaRHBsZEdoeU9qQjRNVEE0TWpBNVpqUXlORGRpTjJabE5qWXdOV0l3WmpVNFpqa3hORFZsWXpNeU5qbGtNREUxTkNKOS5Lc0F6TmVDeHFDaF9rMkt4aTYtWHFveFNXZjBCLWFFR0xXdi1ldHVXQlF2QU5neDFTMG5oZ0ppRkllUnRXakw4ekdnVVV3MUlsSWJtYUZrOEo5aGdhd0UiXSwiYm94UHViIjoiY2g3aGI2S3hsakJ2bXh5UDJXZENWTFNTLzQ2S1hCcmdkWG1Mcm03VEpIST0iLCJpc3MiOiJkaWQ6ZXRocjoweDEwODIwOWY0MjQ3YjdmZTY2MDViMGY1OGY5MTQ1ZWMzMjY5ZDAxNTQifQ.Ncf8B_y0Ha8gdaYyCaL5jLX2RsKTMwxTQ8KlybXFygsxKUUQm9OXo4lU65fduIaFvVyPOP6Oe2adar8m0m2aiwA"
+
+        coEvery { UniversalDID.resolve("did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154") }.returns(EthrDIDDocument.fromJson("""{"id":"did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154","publicKey":[{"id":"did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154#owner","type":"Secp256k1VerificationKey2018","owner":"did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154","ethereumAddress":"0x108209f4247b7fe6605b0f58f9145ec3269d0154","publicKeyHex":null,"publicKeyBase64":null,"publicKeyBase58":null,"value":null}],"authentication":[{"type":"Secp256k1SignatureAuthentication2018","publicKey":"did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154#owner"}],"service":[],"@context":"https://w3id.org/did/v1"}"""))
+
+        coAssert {
+            JWTTools(TestTimeProvider(1535102500000L)).verify(
+                    token = token
+            )
+        }.thrownError {
+            isInstanceOf(InvalidJWTException::class)
+        }
+    }
+
+    @Test
+    fun `throws error when aud and payload aud do not match`() = runBlocking {
+        mockkObject(UniversalDID)
+
+        val token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1MzUwMTY3MDIsImV4cCI6MTUzNTEwMzEwMiwiYXVkIjoiZGlkOmV0aHI6MHhhOWUzMjMyYjYxYmRiNjcyNzEyYjlhZTMzMTk1MDY5ZDhkNjUxYzFhIiwidHlwZSI6InNoYXJlUmVzcCIsIm5hZCI6IjJvZHpqVGFpOFJvNFYzS3hrbTNTblppdjlXU1l1Tm9aNEFoIiwib3duIjp7Im5hbWUiOiJ1UG9ydCBVc2VyIn0sInJlcSI6ImV5SjBlWEFpT2lKS1YxUWlMQ0poYkdjaU9pSkZVekkxTmtzdFVpSjkuZXlKcFlYUWlPakUxTXpVd01UWTJPREVzSW1WNGNDSTZNVFV6TlRBeE56STRNU3dpY21WeGRXVnpkR1ZrSWpwYkltNWhiV1VpTENKd2FHOXVaU0lzSW1OdmRXNTBjbmtpWFN3aWNHVnliV2x6YzJsdmJuTWlPbHNpYm05MGFXWnBZMkYwYVc5dWN5SmRMQ0pqWVd4c1ltRmpheUk2SW1oMGRIQnpPaTh2WTJoaGMzRjFhUzUxY0c5eWRDNXRaUzloY0drdmRqRXZkRzl3YVdNdmJVVXpTbVpXZWxOMFNuUnFhbnBvWWpSYVRFRnhkeUlzSW1GamRDSTZJbXRsZVhCaGFYSWlMQ0owZVhCbElqb2ljMmhoY21WU1pYRWlMQ0pwYzNNaU9pSmthV1E2WlhSb2Nqb3dlR0U1WlRNeU16SmlOakZpWkdJMk56STNNVEppT1dGbE16TXhPVFV3Tmpsa09HUTJOVEZqTVdFaWZRLnVScUdGd01XNnpWSDR4OWFmTDAtS29qSEYwVF9GbW9QWnR6OG5uSjRFXzhNY2cxejBBZ21aMnplOE5iS05wVUNnRHRwTU9RNzVGSjU4WmhzbWFxQUxBRSIsImNhcGFiaWxpdGllcyI6WyJleUowZVhBaU9pSktWMVFpTENKaGJHY2lPaUpGVXpJMU5rc3RVaUo5LmV5SnBZWFFpT2pFMU16VXdNVFkzTURFc0ltVjRjQ0k2TVRVek5qTXhNamN3TVN3aVlYVmtJam9pWkdsa09tVjBhSEk2TUhoaE9XVXpNak15WWpZeFltUmlOamN5TnpFeVlqbGhaVE16TVRrMU1EWTVaRGhrTmpVeFl6RmhJaXdpZEhsd1pTSTZJbTV2ZEdsbWFXTmhkR2x2Ym5NaUxDSjJZV3gxWlNJNkltRnlianBoZDNNNmMyNXpPblZ6TFhkbGMzUXRNam94TVRNeE9UWXlNVFkxTlRnNlpXNWtjRzlwYm5RdlIwTk5MM1ZRYjNKMEx6UXpNRGsxTWpZMkxUSmhPR1F0TTJFMFpTMWlaRFV3TFRka01USm1ZVE00TWpRNFlpSXNJbWx6Y3lJNkltUnBaRHBsZEdoeU9qQjRNVEE0TWpBNVpqUXlORGRpTjJabE5qWXdOV0l3WmpVNFpqa3hORFZsWXpNeU5qbGtNREUxTkNKOS5Lc0F6TmVDeHFDaF9rMkt4aTYtWHFveFNXZjBCLWFFR0xXdi1ldHVXQlF2QU5neDFTMG5oZ0ppRkllUnRXakw4ekdnVVV3MUlsSWJtYUZrOEo5aGdhd0UiXSwiYm94UHViIjoiY2g3aGI2S3hsakJ2bXh5UDJXZENWTFNTLzQ2S1hCcmdkWG1Mcm03VEpIST0iLCJpc3MiOiJkaWQ6ZXRocjoweDEwODIwOWY0MjQ3YjdmZTY2MDViMGY1OGY5MTQ1ZWMzMjY5ZDAxNTQifQ.Ncf8B_y0Ha8gdaYyCaL5jLX2RsKTMwxTQ8KlybXFygsxKUUQm9OXo4lU65fduIaFvVyPOP6Oe2adar8m0m2aiwA"
+
+        coEvery { UniversalDID.resolve("did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154") }.returns(EthrDIDDocument.fromJson("""{"id":"did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154","publicKey":[{"id":"did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154#owner","type":"Secp256k1VerificationKey2018","owner":"did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154","ethereumAddress":"0x108209f4247b7fe6605b0f58f9145ec3269d0154","publicKeyHex":null,"publicKeyBase64":null,"publicKeyBase58":null,"value":null}],"authentication":[{"type":"Secp256k1SignatureAuthentication2018","publicKey":"did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154#owner"}],"service":[],"@context":"https://w3id.org/did/v1"}"""))
+
+        coAssert {
+            JWTTools(TestTimeProvider(1535102500000L)).verify(
+                    token = token,
+                    aud = "did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154"
+            )
+        }.thrownError {
+            isInstanceOf(InvalidJWTException::class)
+        }
+    }
 
     @Test
     fun `throws when a token is issued in the future`() {
@@ -325,7 +362,21 @@ class JWTToolsJVMTest {
         val jwt = tested.createJWT(payload, issuerDID, signer)
         assertThat(jwt)
                 .isEqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJjbGFpbXMiOnsibmFtZSI6IlIgRGFuZWVsIE9saXZhdyJ9LCJpYXQiOjEyMzQ1Njc4LCJleHAiOjEyMzQ1OTc4LCJpc3MiOiJkaWQ6ZXRocjoweDQxMjNjYmQxNDNiNTVjMDZlNDUxZmYyNTNhZjA5Mjg2YjY4N2E5NTAifQ.o6eDKYjHJnak1ylkpe9g8krxvK9UEhKf-1T0EYhH8pGyb8MjOEepRJi8DYlVEnZno0DkVYXQCf3u1i_HThBKtAA")
+    }
 
+    @Test
+    fun `can normalize dids`() {
+        val uportDID = "did:uport:2oeXufHGDpU51bfKBsZDdu7Je9weJ3r7sVG"
+        val mnid = "2oeXufHGDpU51bfKBsZDdu7Je9weJ3r7sVG"
+        val ethrDID = "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4"
+        val ethrAddress = "0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4"
+        val invalidDID = "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9"
+
+        assertThat(normalize(uportDID)).isEqualTo(uportDID)
+        assertThat(normalize(mnid)).isEqualTo(uportDID)
+        assertThat(normalize(ethrDID)).isEqualTo(ethrDID)
+        assertThat(normalize(ethrAddress)).isEqualTo(ethrDID)
+        assertThat(invalidDID).isEqualTo(invalidDID)
     }
 }
 
