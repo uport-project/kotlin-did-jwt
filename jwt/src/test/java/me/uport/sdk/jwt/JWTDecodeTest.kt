@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
+import me.uport.sdk.jwt.JWTUtils.Companion.splitToken
 import org.junit.Test
 
 

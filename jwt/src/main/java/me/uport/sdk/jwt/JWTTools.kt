@@ -8,6 +8,8 @@ import me.uport.sdk.ethrdid.EthrDIDResolver
 import me.uport.sdk.httpsdid.HttpsDIDResolver
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jsonrpc.moshi
+import me.uport.sdk.jwt.JWTUtils.Companion.normalizeKnownDID
+import me.uport.sdk.jwt.JWTUtils.Companion.splitToken
 import me.uport.sdk.jwt.model.JwtHeader
 import me.uport.sdk.jwt.model.JwtHeader.Companion.ES256K
 import me.uport.sdk.jwt.model.JwtHeader.Companion.ES256K_R
@@ -220,7 +222,7 @@ class JWTTools(
 
         if (payload.aud != null) {
 
-            val payloadAudience = normalize(payload.aud)
+            val payloadAudience = normalizeKnownDID(payload.aud)
             if (UniversalDID.canResolve(payloadAudience)) {
 
                 if (aud == null) {

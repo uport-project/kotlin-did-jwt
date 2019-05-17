@@ -11,6 +11,7 @@ import kotlinx.coroutines.runBlocking
 import me.uport.sdk.ethrdid.EthrDIDDocument
 import me.uport.sdk.ethrdid.EthrDIDResolver
 import me.uport.sdk.jsonrpc.JsonRPC
+import me.uport.sdk.jwt.JWTUtils.Companion.normalizeKnownDID
 import me.uport.sdk.jwt.model.JwtPayload
 import me.uport.sdk.jwt.test.EthrDIDTestHelpers
 import me.uport.sdk.signer.KPSigner
@@ -446,11 +447,11 @@ class JWTToolsJVMTest {
         val ethrAddress = "0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4"
         val invalidDID = "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9"
 
-        assertThat(normalize(uportDID)).isEqualTo(uportDID)
-        assertThat(normalize(mnid)).isEqualTo(uportDID)
-        assertThat(normalize(ethrDID)).isEqualTo(ethrDID)
-        assertThat(normalize(ethrAddress)).isEqualTo(ethrDID)
-        assertThat(invalidDID).isEqualTo(invalidDID)
+        assertThat(normalizeKnownDID(uportDID)).isEqualTo(uportDID)
+        assertThat(normalizeKnownDID(mnid)).isEqualTo(uportDID)
+        assertThat(normalizeKnownDID(ethrDID)).isEqualTo(ethrDID)
+        assertThat(normalizeKnownDID(ethrAddress)).isEqualTo(ethrDID)
+        assertThat(normalizeKnownDID(invalidDID)).isEqualTo(invalidDID)
     }
 }
 
