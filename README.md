@@ -52,7 +52,7 @@ allprojects {
 In your application `build.gradle` file, add:
 
 ```groovy
-def did_jwt_version = "0.1.2"
+def did_jwt_version = "0.2.0"
 dependencies {
     //...
     implementation "com.github.uport-project.kotlin-did-jwt:jwt:$did_jwt_version"
@@ -119,11 +119,23 @@ key associated with the issuer DID (`iss` field).
 This association is resolved by a DID resolver, which can produce a `DIDDocument`
 listing various public keys and service endpoints for a given DID.
 
+#### Audience verification
+
+If the token contains a non null `aud` field, an additional soft-check is performed to
+match the verification against an intended audience. 
+This same `aud` DID must be supplied to the `verify()` method for the token to be marked as valid
+(after passing all the cryptographic checks as well).
+
+Generally your app will have its own DID which should always be passed to the `verify` method
+so that only tokens intended for your app are considered valid. 
+
 
 ## CHANGELOG
 
+* 0.2.0
+    - [breaking] add audience checking for JWT verification
+    - add `jwt-test` module with helpers for testing
 * 0.1.2
-    - add audience checking for JWT verification
     - fix crash when parsing legacy identity document 
 * 0.1.1
     - initial stable release isolating the did-jwt implementation in kotlin along with resolvers

@@ -7,24 +7,9 @@ project.ext.description = "tools to enable testing of the did-jwt library"
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+
     implementation project(":ethr-did")
-//    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
-//    implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
-//
-//    api "com.github.komputing.KEthereum:model:$kethereum_version"
-//    api "com.github.komputing.KEthereum:crypto:$kethereum_version"
-//    api "com.github.komputing.KEthereum:extensions:$kethereum_version"
-//
-//    api "com.github.uport-project.kotlin-common:jsonrpc:$uport_kotlin_common_version"
-//    api "com.github.uport-project.kotlin-common:core:$uport_kotlin_common_version"
-//    api project(":universal-did")
-//    api project(":uport-did")
-//    api project(":ethr-did")
-//    api project(":https-did")
-//    implementation "com.madgag.spongycastle:core:$spongycastle_version"
-//
+
     testImplementation "junit:junit:$junit_version"
     testImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"
-//    testImplementation "com.github.uport-project.kotlin-common:test-helpers:$uport_kotlin_common_version"
-//    testImplementation "io.mockk:mockk:$mockk_version"
 }
