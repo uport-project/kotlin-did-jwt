@@ -7,9 +7,9 @@ import me.uport.sdk.jsonrpc.moshi
  * Standard JWT header
  */
 class JwtHeader(
-        val typ: String = "JWT",
+    val typ: String = "JWT",
 
-        val alg: String = ES256K
+    val alg: String = ES256K
 ) {
 
     fun toJson(): String = jsonAdapter.toJson(this)

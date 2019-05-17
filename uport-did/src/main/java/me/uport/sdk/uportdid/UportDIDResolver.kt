@@ -26,7 +26,7 @@ import pm.gnosis.model.Solidity
  * Example mnid: "2nQtiQG6Cgm1GYTBaaKAgr76uY7iSexUkqX"
  */
 open class UportDIDResolver(
-        private val rpc: JsonRPC
+    private val rpc: JsonRPC
 ) : DIDResolver {
     override val method: String = "uport"
 
@@ -36,7 +36,7 @@ open class UportDIDResolver(
             val ddo = getProfileDocumentFor(mnid)
 
             ddo?.convertToDIDDocument(did)
-                    ?: throw BlankDocumentError("unable to fetch profile document for $did")
+                ?: throw BlankDocumentError("unable to fetch profile document for $did")
 
         } else {
             throw IllegalArgumentException("The DID('$did') cannot be resolved by the uPort DID resolver")
@@ -64,9 +64,9 @@ open class UportDIDResolver(
     }
 
     private suspend fun getDocAddressFromUportRegistry(
-            subjectId: String?,
-            issuerId: String? = null,
-            registrationIdentifier: String = "uPortProfileIPFS1220"
+        subjectId: String?,
+        issuerId: String? = null,
+        registrationIdentifier: String = "uPortProfileIPFS1220"
     ): String {
 
         val (issuer, subject) = decodeMnidTargets(issuerId, subjectId)

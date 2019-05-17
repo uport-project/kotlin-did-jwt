@@ -25,7 +25,8 @@ class UportDIDResolverTest {
 
     @Test
     fun `can encode a uPort registry Get method call`() {
-        val expectedEncoding = "0x447885f075506f727450726f66696c654950465331323230000000000000000000000000000000000000000000000000f12c30cd32b4a027710c150ae742f50db0749213000000000000000000000000f12c30cd32b4a027710c150ae742f50db0749213"
+        val expectedEncoding =
+            "0x447885f075506f727450726f66696c654950465331323230000000000000000000000000000000000000000000000000f12c30cd32b4a027710c150ae742f50db0749213000000000000000000000000f12c30cd32b4a027710c150ae742f50db0749213"
         val acc = Account.from(network = "0x04", address = "0xf12c30cd32b4a027710c150ae742f50db0749213")
         val rpc = mockk<JsonRPC>()
         val encoding = UportDIDResolver(rpc).encodeRegistryGetCall("uPortProfileIPFS1220", acc, acc)
@@ -39,7 +40,12 @@ class UportDIDResolverTest {
         val encodedCallSlot = slot<String>()
 
         val rpc = mockk<JsonRPC>() {
-            coEvery { ethCall(any(), capture(encodedCallSlot)) } returns "0x807a7cb8b670125774d70cf94d35e2355bb18bb51cf604f376c9996057f92fbf"
+            coEvery {
+                ethCall(
+                    any(),
+                    capture(encodedCallSlot)
+                )
+            } returns "0x807a7cb8b670125774d70cf94d35e2355bb18bb51cf604f376c9996057f92fbf"
         }
 
         val docAddressHex = UportDIDResolver(rpc).getIpfsHash("2ozs2ntCXceKkAQKX4c9xp2zPS8pvkJhVqC")
@@ -50,16 +56,17 @@ class UportDIDResolverTest {
 
     @Test
     fun `can convert legacy UportIdentityDocument to DIDDocument`() {
-        val publicKeyHex = "0x04e8989d1826cd6258906cfaa71126e2db675eaef47ddeb9310ee10db69b339ab960649e1934dc1e1eac1a193a94bd7dc5542befc5f7339845265ea839b9cbe56f"
+        val publicKeyHex =
+            "0x04e8989d1826cd6258906cfaa71126e2db675eaef47ddeb9310ee10db69b339ab960649e1934dc1e1eac1a193a94bd7dc5542befc5f7339845265ea839b9cbe56f"
         val publicEncKey = "k8q5G4YoIMP7zvqMC9q84i7xUBins6dXGt8g5H007F0="
         val legacyDDO = UportIdentityDocument(
-                context = "http://schema.org",
-                type = "Person",
-                publicKey = publicKeyHex,
-                publicEncKey = publicEncKey,
-                description = null,
-                image = ProfilePicture(),
-                name = null
+            context = "http://schema.org",
+            type = "Person",
+            publicKey = publicKeyHex,
+            publicEncKey = publicEncKey,
+            description = null,
+            image = ProfilePicture(),
+            name = null
         )
 
         val convertedDDO = legacyDDO.convertToDIDDocument("2ozs2ntCXceKkAQKX4c9xp2zPS8pvkJhVqC")
@@ -91,17 +98,22 @@ class UportDIDResolverTest {
             coEvery { urlGet(any()) } returns """{"@context":"http://schema.org","@type":"Person","publicKey":"0x04e8989d1826cd6258906cfaa71126e2db675eaef47ddeb9310ee10db69b339ab960649e1934dc1e1eac1a193a94bd7dc5542befc5f7339845265ea839b9cbe56f","publicEncKey":"k8q5G4YoIMP7zvqMC9q84i7xUBins6dXGt8g5H007F0="}"""
         }
         val rpc = spyk(JsonRPC(Networks.rinkeby.rpcUrl, http)) {
-            coEvery { ethCall(any(), any()) } returns "0x807a7cb8b670125774d70cf94d35e2355bb18bb51cf604f376c9996057f92fbf"
+            coEvery {
+                ethCall(
+                    any(),
+                    any()
+                )
+            } returns "0x807a7cb8b670125774d70cf94d35e2355bb18bb51cf604f376c9996057f92fbf"
         }
 
         val expectedDDO = UportIdentityDocument(
-                context = "http://schema.org",
-                type = "Person",
-                publicKey = "0x04e8989d1826cd6258906cfaa71126e2db675eaef47ddeb9310ee10db69b339ab960649e1934dc1e1eac1a193a94bd7dc5542befc5f7339845265ea839b9cbe56f",
-                publicEncKey = "k8q5G4YoIMP7zvqMC9q84i7xUBins6dXGt8g5H007F0=",
-                description = null,
-                image = null,
-                name = null
+            context = "http://schema.org",
+            type = "Person",
+            publicKey = "0x04e8989d1826cd6258906cfaa71126e2db675eaef47ddeb9310ee10db69b339ab960649e1934dc1e1eac1a193a94bd7dc5542befc5f7339845265ea839b9cbe56f",
+            publicEncKey = "k8q5G4YoIMP7zvqMC9q84i7xUBins6dXGt8g5H007F0=",
+            description = null,
+            image = null,
+            name = null
         )
 
         val ddo = UportDIDResolver(rpc).getProfileDocumentFor(mnid = "2ozs2ntCXceKkAQKX4c9xp2zPS8pvkJhVqC")
@@ -114,10 +126,10 @@ class UportDIDResolverTest {
     fun can_resolve_valid_dids() {
         val tested = UportDIDResolver(JsonRPC(Networks.rinkeby.rpcUrl))
         listOf(
-                "2nQtiQG6Cgm1GYTBaaKAgr76uY7iSexUkqX",
-                "5A8bRWU3F7j3REx3vkJWxdjQPp4tqmxFPmab1Tr",
-                "did:uport:2nQtiQG6Cgm1GYTBaaKAgr76uY7iSexUkqX",
-                "did:uport:2nQtiQG6Cgm1GYTBaaKAgr76uY7iSexUkqX#owner"
+            "2nQtiQG6Cgm1GYTBaaKAgr76uY7iSexUkqX",
+            "5A8bRWU3F7j3REx3vkJWxdjQPp4tqmxFPmab1Tr",
+            "did:uport:2nQtiQG6Cgm1GYTBaaKAgr76uY7iSexUkqX",
+            "did:uport:2nQtiQG6Cgm1GYTBaaKAgr76uY7iSexUkqX#owner"
         ).forEach {
             assertThat(tested.canResolve(it)).isTrue()
         }
@@ -127,13 +139,13 @@ class UportDIDResolverTest {
     fun fails_on_invalid_dids() {
         val tested = UportDIDResolver(JsonRPC(Networks.rinkeby.rpcUrl))
         listOf(
-                "did:something:2nQtiQG6Cgm1GYTBaaKAgr76uY7iSexUkqX", //different method
-                "QmXuNqXmrkxs4WhTDC2GCnXEep4LUD87bu97LQMn1rkxmQ", //not mnid
-                "1GbVUSW5WJmRCpaCJ4hanUny77oDaWW4to", //not mnid
-                "0x00521965e7bd230323c423d96c657db5b79d099f", //not mnid
-                "did:2nQtiQG6Cgm1GYTBaaKAgr76uY7iSexUkqX", //missing method
-                "did:uport:", //missing mnid
-                "did:uport" //missing mnid and colon
+            "did:something:2nQtiQG6Cgm1GYTBaaKAgr76uY7iSexUkqX", //different method
+            "QmXuNqXmrkxs4WhTDC2GCnXEep4LUD87bu97LQMn1rkxmQ", //not mnid
+            "1GbVUSW5WJmRCpaCJ4hanUny77oDaWW4to", //not mnid
+            "0x00521965e7bd230323c423d96c657db5b79d099f", //not mnid
+            "did:2nQtiQG6Cgm1GYTBaaKAgr76uY7iSexUkqX", //missing method
+            "did:uport:", //missing mnid
+            "did:uport" //missing mnid and colon
         ).forEach {
             assertThat(tested.canResolve(it)).isFalse()
         }

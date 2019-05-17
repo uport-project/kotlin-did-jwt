@@ -3,24 +3,19 @@
 package me.uport.sdk.ethrdid
 
 import me.uport.sdk.core.ITimeProvider
-import me.uport.sdk.signer.Signer
 import me.uport.sdk.core.SystemTimeProvider
-import me.uport.sdk.signer.bytes32ToString
-import me.uport.sdk.signer.hexToBytes32
 import me.uport.sdk.core.toBase64
-import me.uport.sdk.signer.utf8
 import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDAttributeChanged
 import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDDelegateChanged
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jsonrpc.JsonRpcException
-import me.uport.sdk.universaldid.AuthenticationEntry
-import me.uport.sdk.universaldid.DIDResolver
-import me.uport.sdk.universaldid.DidResolverError
-import me.uport.sdk.universaldid.PublicKeyEntry
-import me.uport.sdk.universaldid.PublicKeyType
+import me.uport.sdk.signer.Signer
+import me.uport.sdk.signer.bytes32ToString
+import me.uport.sdk.signer.hexToBytes32
+import me.uport.sdk.signer.utf8
+import me.uport.sdk.universaldid.*
 import me.uport.sdk.universaldid.PublicKeyType.Companion.Secp256k1SignatureAuthentication2018
 import me.uport.sdk.universaldid.PublicKeyType.Companion.Secp256k1VerificationKey2018
-import me.uport.sdk.universaldid.ServiceEntry
 import org.kethereum.encodings.encodeToBase58String
 import org.kethereum.extensions.hexToBigInteger
 import org.kethereum.extensions.toHexStringNoPrefix
@@ -39,9 +34,9 @@ import java.util.*
  * Example ethr did: "did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a"
  */
 open class EthrDIDResolver(
-        private val rpc: JsonRPC,
-        val registryAddress: String = DEFAULT_REGISTRY_ADDRESS,
-        private val timeProvider: ITimeProvider = SystemTimeProvider
+    private val rpc: JsonRPC,
+    val registryAddress: String = DEFAULT_REGISTRY_ADDRESS,
+    private val timeProvider: ITimeProvider = SystemTimeProvider
 ) : DIDResolver {
 
     override val method = "ethr"
@@ -78,7 +73,10 @@ open class EthrDIDResolver(
         return try {
             rpc.ethCall(registryAddress, encodedCall)
         } catch (err: JsonRpcException) {
-            throw DidResolverError("Unable to evaluate when or if the $identity was lastChanged because RPC endpoint responded with an error", err)
+            throw DidResolverError(
+                "Unable to evaluate when or if the $identity was lastChanged because RPC endpoint responded with an error",
+                err
+            )
         }
     }
 
@@ -138,19 +136,23 @@ open class EthrDIDResolver(
     internal fun wrapDidDocument(ownerDID: String, ownerAddress: String, history: List<Any>): EthrDIDDocument {
 
         val pkEntries = mapOf<String, PublicKeyEntry>().toMutableMap().apply {
-            put("owner", PublicKeyEntry(
+            put(
+                "owner", PublicKeyEntry(
                     id = "$ownerDID#owner",
                     type = Secp256k1VerificationKey2018,
                     owner = ownerDID,
                     ethereumAddress = ownerAddress
-            ))
+                )
+            )
 
         }
         val authEntries = mapOf<String, AuthenticationEntry>().toMutableMap().apply {
-            put("owner", AuthenticationEntry(
+            put(
+                "owner", AuthenticationEntry(
                     type = Secp256k1SignatureAuthentication2018,
                     publicKey = "$ownerDID#owner"
-            ))
+                )
+            )
         }
         val serviceEntries = mapOf<String, ServiceEntry>().toMutableMap()
 
@@ -175,17 +177,17 @@ open class EthrDIDResolver(
         }
 
         return EthrDIDDocument(
-                id = ownerDID,
-                publicKey = pkEntries.values.toList(),
-                authentication = authEntries.values.toList(),
-                service = serviceEntries.values.toList()
+            id = ownerDID,
+            publicKey = pkEntries.values.toList(),
+            authentication = authEntries.values.toList(),
+            service = serviceEntries.values.toList()
         )
     }
 
     private fun processAttributeChanged(
-            event: DIDAttributeChanged.Arguments,
-            delegateCount: Int,
-            normalizedDid: String
+        event: DIDAttributeChanged.Arguments,
+        delegateCount: Int,
+        normalizedDid: String
     ): Pair<Map<String, PublicKeyEntry>, Map<String, ServiceEntry>> {
         val pkEntries = mapOf<String, PublicKeyEntry>().toMutableMap()
         val serviceEntries = mapOf<String, ServiceEntry>().toMutableMap()
@@ -201,7 +203,7 @@ open class EthrDIDResolver(
         //language=RegExp
         val regex = """^did/(pub|auth|svc)/(\w+)(/(\w+))?(/(\w+))?$""".toRegex()
         val matchResult = regex.matchEntire(name)
-                ?: return (pkEntries to serviceEntries)
+            ?: return (pkEntries to serviceEntries)
         val (section, algo, _, rawType, _, encoding)
                 = matchResult.destructured
         val type = parseType(algo, rawType)
@@ -211,9 +213,10 @@ open class EthrDIDResolver(
             "pub" -> {
                 delegateIndex++
                 val pk = PublicKeyEntry(
-                        id = "$normalizedDid#delegate-$delegateIndex",
-                        type = type,
-                        owner = normalizedDid)
+                    id = "$normalizedDid#delegate-$delegateIndex",
+                    type = type,
+                    owner = normalizedDid
+                )
 
                 pkEntries[key] = when (encoding) {
                     "", "null", "hex" ->
@@ -230,8 +233,8 @@ open class EthrDIDResolver(
 
             "svc" -> {
                 serviceEntries[key] = ServiceEntry(
-                        type = algo,
-                        serviceEndpoint = event.value.items.toString(utf8)
+                    type = algo,
+                    serviceEndpoint = event.value.items.toString(utf8)
                 )
             }
         }
@@ -257,15 +260,17 @@ open class EthrDIDResolver(
             when (delegateType) {
                 Secp256k1SignatureAuthentication2018.name,
                 sigAuth -> authEntries[key] = AuthenticationEntry(
-                        type = Secp256k1SignatureAuthentication2018,
-                        publicKey = "$ownerDID#delegate-$delegateIndex")
+                    type = Secp256k1SignatureAuthentication2018,
+                    publicKey = "$ownerDID#delegate-$delegateIndex"
+                )
 
                 Secp256k1VerificationKey2018.name,
                 veriKey -> pkEntries[key] = PublicKeyEntry(
-                        id = "$ownerDID#delegate-$delegateIndex",
-                        type = Secp256k1VerificationKey2018,
-                        owner = ownerDID,
-                        ethereumAddress = delegate)
+                    id = "$ownerDID#delegate-$delegateIndex",
+                    type = Secp256k1VerificationKey2018,
+                    owner = ownerDID,
+                    ethereumAddress = delegate
+                )
             }
         }
         return (pkEntries to authEntries)
@@ -278,8 +283,8 @@ open class EthrDIDResolver(
         internal const val sigAuth = "sigAuth"
 
         private val attrTypes = mapOf(
-                sigAuth to "SignatureAuthentication2018",
-                veriKey to "VerificationKey2018"
+            sigAuth to "SignatureAuthentication2018",
+            veriKey to "VerificationKey2018"
         )
 
         private fun parseType(algo: String, rawType: String): PublicKeyType {
@@ -295,8 +300,8 @@ open class EthrDIDResolver(
         private val didParsePattern = "^(did:)?((\\w+):)?((0x)([0-9a-fA-F]{40}))".toRegex()
 
         private fun parseIdentity(normalizedDid: String) = identityExtractPattern
-                .find(normalizedDid)
-                ?.destructured?.component1() ?: ""
+            .find(normalizedDid)
+            ?.destructured?.component1() ?: ""
 
         internal fun normalizeDid(did: String): String {
             val matchResult = didParsePattern.find(did) ?: return ""

@@ -147,6 +147,6 @@ fun signedJwtToKey(message: ByteArray, signatureData: SignatureData): BigInteger
 
     val messageHash = message.sha256()
     return recoverFromSignature(recId, sig, messageHash)
-            ?: throw SignatureException("Could not recover public key from signature")
+        ?: throw SignatureException("Could not recover public key from signature")
 }
 

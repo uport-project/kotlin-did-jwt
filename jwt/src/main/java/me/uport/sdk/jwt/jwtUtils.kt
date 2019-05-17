@@ -22,9 +22,9 @@ fun splitToken(token: String): Triple<String, String, String> {
  * It returns the inital string if it is unable to normalize it
  */
 fun normalize(did: String): String {
-  if (did.startsWith("did:")) {
-    return did
-  }
+    if (did.startsWith("did:")) {
+        return did
+    }
     if (MNID.isMNID(did)) {
         return "did:uport:$did"
     }

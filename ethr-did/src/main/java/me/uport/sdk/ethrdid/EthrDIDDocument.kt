@@ -15,20 +15,20 @@ import me.uport.sdk.universaldid.ServiceEntry
  */
 @Serializable
 data class EthrDIDDocument(
-        @SerialName("id")
-        override val id: String,
+    @SerialName("id")
+    override val id: String,
 
-        @SerialName("publicKey")
-        override val publicKey: List<PublicKeyEntry> = emptyList(),
+    @SerialName("publicKey")
+    override val publicKey: List<PublicKeyEntry> = emptyList(),
 
-        @SerialName("authentication")
-        override val authentication: List<AuthenticationEntry> = emptyList(),
+    @SerialName("authentication")
+    override val authentication: List<AuthenticationEntry> = emptyList(),
 
-        @SerialName("service")
-        override val service: List<ServiceEntry> = emptyList(),
+    @SerialName("service")
+    override val service: List<ServiceEntry> = emptyList(),
 
-        @SerialName("@context")
-        override val context: String = "https://w3id.org/did/v1"
+    @SerialName("@context")
+    override val context: String = "https://w3id.org/did/v1"
 ) : DIDDocument {
 
     /**

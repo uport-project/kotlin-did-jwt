@@ -52,10 +52,10 @@ class EthereumDIDRegistry {
         private const val METHOD_ID: String = "a7068d66"
 
         fun encode(
-                identity: Solidity.Address,
-                delegateType: Solidity.Bytes32,
-                delegate: Solidity.Address,
-                validity: Solidity.UInt256
+            identity: Solidity.Address,
+            delegateType: Solidity.Bytes32,
+            delegate: Solidity.Address,
+            validity: Solidity.UInt256
         ): String {
             return "0x$METHOD_ID${SolidityBase.encodeFunctionArguments(identity, delegateType, delegate, validity)}"
         }
@@ -66,9 +66,9 @@ class EthereumDIDRegistry {
         private const val METHOD_ID: String = "80b29f7c"
 
         fun encode(
-                identity: Solidity.Address,
-                delegateType: Solidity.Bytes32,
-                delegate: Solidity.Address
+            identity: Solidity.Address,
+            delegateType: Solidity.Bytes32,
+            delegate: Solidity.Address
         ): String {
             return "0x$METHOD_ID${SolidityBase.encodeFunctionArguments(identity, delegateType, delegate)}"
         }
@@ -79,10 +79,10 @@ class EthereumDIDRegistry {
         private const val METHOD_ID: String = "7ad4b0a4"
 
         fun encode(
-                identity: Solidity.Address,
-                name: Solidity.Bytes32,
-                value: Solidity.Bytes,
-                validity: Solidity.UInt256
+            identity: Solidity.Address,
+            name: Solidity.Bytes32,
+            value: Solidity.Bytes,
+            validity: Solidity.UInt256
         ): String {
             return "0x$METHOD_ID${SolidityBase.encodeFunctionArguments(identity, name, value, validity)}"
         }
@@ -92,7 +92,7 @@ class EthereumDIDRegistry {
     object Events {
         object DIDOwnerChanged {
             private const val EVENT_ID: String =
-                    "38a5a6e68f30ed1ab45860a4afb34bcb2fc00f22ca462d249b8a8d40cda6f7a3"
+                "38a5a6e68f30ed1ab45860a4afb34bcb2fc00f22ca462d249b8a8d40cda6f7a3"
 
             fun decode(topics: List<String>, data: String): Arguments {
                 // Decode topics
@@ -109,15 +109,15 @@ class EthereumDIDRegistry {
             }
 
             data class Arguments(
-                    val identity: Solidity.Address,
-                    val owner: Solidity.Address,
-                    val previouschange: Solidity.UInt256
+                val identity: Solidity.Address,
+                val owner: Solidity.Address,
+                val previouschange: Solidity.UInt256
             )
         }
 
         object DIDDelegateChanged {
             private const val EVENT_ID: String =
-                    "5a5084339536bcab65f20799fcc58724588145ca054bd2be626174b27ba156f7"
+                "5a5084339536bcab65f20799fcc58724588145ca054bd2be626174b27ba156f7"
 
             fun decode(topics: List<String>, data: String): Arguments {
                 // Decode topics
@@ -136,17 +136,17 @@ class EthereumDIDRegistry {
             }
 
             data class Arguments(
-                    val identity: Solidity.Address,
-                    val delegatetype: Solidity.Bytes32,
-                    val delegate: Solidity.Address,
-                    val validto: Solidity.UInt256,
-                    val previouschange: Solidity.UInt256
+                val identity: Solidity.Address,
+                val delegatetype: Solidity.Bytes32,
+                val delegate: Solidity.Address,
+                val validto: Solidity.UInt256,
+                val previouschange: Solidity.UInt256
             )
         }
 
         object DIDAttributeChanged {
             private const val EVENT_ID: String =
-                    "18ab6b2ae3d64306c00ce663125f2bd680e441a098de1635bd7ad8b0d44965e4"
+                "18ab6b2ae3d64306c00ce663125f2bd680e441a098de1635bd7ad8b0d44965e4"
 
             fun decode(topics: List<String>, data: String): Arguments {
                 // Decode topics
@@ -166,11 +166,11 @@ class EthereumDIDRegistry {
             }
 
             data class Arguments(
-                    val identity: Solidity.Address,
-                    val name: Solidity.Bytes32,
-                    val value: Solidity.Bytes,
-                    val validto: Solidity.UInt256,
-                    val previouschange: Solidity.UInt256
+                val identity: Solidity.Address,
+                val name: Solidity.Bytes32,
+                val value: Solidity.Bytes,
+                val validto: Solidity.UInt256,
+                val previouschange: Solidity.UInt256
             )
         }
     }

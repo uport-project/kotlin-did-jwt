@@ -1,10 +1,10 @@
 package me.uport.sdk.jwt
 
+import me.uport.sdk.jwt.model.JwtHeader
 import me.uport.sdk.signer.Signer
 import me.uport.sdk.signer.getJoseEncoded
 import me.uport.sdk.signer.signJWT
 import me.uport.sdk.signer.utf8
-import me.uport.sdk.jwt.model.JwtHeader
 
 /**
  * Abstracts the signature to a recoverable/non-recoverable JOSE encoding based on the jwt header or algorithm provided during construction
