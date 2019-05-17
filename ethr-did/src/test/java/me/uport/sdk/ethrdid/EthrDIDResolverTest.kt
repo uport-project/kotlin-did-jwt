@@ -15,6 +15,7 @@ import me.uport.sdk.core.Networks
 import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDOwnerChanged
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jsonrpc.JsonRpcLogItem
+import me.uport.sdk.jwt.test.EthrDIDTestHelpers
 import me.uport.sdk.signer.hexToBytes32
 import me.uport.sdk.signer.utf8
 import org.junit.Test
@@ -250,22 +251,7 @@ class EthrDIDResolverTest {
     fun `can resolve real did`() = runBlocking {
         val http = mockk<HttpClient>()
 
-        //language=JSON
-        val referenceDDOString = """
-            {
-              "@context": "https://w3id.org/did/v1",
-              "id": "did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a",
-              "publicKey": [{
-                   "id": "did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a#owner",
-                   "type": "Secp256k1VerificationKey2018",
-                   "owner": "did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a",
-                   "ethereumAddress": "0xb9c5714089478a327f09197987f16f9e5d936e8a"}],
-              "authentication": [{
-                   "type": "Secp256k1SignatureAuthentication2018",
-                   "publicKey": "did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a#owner"}]
-            }
-        """.trimIndent()
-        val referenceDDO = EthrDIDDocument.fromJson(referenceDDOString)
+        val referenceDDO = EthrDIDTestHelpers.mockDocForAddress("0xb9c5714089478a327f09197987f16f9e5d936e8a")
 
         val addressHex = "b9c5714089478a327f09197987f16f9e5d936e8a"
 

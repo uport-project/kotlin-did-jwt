@@ -6,9 +6,9 @@ open class EthrDIDTestHelpers {
 
     companion object {
 
-        fun mockDocForAddress(address: String) {
+        fun mockDocForAddress(address: String): EthrDIDDocument {
             val did = "did:ethr:$address"
-            EthrDIDDocument.fromJson("""
+            return EthrDIDDocument.fromJson("""
             {
               "@context": "https://w3id.org/did/v1",
               "id": "$did",

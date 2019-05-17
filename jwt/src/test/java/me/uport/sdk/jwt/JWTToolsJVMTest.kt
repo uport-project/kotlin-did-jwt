@@ -12,6 +12,7 @@ import me.uport.sdk.ethrdid.EthrDIDDocument
 import me.uport.sdk.ethrdid.EthrDIDResolver
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jwt.model.JwtPayload
+import me.uport.sdk.jwt.test.EthrDIDTestHelpers
 import me.uport.sdk.signer.KPSigner
 import me.uport.sdk.testhelpers.TestTimeProvider
 import me.uport.sdk.testhelpers.coAssert
@@ -409,22 +410,8 @@ class JWTToolsJVMTest {
 
         val resolver = spyk(EthrDIDResolver(JsonRPC("")))
 
-        coEvery { resolver.resolve(eq(did)) } returns EthrDIDDocument.fromJson(
-            """
-            {
-              "@context": "https://w3id.org/did/v1",
-              "id": "$did",
-              "publicKey": [{
-                   "id": "$did#owner",
-                   "type": "Secp256k1VerificationKey2018",
-                   "owner": "$did",
-                   "ethereumAddress": "${signer.getAddress()}"}],
-              "authentication": [{
-                   "type": "Secp256k1SignatureAuthentication2018",
-                   "publicKey": "$did#owner"}]
-            }
-        """.trimIndent()
-        )
+        coEvery { resolver.resolve(eq(did)) } returns
+                EthrDIDTestHelpers.mockDocForAddress(signer.getAddress())
 
         UniversalDID.registerResolver(resolver)
 
