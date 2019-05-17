@@ -26,4 +26,5 @@ dependencies {
     testImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"
     testImplementation "com.github.uport-project.kotlin-common:test-helpers:$uport_kotlin_common_version"
     testImplementation "io.mockk:mockk:$mockk_version"
+    testImplementation project(":jwt-test")
 }
