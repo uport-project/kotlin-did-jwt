@@ -48,7 +48,7 @@ data class JwtPayload(
          * This replaces requested and verified
          */
         //val requestClaims: Map<String, Any>?, //An object containing one or more request claims [specs](https://github.com/uport-project/specs/blob/develop/messages/sharereq.md#claims-spec)
-        @Json(name = "claim") val requestClaims: Map<String, Any>? = null,
+        @Json(name = "claims") val requestClaims: Map<String, Any>? = null,
 
         /**
          * Specific to Private Chain
