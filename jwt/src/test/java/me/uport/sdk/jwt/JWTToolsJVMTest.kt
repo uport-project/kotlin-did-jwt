@@ -13,6 +13,7 @@ import me.uport.sdk.ethrdid.EthrDIDResolver
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jwt.JWTUtils.Companion.normalizeKnownDID
 import me.uport.sdk.jwt.model.JwtPayload
+import me.uport.sdk.jwt.test.EthrDIDTestHelpers
 import me.uport.sdk.signer.KPSigner
 import me.uport.sdk.testhelpers.TestTimeProvider
 import me.uport.sdk.testhelpers.coAssert
