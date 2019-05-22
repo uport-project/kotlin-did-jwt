@@ -13,7 +13,6 @@ import me.uport.sdk.ethrdid.EthrDIDResolver
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jwt.JWTUtils.Companion.normalizeKnownDID
 import me.uport.sdk.jwt.model.JwtPayload
-import me.uport.sdk.jwt.test.EthrDIDTestHelpers
 import me.uport.sdk.signer.KPSigner
 import me.uport.sdk.testhelpers.TestTimeProvider
 import me.uport.sdk.testhelpers.coAssert
@@ -72,7 +71,7 @@ class JWTToolsJVMTest {
         dad = null,
         own = null,
         capabilities = null,
-        claims = null,
+        responseClaims = null,
         ctl = null,
         reg = null,
         rel = null,
@@ -100,7 +99,7 @@ class JWTToolsJVMTest {
         dad = null,
         own = null,
         capabilities = null,
-        claims = null,
+        responseClaims = null,
         ctl = null,
         reg = null,
         rel = null,
@@ -428,7 +427,7 @@ class JWTToolsJVMTest {
         val tested = JWTTools(TestTimeProvider(12345678000L))
 
         val payload = mapOf(
-            "claims" to mapOf("name" to "R Daneel Olivaw")
+            "responseClaims" to mapOf("name" to "R Daneel Olivaw")
         )
 
         val signer = KPSigner("0x54ece214d38fe6b46110a21c69fd55230f09688bf85b95fc7c1e4e160441ece1")
