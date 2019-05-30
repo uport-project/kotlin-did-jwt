@@ -18,23 +18,23 @@ import me.uport.sdk.universaldid.PublicKeyType
 import org.junit.Test
 import java.io.IOException
 
-class HttpsDIDResolverTest {
+class WebDIDResolverTest {
 
     private val exampleDidDoc = HttpsDIDDocument(
         context = "https://w3id.org/did/v1",
-        id = "did:https:example.com",
+        id = "did:web:example.com",
         publicKey = listOf(
             PublicKeyEntry(
-                id = "did:https:example.com",
+                id = "did:web:example.com",
                 type = PublicKeyType.Secp256k1VerificationKey2018,
-                owner = "did:https:example.com",
+                owner = "did:web:example.com",
                 ethereumAddress = "0x3c7d65d6daf5df62378874d35fa3626100af9d85"
             )
         ),
         authentication = listOf(
             AuthenticationEntry(
                 type = PublicKeyType.Secp256k1SignatureAuthentication2018,
-                publicKey = "did:https:example.com#owner"
+                publicKey = "did:web:example.com#owner"
             )
         ),
         service = emptyList()
@@ -44,10 +44,10 @@ class HttpsDIDResolverTest {
     @Test
     fun `can resolve valid dids`() {
         listOf(
-            "did:https:example.com",
-            "did:https:example.ngrok.com#owner"
+            "did:web:example.com",
+            "did:web:example.ngrok.com#owner"
         ).forEach {
-            assertThat(HttpsDIDResolver().canResolve(it)).isTrue()
+            assertThat(WebDIDResolver().canResolve(it)).isTrue()
         }
 
     }
@@ -58,18 +58,18 @@ class HttpsDIDResolverTest {
             "did:something:example.com", //different method
             "example.com"
         ).forEach {
-            assertThat(HttpsDIDResolver().canResolve(it)).isFalse()
+            assertThat(WebDIDResolver().canResolve(it)).isFalse()
         }
     }
 
     @Test
     fun `fails when the endpoint doesn't provide a DID document`() = runBlocking {
         val http = mockk<HttpClient>()
-        val tested = HttpsDIDResolver(http)
+        val tested = WebDIDResolver(http)
         coEvery { http.urlGet(any()) } returns ""
 
         coAssert {
-            tested.resolve("did:https:example.com")
+            tested.resolve("did:web:example.com")
         }.thrownError {
             isInstanceOf(
                 listOf(
@@ -86,11 +86,11 @@ class HttpsDIDResolverTest {
     fun `resolves document`() = runBlocking {
 
         val http = mockk<HttpClient>()
-        val tested = HttpsDIDResolver(http)
+        val tested = WebDIDResolver(http)
 
         coEvery { http.urlGet(any()) } returns exampleDidDoc.toJson()
 
-        val response = tested.resolve("did:https:example.com")
+        val response = tested.resolve("did:web:example.com")
         assertThat(response).isEqualTo(exampleDidDoc)
     }
 
