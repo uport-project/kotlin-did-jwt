@@ -20,7 +20,8 @@ We currently support the following DID methods:
 
 - [`ethr`](https://github.com/uport-project/ethr-did-resolver)
 - [`uport`](https://github.com/uport-project/uport-did-resolver)
-- [`https`](https://github.com/uport-project/https-did-resolver)
+- [`web`](https://github.com/uport-project/https-did-resolver)
+- [`https`](https://github.com/uport-project/https-did-resolver) *DEPRECATED*
 
 Defaults are automatically installed but you can customize to fit your needs.
 
