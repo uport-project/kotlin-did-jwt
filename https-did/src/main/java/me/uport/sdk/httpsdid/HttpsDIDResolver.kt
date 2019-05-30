@@ -12,6 +12,7 @@ import me.uport.sdk.universaldid.DidResolverError
  *
  * Example https did: "did:https:example.com"
  */
+@Deprecated(message = "the `https` method has been deprecated in favor of the `web` method. Use the `WebDIDResolver` to make the transition")
 open class HttpsDIDResolver(private val httpClient: HttpClient = HttpClient()) : DIDResolver {
     override val method: String = "https"
 
