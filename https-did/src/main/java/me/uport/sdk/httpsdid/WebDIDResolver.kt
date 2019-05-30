@@ -6,15 +6,14 @@ import me.uport.sdk.universaldid.DIDResolver
 import me.uport.sdk.universaldid.DidResolverError
 
 /**
- * This is a DID resolver implementation that supports the "https" DID method.
+ * This is a DID resolver implementation that supports the "web" DID method.
  * It accepts https-did strings and produces a document described at:
  * https://w3c-ccg.github.io/did-spec/#did-documents
  *
- * Example https did: "did:https:example.com"
+ * Example https did: "did:web:example.com"
  */
-@Deprecated(message = "the `https` method has been deprecated in favor of the `web` method. Use the `WebDIDResolver` to make the transition")
-open class HttpsDIDResolver(private val httpClient: HttpClient = HttpClient()) : DIDResolver {
-    override val method: String = "https"
+open class WebDIDResolver(private val httpClient: HttpClient = HttpClient()) : DIDResolver {
+    override val method: String = "web"
 
     override suspend fun resolve(did: String): HttpsDIDDocument {
         if (canResolve(did)) {
@@ -41,7 +40,7 @@ open class HttpsDIDResolver(private val httpClient: HttpClient = HttpClient()) :
     }
 
     companion object {
-        private val uportDIDPattern = "^(did:(https):)?([-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])".toRegex()
+        private val uportDIDPattern = "^(did:(web):)?([-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])".toRegex()
 
         internal fun parseDIDString(did: String): Pair<String, String> {
             val matchResult = uportDIDPattern.find(did) ?: return ("" to did)
