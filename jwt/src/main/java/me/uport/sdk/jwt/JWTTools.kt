@@ -98,28 +98,38 @@ class JWTTools(
      *                  an `exp` timestamp is already part of the [payload].
      *                  If there is no `exp` field in the payload and the param is not specified,
      *                  it defaults to [DEFAULT_JWT_VALIDITY_SECONDS]
+     *                  If this param is negative or if `payload["exp"]` is explicitly set to `null`,
+     *                  the resulting JWT will not have an `exp` field
      * @param algorithm defaults to `ES256K-R`. The signing algorithm for this JWT.
      *                  Supported types are `ES256K` for uport DID and `ES256K-R` for ethr-did and the rest
      *
      */
     suspend fun createJWT(
-        payload: Map<String, Any>,
+        payload: Map<String, Any?>,
         issuerDID: String,
         signer: Signer,
         expiresInSeconds: Long = DEFAULT_JWT_VALIDITY_SECONDS,
         algorithm: String = ES256K_R
     ): String {
-        val mapAdapter = moshi.mapAdapter<String, Any>(String::class.java, Any::class.java)
+        val mapAdapter = moshi.mapAdapter<String, Any?>(String::class.java, Any::class.java)
 
         val mutablePayload = payload.toMutableMap()
 
         val header = JwtHeader(alg = algorithm)
 
         val iatSeconds = Math.floor(timeProvider.nowMs() / 1000.0).toLong()
-        val expSeconds = iatSeconds + expiresInSeconds
-
         mutablePayload["iat"] = iatSeconds
-        mutablePayload["exp"] = payload["exp"] ?: expSeconds
+
+        val expSeconds = iatSeconds + expiresInSeconds
+        if (expiresInSeconds >= 0) {
+            mutablePayload["exp"] = payload["exp"] ?: expSeconds
+        } else {
+            mutablePayload.remove("exp")
+        }
+        if (payload.containsKey("exp") && payload["exp"] == null) {
+            mutablePayload.remove("exp")
+        }
+
         mutablePayload["iss"] = issuerDID
 
         @Suppress("SimplifiableCallChain", "ConvertCallChainIntoSequence")

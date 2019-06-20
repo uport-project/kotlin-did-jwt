@@ -2,6 +2,7 @@ package me.uport.sdk.jwt
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import io.mockk.coEvery
@@ -452,6 +453,62 @@ class JWTToolsJVMTest {
         assertThat(normalizeKnownDID(ethrDID)).isEqualTo(ethrDID)
         assertThat(normalizeKnownDID(ethrAddress)).isEqualTo(ethrDID)
         assertThat(normalizeKnownDID(invalidDID)).isEqualTo(invalidDID)
+    }
+
+    @Test
+    fun `ignores expiredInSeconds param when exp is already set in payload`() = runBlocking {
+        val tested = JWTTools()
+
+        val payload = mapOf("exp" to 432101234L)
+        val signer = KPSigner("0x1234")
+        val issuerDID = "did:ethr:${signer.getAddress()}"
+
+        val jwt = tested.createJWT(payload, issuerDID, signer, expiresInSeconds = 1234L)
+
+        val (_, dec, _) = tested.decode(jwt)
+        assertThat(dec.exp).isEqualTo(432101234L)
+    }
+
+    @Test
+    fun `sets exp based on expiresInSeconds`() = runBlocking {
+        val tested = JWTTools(TestTimeProvider(1111000L))
+
+        val payload = mapOf("hello" to "world")
+        val signer = KPSigner("0x1234")
+        val issuerDID = "did:ethr:${signer.getAddress()}"
+
+        val jwt = tested.createJWT(payload, issuerDID, signer, expiresInSeconds = 42L)
+
+        val (_, dec, _) = tested.decode(jwt)
+        assertThat(dec.exp).isEqualTo(1153L)
+    }
+
+    @Test
+    fun `removes exp when payload sets it to null`() = runBlocking {
+        val tested = JWTTools()
+
+        val payload = mapOf("exp" to null)
+        val signer = KPSigner("0x1234")
+        val issuerDID = "did:ethr:${signer.getAddress()}"
+
+        val jwt = tested.createJWT(payload, issuerDID, signer)
+
+        val (_, decoded, _) = tested.decodeRaw(jwt)
+        assertThat(decoded.containsKey("exp")).isFalse()
+    }
+
+    @Test
+    fun `removes exp when expiry interval is negative`() = runBlocking {
+        val tested = JWTTools()
+
+        val payload = mapOf("exp" to 1234)
+        val signer = KPSigner("0x1234")
+        val issuerDID = "did:ethr:${signer.getAddress()}"
+
+        val jwt = tested.createJWT(payload, issuerDID, signer, expiresInSeconds = -1)
+
+        val (_, decoded, _) = tested.decodeRaw(jwt)
+        assertThat(decoded.containsKey("exp")).isFalse()
     }
 }
 
