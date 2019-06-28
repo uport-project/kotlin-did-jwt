@@ -209,16 +209,20 @@ class JWTTools(
 
     /**
      * Verifies a jwt [token]
-     * @params jwt token
-     * @throws InvalidJWTException when the current time is not within the time range of payload iat and exp
-     *          when no public key matches are found in the DID document
+     * @param token the jwt token to be verified
+     * @param auth if this param is `true` the public key list that this token is checked against is filtered to the
+     *          entries in the `authentication` entries in the DID document of the issuer of the token.
+     * @param audience the audience that should be able to verify this token. This is usually a DID but can also be a
+     *          callback URL for situations where the token represents a response or a bearer token.
+     * @throws InvalidJWTException when the current time is not within the time range of payload `iat` and `exp`
+     *          , when no public key matches are found in the DID document
+     *          , when the `audience` does not match the intended audience (`aud` field)
      * @return a [JwtPayload] if the verification is successful and `null` if it fails
      */
     suspend fun verify(
         token: String,
         auth: Boolean = false,
-        aud: String? = null,
-        callbackUrl: String? = null
+        audience: String? = null
     ): JwtPayload {
         val (header, payload, signatureBytes) = decode(token)
 
@@ -235,20 +239,18 @@ class JWTTools(
             val payloadAudience = normalizeKnownDID(payload.aud)
             if (UniversalDID.canResolve(payloadAudience)) {
 
-                if (aud == null) {
-                    throw InvalidJWTException("JWT audience is required but your app address has not been configured")
+                if (audience == null) {
+                    throw InvalidJWTException(
+                        "JWT audience is required but your app address has not been configured. " +
+                                "You can provide the proper app address using the `audience` parameter when verifying."
+                    )
                 }
 
-                if (aud != payloadAudience) {
-                    throw InvalidJWTException("JWT audience does not match your DID: aud: ${payloadAudience} != yours: ${aud}")
-                }
-            } else {
-                if (callbackUrl == null) {
-                    throw InvalidJWTException("JWT audience matching your callback url is required but one wasn\'t passed in")
-                }
-
-                if (callbackUrl != payloadAudience) {
-                    throw InvalidJWTException("JWT audience does not match the callback url: aud: ${payloadAudience} != url: ${callbackUrl}")
+                if (audience != payloadAudience) {
+                    throw InvalidJWTException(
+                        "JWT audience does not match your DID. " +
+                                "aud: $payloadAudience != yours: $audience"
+                    )
                 }
             }
         }
@@ -266,9 +268,13 @@ class JWTTools(
         if (signatureIsValid) {
             return payload
         } else {
-            throw InvalidJWTException("Signature invalid for JWT. DID document for ${payload.iss} does not have any matching public keys")
+            throw InvalidJWTException(
+                "Signature invalid for JWT. DID document for ${payload.iss} does not have any " +
+                        "matching public keys"
+            )
         }
     }
+
 
     /**
      * maps known algorithms to the corresponding verification method
@@ -343,7 +349,7 @@ class JWTTools(
      * entries in the DIDDocument
      *
      */
-    suspend fun resolveAuthenticator(alg: String, issuer: String, auth: Boolean): List<PublicKeyEntry> {
+    internal suspend fun resolveAuthenticator(alg: String, issuer: String, auth: Boolean): List<PublicKeyEntry> {
 
         if (alg !in verificationMethod.keys) {
             throw JWTEncodingException("JWT algorithm '$alg' not supported")

@@ -47,7 +47,7 @@ class JWTToolsJVMTest {
         tokens.forEach { token ->
             val payload = JWTTools(TestTimeProvider(1535102500000L)).verify(
                 token = token,
-                aud = "did:ethr:0xa9e3232b61bdb672712b9ae33195069d8d651c1a"
+                audience = "did:ethr:0xa9e3232b61bdb672712b9ae33195069d8d651c1a"
             )
             assertThat(payload).isNotNull()
         }
@@ -176,7 +176,7 @@ class JWTToolsJVMTest {
         coAssert {
             JWTTools(TestTimeProvider(1535102500000L)).verify(
                 token = token,
-                aud = "did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154"
+                audience = "did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154"
             )
         }.thrownError {
             isInstanceOf(InvalidJWTException::class)
