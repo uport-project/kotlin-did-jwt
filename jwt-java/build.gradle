@@ -1,0 +1,14 @@
+apply plugin: 'java-library'
+apply plugin: 'kotlin'
+
+dependencies {
+    implementation project(":jwt")
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutines_version"
+
+    testImplementation "junit:junit:$junit_version"
+    testImplementation "com.github.uport-project.kotlin-common:test-helpers:$uport_kotlin_common_version"
+    testImplementation project(":jwt-test")
+}
+
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
