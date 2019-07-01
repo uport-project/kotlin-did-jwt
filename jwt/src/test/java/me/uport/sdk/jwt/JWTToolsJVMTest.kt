@@ -424,6 +424,22 @@ class JWTToolsJVMTest {
     }
 
     @Test
+    fun `can verify a ES256K signature with only ethereumAddress in the DID doc`() = runBlocking {
+        val address = "0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed"
+
+        val resolver = spyk(EthrDIDResolver(JsonRPC("")))
+
+        coEvery { resolver.resolve(eq("did:ethr:$address")) } returns
+                EthrDIDTestHelpers.mockDocForAddress(address)
+
+        UniversalDID.registerResolver(resolver)
+
+        val token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJoZWxsbyI6IndvcmxkIiwiaWF0IjoxNTYxOTcxMTE5LCJpc3MiOiJkaWQ6ZXRocjoweGNmMDNkZDBhODk0ZWY3OWNiNWI2MDFhNDNjNGIyNWUzYWU0YzY3ZWQifQ.t5o1vzZExArlrrTVHmwtti7fnicXqvWrX6SS3F-Lu3budH7p6zQHjG8X7EvUTRUxhvr-eENCbXeteSE4rgF7MA"
+        val payload = JWTTools().verify(token)
+        assertThat(payload.iss).isEqualTo("did:ethr:$address")
+    }
+
+    @Test
     fun `can create token from map of claims`() = runBlocking {
 
         val tested = JWTTools(TestTimeProvider(12345678000L))

@@ -1,3 +1,5 @@
+@file:Suppress("KDocUnresolvedReference")
+
 package me.uport.sdk.jwt
 
 import com.squareup.moshi.JsonAdapter
@@ -14,10 +16,7 @@ import me.uport.sdk.jwt.model.JwtHeader
 import me.uport.sdk.jwt.model.JwtHeader.Companion.ES256K
 import me.uport.sdk.jwt.model.JwtHeader.Companion.ES256K_R
 import me.uport.sdk.jwt.model.JwtPayload
-import me.uport.sdk.signer.Signer
-import me.uport.sdk.signer.decodeJose
-import me.uport.sdk.signer.normalize
-import me.uport.sdk.signer.utf8
+import me.uport.sdk.signer.*
 import me.uport.sdk.universaldid.DIDDocument
 import me.uport.sdk.universaldid.DIDResolver
 import me.uport.sdk.universaldid.PublicKeyEntry
@@ -32,11 +31,24 @@ import org.kethereum.extensions.toBigInteger
 import org.kethereum.hashes.sha256
 import org.kethereum.model.PUBLIC_KEY_SIZE
 import org.kethereum.model.PublicKey
-import org.kethereum.model.SignatureData
 import org.walleth.khex.clean0xPrefix
 import org.walleth.khex.hexToByteArray
 import java.math.BigInteger
 import java.security.SignatureException
+
+/**
+ * Method signature for the verification methods.
+ *
+ * @param publicKeys : List<PublicKeyEntry> list of public key entries to be verified against the signature
+ * @param signatureBytes : ByteArray the algorithm-specific encoded signature
+ * @param signedData : ByteArray the blob of data that was signed
+ *
+ */
+typealias VerificationMethod = (
+    publicKeys: List<PublicKeyEntry>,
+    signatureBytes: ByteArray,
+    signedData: ByteArray
+) -> Boolean
 
 /**
  * Tools for Verifying, Creating, and Decoding uport JWTs
@@ -259,10 +271,8 @@ class JWTTools(
 
         val signingInputBytes = token.substringBeforeLast('.').toByteArray(utf8)
 
-        val sigData = signatureBytes.decodeJose()
-
         val signatureIsValid = verificationMethod[header.alg]
-            ?.invoke(publicKeys, sigData, signingInputBytes)
+            ?.invoke(publicKeys, signatureBytes, signingInputBytes)
             ?: throw JWTEncodingException("JWT algorithm ${header.alg} not supported")
 
         if (signatureIsValid) {
@@ -275,20 +285,21 @@ class JWTTools(
         }
     }
 
-
     /**
      * maps known algorithms to the corresponding verification method
      */
-    private val verificationMethod = mapOf(
+    private val verificationMethod: Map<String, VerificationMethod> = mapOf(
         ES256K_R to ::verifyRecoverableES256K,
         ES256K to ::verifyES256K
     )
 
     private fun verifyES256K(
         publicKeys: List<PublicKeyEntry>,
-        sigData: SignatureData,
+        signatureBytes: ByteArray,
         signingInputBytes: ByteArray
     ): Boolean {
+
+        val sigData = signatureBytes.decodeJose()
 
         val messageHash = signingInputBytes.sha256()
 
@@ -301,27 +312,50 @@ class JWTTools(
             PublicKey(pkBytes.toBigInteger()).normalize()
 
         }.filter { publicKey ->
-
-            ecVerify(messageHash, sigData, publicKey)
+            try {
+                ecVerify(messageHash, sigData, publicKey)
+            } catch (ex: IllegalArgumentException) {
+                false
+            }
         }
 
-        return matches.isNotEmpty()
+        fun hasEthereumAddressKeys(publicKeys: List<PublicKeyEntry>): Boolean {
+            return publicKeys.any { it.ethereumAddress != null }
+        }
+
+        if (matches.isEmpty() && hasEthereumAddressKeys(publicKeys)) {
+            return verifyRecoverableES256K(publicKeys, signatureBytes, signingInputBytes)
+        } else {
+            return matches.isNotEmpty()
+        }
+
     }
 
     private fun verifyRecoverableES256K(
         publicKeys: List<PublicKeyEntry>,
-        sigData: SignatureData,
+        signatureBytes: ByteArray,
         signingInputBytes: ByteArray
     ): Boolean {
 
-        val recoveredPubKey: BigInteger = try {
-            signedJwtToKey(signingInputBytes, sigData)
-        } catch (e: SignatureException) {
-            BigInteger.ZERO
+        val signatures = if (signatureBytes.size == SIG_RECOVERABLE_SIZE) {
+            listOf(signatureBytes.decodeJose())
+        } else {
+            listOf(
+                signatureBytes.decodeJose(0),
+                signatureBytes.decodeJose(1)
+            )
         }
 
-        val pubKeyNoPrefix = PublicKey(recoveredPubKey).normalize()
-        val recoveredAddress = pubKeyNoPrefix.toAddress().cleanHex.toLowerCase()
+        val recoveredAddresses = signatures.map { signature ->
+            try {
+                signedJwtToKey(signingInputBytes, signature)
+            } catch (e: SignatureException) {
+                BigInteger.ZERO
+            }
+        }.map { pubKey ->
+            val pubKeyNoPrefix = PublicKey(pubKey).normalize()
+            pubKeyNoPrefix.toAddress().cleanHex.toLowerCase()
+        }
 
         val matches = publicKeys.map { pubKeyEntry ->
 
@@ -334,8 +368,7 @@ class JWTTools(
             (pubKeyEntry.ethereumAddress?.clean0xPrefix() ?: pubKey.toAddress().cleanHex)
 
         }.filter { ethereumAddress ->
-
-            ethereumAddress.toLowerCase() == recoveredAddress
+            ethereumAddress.toLowerCase() in recoveredAddresses
         }
 
         return matches.isNotEmpty()
