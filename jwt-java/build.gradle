@@ -1,5 +1,9 @@
-apply plugin: 'java-library'
-apply plugin: 'kotlin'
+apply plugin: "java-library"
+apply plugin: "kotlin"
+apply plugin: "maven"
+apply plugin: "com.jfrog.bintray"
+
+project.ext.description = "tools for creating and verifying JWTs that use uPort algorithms, usable in a JAVA context"
 
 dependencies {
     implementation project(":jwt")
