@@ -31,7 +31,7 @@ public class JWTToolsTest {
 
         KPSigner signer = new KPSigner("0x1234");
         String issuer = "did:ethr:" + signer.getAddress();
-        CompletableFuture<String> jwtFuture = tools.createAsync(
+        CompletableFuture<String> jwtFuture = tools.createJWT(
                 put,
                 issuer,
                 signer,
@@ -50,7 +50,7 @@ public class JWTToolsTest {
 
         JWTTools tools = new JWTTools();
         CompletableFuture<JwtPayload> jwtPayloadCompletableFuture =
-                tools.verifyAsync(
+                tools.verify(
                         "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJoZWxsbyI6IndvcmxkIiwiaWF0IjoxNTYxOTcxMTE5LCJpc3MiOiJkaWQ6ZXRocjoweGNmMDNkZDBhODk0ZWY3OWNiNWI2MDFhNDNjNGIyNWUzYWU0YzY3ZWQifQ.t5o1vzZExArlrrTVHmwtti7fnicXqvWrX6SS3F-Lu3budH7p6zQHjG8X7EvUTRUxhvr-eENCbXeteSE4rgF7MA",
                         false,
                         null);

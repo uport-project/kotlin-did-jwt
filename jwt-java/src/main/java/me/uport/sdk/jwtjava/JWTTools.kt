@@ -55,7 +55,7 @@ class JWTTools(
      *                  Supported types are `ES256K` for uport DID and `ES256K-R` for ethr-did and the rest
      *
      */
-    fun createAsync(
+    fun createJWT(
         payload: Map<String, Any?>,
         issuerDID: String,
         signer: Signer,
@@ -84,7 +84,7 @@ class JWTTools(
      *          , when the `audience` does not match the intended audience (`aud` field)
      * @return a [JwtPayload] if the verification is successful and `null` if it fails
      */
-    fun verifyAsync(
+    fun verify(
         token: String,
         auth: Boolean = false,
         audience: String? = null
