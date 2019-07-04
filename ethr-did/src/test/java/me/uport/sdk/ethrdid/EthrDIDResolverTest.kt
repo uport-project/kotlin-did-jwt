@@ -177,6 +177,78 @@ class EthrDIDResolverTest {
         assertThat(events).hasSize(3)
     }
 
+    @Test
+    fun `can resolve doc for address with delegate key added`() = runBlocking {
+
+        val rpc = mockk<JsonRPC>()
+
+        coEvery {
+            //mock the lookup owner call to return itself
+            rpc.ethCall(any(), eq("0x8733d4e8000000000000000000000000cf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed"))
+        }.returns("0x000000000000000000000000cf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed")
+
+        coEvery {
+            //mock the lastChanged call to point to block number 4513151 (0x44dd7f)
+            rpc.ethCall(any(), eq("0xf96d0f9f000000000000000000000000cf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed"))
+        }.returns("0x000000000000000000000000000000000000000000000000000000000044dd7f")
+
+        coEvery {
+            rpc.getLogs(address = any(), topics = any(), fromBlock = any(), toBlock = any())
+        }.returnsMany(
+            listOf(
+                JsonRpcLogItem(
+                    address = "0xdca7ef03e98e0dc2b855be647c39abe984fcf21b",
+                    topics = listOf(
+                        "0x5a5084339536bcab65f20799fcc58724588145ca054bd2be626174b27ba156f7",
+                        "0x000000000000000000000000cf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed"
+                    ),
+                    //this is the important bit that states that a delegate key was added
+                    data = "0x536563703235366b31566572696669636174696f6e4b6579323031380000000000000000000000000000000062d283fe6939c01fc88f02c6d2c9a547cc3e265600000000000000000000000000000000000000000000000000000000621f6e260000000000000000000000000000000000000000000000000000000000000000",
+                    blockNumber = BigInteger("4513151"),
+                    transactionHash = "0x16f847d99c47b90f34c494588a31874dc2da081b00ff34968a86d6f7d15863af",
+                    transactionIndex = BigInteger("8"),
+                    blockHash = "0xa237598ed026c2872ed8272a02d9fe8174a64b5bef9286cb37190a854fec3706",
+                    logIndex = BigInteger("8"),
+                    removed = false
+                )
+            ),
+            emptyList()
+        )
+
+        val resolver = EthrDIDResolver(rpc)
+        val ddo = resolver.resolve("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed")
+
+        val expectedDDO = EthrDIDDocument.fromJson(
+            //language=json
+            """{
+          "id": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed",
+          "publicKey": [
+            {
+              "id": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed#owner",
+              "type": "Secp256k1VerificationKey2018",
+              "owner": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed",
+              "ethereumAddress": "0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed"
+            },
+            {
+              "id": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed#delegate-1",
+              "type": "Secp256k1VerificationKey2018",
+              "owner": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed",
+              "ethereumAddress": "0x62d283fe6939c01fc88f02c6d2c9a547cc3e2656"
+            }
+          ],
+          "authentication": [
+            {
+              "type": "Secp256k1SignatureAuthentication2018",
+              "publicKey": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed#owner"
+            }
+          ]
+        }
+        """.trimIndent()
+        )
+
+        assertThat(ddo).isEqualTo(expectedDDO)
+    }
+
     // "did/pub/(Secp256k1|Rsa|Ed25519)/(veriKey|sigAuth)/(hex|base64)",
     private val attributeRegexes = listOf(
         "did/pub/Secp256k1/veriKey/hex",
@@ -219,7 +291,7 @@ class EthrDIDResolverTest {
     }
 
     @Test
-    fun `can parse sample attr change event`() {
+    fun `can parse sample attr change event in history`() {
         val soon = System.currentTimeMillis() / 1000 + 600
         val identity = "0xf3beac30c498d9e26865f34fcaa57dbb935b0d74"
         val owner = identity
