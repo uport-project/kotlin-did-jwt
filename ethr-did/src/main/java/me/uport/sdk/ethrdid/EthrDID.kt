@@ -61,7 +61,7 @@ class EthrDID(
         return rawResult.substring(rawResult.length - 40).prepend0xPrefix()
     }
 
-    suspend fun changeOwner(newOwner: String): String {
+    suspend fun changeOwner(newOwner: String, txOptions: TransactionOptions? = null): String {
         val owner = lookupOwner()
 
         val encodedCall = EthereumDIDRegistry.ChangeOwner.encode(
@@ -69,11 +69,11 @@ class EthrDID(
             Solidity.Address(newOwner.hexToBigInteger())
         )
 
-        return signAndSendContractCall(owner, encodedCall)
+        return signAndSendContractCall(owner, encodedCall, txOptions)
     }
 
 
-    suspend fun addDelegate(delegate: String, options: DelegateOptions = DelegateOptions()): String {
+    suspend fun addDelegate(delegate: String, options: DelegateOptions = DelegateOptions(), txOptions: TransactionOptions? = null): String {
         val owner = lookupOwner()
 
         val encodedCall = EthereumDIDRegistry.AddDelegate.encode(
@@ -83,12 +83,13 @@ class EthrDID(
             Solidity.UInt256(BigInteger.valueOf(options.expiresIn))
         )
 
-        return signAndSendContractCall(owner, encodedCall)
+        return signAndSendContractCall(owner, encodedCall, txOptions)
     }
 
     suspend fun revokeDelegate(
         delegate: String,
-        delegateType: PublicKeyType = PublicKeyType.Secp256k1VerificationKey2018
+        delegateType: PublicKeyType = PublicKeyType.Secp256k1VerificationKey2018,
+        txOptions: TransactionOptions? = null
     ): String {
         val owner = this.lookupOwner()
         val encodedCall = EthereumDIDRegistry.RevokeDelegate.encode(
@@ -97,10 +98,10 @@ class EthrDID(
             Solidity.Address(delegate.hexToBigInteger())
         )
 
-        return signAndSendContractCall(owner, encodedCall)
+        return signAndSendContractCall(owner, encodedCall, txOptions)
     }
 
-    suspend fun setAttribute(key: String, value: String, expiresIn: Long = 86400L): String {
+    suspend fun setAttribute(key: String, value: String, expiresIn: Long = 86400L, txOptions: TransactionOptions? = null): String {
         val owner = this.lookupOwner()
         val encodedCall = EthereumDIDRegistry.SetAttribute.encode(
             Solidity.Address(this.address.hexToBigInteger()),
@@ -108,23 +109,52 @@ class EthrDID(
             Solidity.Bytes(value.toByteArray()),
             Solidity.UInt256(BigInteger.valueOf(expiresIn))
         )
-        return signAndSendContractCall(owner, encodedCall)
+        return signAndSendContractCall(owner, encodedCall, txOptions)
     }
 
-    private suspend fun signAndSendContractCall(owner: String, encodedCall: String): String {
+    /**
+     * Encapsulates some overrides
+     */
+    data class TransactionOptions(
+        /**
+         * overrides the gasLimit used in the transaction
+         */
+        val gasLimit: BigInteger? = null,
+
+        /**
+         * overrides the gasPrice (measured in wei) set for the transaction
+         */
+        val gasPrice: BigInteger? = null,
+
+        /**
+         * overrides the nonce used in the transaction
+         * (for rebroadcasting with different params while the current one is not yet mined)
+         */
+        val nonce: BigInteger? = null,
+
+        /**
+         * overrides the ETH value (measured in wei).
+         */
+        val value: BigInteger? = null
+    )
+
+    private suspend fun signAndSendContractCall(
+        owner: String,
+        encodedCall: String,
+        txOption: TransactionOptions? = null
+    ): String {
         //these requests can be done in parallel
-        val nonce = rpc.getTransactionCount(owner)
-        val networkPrice = rpc.getGasPrice()
+        val nonce = txOption?.nonce ?: rpc.getTransactionCount(owner)
+        val networkPrice = txOption?.gasPrice ?: rpc.getGasPrice()
 
         val unsignedTx = createTransactionWithDefaults(
             from = Address(owner),
             to = Address(registry),
-            gasLimit = BigInteger.valueOf(70_000),
-            //FIXME: allow overriding the gas price
+            gasLimit = txOption?.gasLimit ?: BigInteger.valueOf(80_000),
             gasPrice = networkPrice,
             nonce = nonce,
             input = encodedCall.hexToByteArray(),
-            value = BigInteger.ZERO
+            value = txOption?.value ?: BigInteger.ZERO
         )
 
         val signedEncodedTx = signer.signRawTx(unsignedTx)
