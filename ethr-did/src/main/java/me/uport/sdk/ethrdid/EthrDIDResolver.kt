@@ -89,7 +89,7 @@ open class EthrDIDResolver(
      */
     @Suppress("TooGenericExceptionCaught")
     internal suspend fun getHistory(identity: String): List<Any> {
-        val lastChangedQueue: Queue<BigInteger> = PriorityQueue<BigInteger>()
+        val lastChangedQueue: Queue<BigInteger> = PriorityQueue()
         val events = emptyList<Any>().toMutableList()
         lastChangedQueue.add(lastChanged(identity).hexToBigInteger())
         do {
@@ -249,7 +249,7 @@ open class EthrDIDResolver(
         val authEntries = mapOf<String, AuthenticationEntry>().toMutableMap()
 
         var delegateIndex = delegateCount
-        val delegateType = event.delegatetype.bytes.toString(utf8)
+        val delegateType = event.delegatetype.bytes.toString(utf8).replace("\u0000","")
         val delegate = event.delegate.value.toHexStringNoPrefix().prepend0xPrefix()
         val key = "DIDDelegateChanged-$delegateType-$delegate"
         val validTo = event.validto.value.toLong()
