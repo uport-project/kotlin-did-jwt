@@ -16,6 +16,8 @@ import me.uport.sdk.signer.utf8
 import me.uport.sdk.universaldid.*
 import me.uport.sdk.universaldid.PublicKeyType.Companion.Secp256k1SignatureAuthentication2018
 import me.uport.sdk.universaldid.PublicKeyType.Companion.Secp256k1VerificationKey2018
+import me.uport.sdk.universaldid.PublicKeyType.Companion.sigAuth
+import me.uport.sdk.universaldid.PublicKeyType.Companion.veriKey
 import org.kethereum.encodings.encodeToBase58String
 import org.kethereum.extensions.hexToBigInteger
 import org.kethereum.extensions.toHexStringNoPrefix
@@ -259,13 +261,13 @@ open class EthrDIDResolver(
 
             when (delegateType) {
                 Secp256k1SignatureAuthentication2018.name,
-                sigAuth -> authEntries[key] = AuthenticationEntry(
+                sigAuth.name -> authEntries[key] = AuthenticationEntry(
                     type = Secp256k1SignatureAuthentication2018,
                     publicKey = "$ownerDID#delegate-$delegateIndex"
                 )
 
                 Secp256k1VerificationKey2018.name,
-                veriKey -> pkEntries[key] = PublicKeyEntry(
+                veriKey.name -> pkEntries[key] = PublicKeyEntry(
                     id = "$ownerDID#delegate-$delegateIndex",
                     type = Secp256k1VerificationKey2018,
                     owner = ownerDID,
@@ -279,16 +281,13 @@ open class EthrDIDResolver(
     companion object {
         const val DEFAULT_REGISTRY_ADDRESS = "0xdca7ef03e98e0dc2b855be647c39abe984fcf21b"
 
-        internal const val veriKey = "veriKey"
-        internal const val sigAuth = "sigAuth"
-
         private val attrTypes = mapOf(
-            sigAuth to "SignatureAuthentication2018",
-            veriKey to "VerificationKey2018"
+            sigAuth.name to "SignatureAuthentication2018",
+            veriKey.name to "VerificationKey2018"
         )
 
         private fun parseType(algo: String, rawType: String): PublicKeyType {
-            var type = if (rawType.isBlank()) veriKey else rawType
+            var type = if (rawType.isBlank()) veriKey.name else rawType
             type = attrTypes[type] ?: type
             return PublicKeyType("$algo$type") //will throw exception if none found
         }

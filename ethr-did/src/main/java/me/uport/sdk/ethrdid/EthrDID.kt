@@ -5,6 +5,7 @@ package me.uport.sdk.ethrdid
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.signer.Signer
 import me.uport.sdk.signer.signRawTx
+import me.uport.sdk.signer.utf8
 import me.uport.sdk.universaldid.PublicKeyType
 import org.kethereum.extensions.hexToBigInteger
 import org.kethereum.model.Address
@@ -50,7 +51,7 @@ class EthrDID(
 
 
     class DelegateOptions(
-        val delegateType: PublicKeyType = PublicKeyType.Secp256k1VerificationKey2018,
+        val delegateType: PublicKeyType = PublicKeyType.veriKey,
         val expiresIn: Long = 86400L
     )
 
@@ -78,7 +79,7 @@ class EthrDID(
 
         val encodedCall = EthereumDIDRegistry.AddDelegate.encode(
             Solidity.Address(this.address.hexToBigInteger()),
-            Solidity.Bytes32(options.delegateType.name.toByteArray()),
+            Solidity.Bytes32(options.delegateType.name.toByteArray(utf8)),
             Solidity.Address(delegate.hexToBigInteger()),
             Solidity.UInt256(BigInteger.valueOf(options.expiresIn))
         )
@@ -88,13 +89,13 @@ class EthrDID(
 
     suspend fun revokeDelegate(
         delegate: String,
-        delegateType: PublicKeyType = PublicKeyType.Secp256k1VerificationKey2018,
+        delegateType: PublicKeyType = PublicKeyType.veriKey,
         txOptions: TransactionOptions? = null
     ): String {
         val owner = this.lookupOwner()
         val encodedCall = EthereumDIDRegistry.RevokeDelegate.encode(
             Solidity.Address(this.address.hexToBigInteger()),
-            Solidity.Bytes32(delegateType.name.toByteArray()),
+            Solidity.Bytes32(delegateType.name.toByteArray(utf8)),
             Solidity.Address(delegate.hexToBigInteger())
         )
 
@@ -105,8 +106,8 @@ class EthrDID(
         val owner = this.lookupOwner()
         val encodedCall = EthereumDIDRegistry.SetAttribute.encode(
             Solidity.Address(this.address.hexToBigInteger()),
-            Solidity.Bytes32(key.toByteArray()),
-            Solidity.Bytes(value.toByteArray()),
+            Solidity.Bytes32(key.toByteArray(utf8)),
+            Solidity.Bytes(value.toByteArray(utf8)),
             Solidity.UInt256(BigInteger.valueOf(expiresIn))
         )
         return signAndSendContractCall(owner, encodedCall, txOptions)
