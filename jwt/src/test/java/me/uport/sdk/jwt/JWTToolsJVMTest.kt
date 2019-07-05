@@ -47,7 +47,7 @@ class JWTToolsJVMTest {
         tokens.forEach { token ->
             val payload = JWTTools(TestTimeProvider(1535102500000L)).verify(
                 token = token,
-                aud = "did:ethr:0xa9e3232b61bdb672712b9ae33195069d8d651c1a"
+                audience = "did:ethr:0xa9e3232b61bdb672712b9ae33195069d8d651c1a"
             )
             assertThat(payload).isNotNull()
         }
@@ -176,7 +176,7 @@ class JWTToolsJVMTest {
         coAssert {
             JWTTools(TestTimeProvider(1535102500000L)).verify(
                 token = token,
-                aud = "did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154"
+                audience = "did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154"
             )
         }.thrownError {
             isInstanceOf(InvalidJWTException::class)
@@ -421,6 +421,22 @@ class JWTToolsJVMTest {
         val payload = JWTTools().verify(token)
         assertThat(payload).isNotNull()
         Unit
+    }
+
+    @Test
+    fun `can verify a ES256K signature with only ethereumAddress in the DID doc`() = runBlocking {
+        val address = "0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed"
+
+        val resolver = spyk(EthrDIDResolver(JsonRPC("")))
+
+        coEvery { resolver.resolve(eq("did:ethr:$address")) } returns
+                EthrDIDTestHelpers.mockDocForAddress(address)
+
+        UniversalDID.registerResolver(resolver)
+
+        val token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJoZWxsbyI6IndvcmxkIiwiaWF0IjoxNTYxOTcxMTE5LCJpc3MiOiJkaWQ6ZXRocjoweGNmMDNkZDBhODk0ZWY3OWNiNWI2MDFhNDNjNGIyNWUzYWU0YzY3ZWQifQ.t5o1vzZExArlrrTVHmwtti7fnicXqvWrX6SS3F-Lu3budH7p6zQHjG8X7EvUTRUxhvr-eENCbXeteSE4rgF7MA"
+        val payload = JWTTools().verify(token)
+        assertThat(payload.iss).isEqualTo("did:ethr:$address")
     }
 
     @Test
