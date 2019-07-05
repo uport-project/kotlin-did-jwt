@@ -69,13 +69,16 @@ detekt {
     }
 }
 
+
 allprojects {
+
     repositories {
         google()
         jcenter()
         maven { url 'https://jitpack.io' }
         maven { url "https://kotlin.bintray.com/kotlinx" }
-//        mavenLocal()
+        maven { url "http://repo1.maven.org/maven2/" }
+        mavenLocal()
     }
 
 //address warnings about multiple kotlin runtimes in classpath
