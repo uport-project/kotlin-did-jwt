@@ -56,7 +56,7 @@ data class ServiceEntry(
 
 /**
  * This is a wrapper class for PublicKeyType
- * It is meant to provide a more typesafe way of dealing with these strings.
+ * It is meant to provide a more type-safe way of dealing with these strings.
  * This will be ported to inline classes when that feature of kotlin stabilizes and works properly with serialization
  *
  * see DID Document spec:
@@ -91,7 +91,6 @@ data class PublicKeyType(val name: String) {
          */
         val Secp256k1SignatureAuthentication2018 = PublicKeyType("Secp256k1SignatureAuthentication2018")
 
-
         /**
          * While not directly generated here, it is treated as [Secp256k1VerificationKey2018]
          */
@@ -106,5 +105,19 @@ data class PublicKeyType(val name: String) {
          * encryption key. Usage described here: https://github.com/uport-project/specs/blob/develop/pki/diddocument.md
          */
         val Curve25519EncryptionPublicKey = PublicKeyType("Curve25519EncryptionPublicKey")
+
+        /**
+         * Used in ethr-did events to signal the existence of a [Secp256k1VerificationKey2018]
+         * in the DID document.
+         * Using a shorter key name reduces gas cost in DID operations.
+         */
+        val veriKey = PublicKeyType("veriKey")
+
+        /**
+         * Used in ethr-did events to signal the existence of a [Secp256k1SignatureAuthentication2018]
+         * in the DID document.
+         * Using a shorter key name reduces gas cost in DID operations.
+         */
+        val sigAuth = PublicKeyType("sigAuth")
     }
 }
