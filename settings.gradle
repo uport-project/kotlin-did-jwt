@@ -1,4 +1,4 @@
-include ':https-did'
+include ':web-did'
 include ':uport-did'
 include ':ethr-did'
 include ':universal-did'

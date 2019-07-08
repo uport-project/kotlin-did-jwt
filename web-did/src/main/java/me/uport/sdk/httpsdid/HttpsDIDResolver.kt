@@ -7,7 +7,7 @@ import me.uport.sdk.universaldid.DidResolverError
 
 /**
  * This is a DID resolver implementation that supports the "https" DID method.
- * It accepts https-did strings and produces a document described at:
+ * It accepts web-did strings and produces a document described at:
  * https://w3c-ccg.github.io/did-spec/#did-documents
  *
  * Example https did: "did:https:example.com"

@@ -23,6 +23,7 @@ We currently support the following DID methods:
 - [`web`](https://github.com/uport-project/https-did-resolver)
 - [`https`](https://github.com/uport-project/https-did-resolver) *DEPRECATED*
 
+
 Defaults are automatically installed but you can customize to fit your needs.
 
 Support for other DID methods should be simple.
