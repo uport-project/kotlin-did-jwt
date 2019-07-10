@@ -133,8 +133,13 @@ so that only tokens intended for your app are considered valid.
 
 ## CHANGELOG
 
+* 0.2.1
+    - add support for web DID, deprecating https DID (#5)
+    - allow creation of JWTs with no expiry (#6)
+    - fallback to ES256K-R style verification if ES256K algorithm fails because of missing key encoding (#7)
+    - [bugfix] delegate keys in ethr-did documents were not being resolved properly (#9)
 * 0.2.0
-    - [breaking] add audience checking for JWT verification
+    - [breaking] add audience checking for JWT verification (#2)
     - add `jwt-test` module with helpers for testing
 * 0.1.2
     - fix crash when parsing legacy identity document 
