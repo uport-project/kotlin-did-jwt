@@ -22,6 +22,7 @@ jobs:
             - v1-dependencies-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-
 
       - run: ./gradlew dependencies
+      - run: bash <(curl -s https://codecov.io/bash)
 
       - save_cache:
           paths:
