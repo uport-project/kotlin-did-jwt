@@ -1,3 +1,5 @@
+@file:Suppress("KDocUnresolvedReference")
+
 package me.uport.sdk.jwt
 
 import com.squareup.moshi.JsonAdapter
@@ -14,10 +16,7 @@ import me.uport.sdk.jwt.model.JwtHeader
 import me.uport.sdk.jwt.model.JwtHeader.Companion.ES256K
 import me.uport.sdk.jwt.model.JwtHeader.Companion.ES256K_R
 import me.uport.sdk.jwt.model.JwtPayload
-import me.uport.sdk.signer.Signer
-import me.uport.sdk.signer.decodeJose
-import me.uport.sdk.signer.normalize
-import me.uport.sdk.signer.utf8
+import me.uport.sdk.signer.*
 import me.uport.sdk.universaldid.DIDDocument
 import me.uport.sdk.universaldid.DIDResolver
 import me.uport.sdk.universaldid.PublicKeyEntry
@@ -32,11 +31,24 @@ import org.kethereum.extensions.toBigInteger
 import org.kethereum.hashes.sha256
 import org.kethereum.model.PUBLIC_KEY_SIZE
 import org.kethereum.model.PublicKey
-import org.kethereum.model.SignatureData
 import org.walleth.khex.clean0xPrefix
 import org.walleth.khex.hexToByteArray
 import java.math.BigInteger
 import java.security.SignatureException
+
+/**
+ * Method signature for the verification methods.
+ *
+ * @param publicKeys : List<PublicKeyEntry> list of public key entries to be verified against the signature
+ * @param signatureBytes : ByteArray the algorithm-specific encoded signature
+ * @param signedData : ByteArray the blob of data that was signed
+ *
+ */
+typealias VerificationMethod = (
+    publicKeys: List<PublicKeyEntry>,
+    signatureBytes: ByteArray,
+    signedData: ByteArray
+) -> Boolean
 
 /**
  * Tools for Verifying, Creating, and Decoding uport JWTs
@@ -98,28 +110,38 @@ class JWTTools(
      *                  an `exp` timestamp is already part of the [payload].
      *                  If there is no `exp` field in the payload and the param is not specified,
      *                  it defaults to [DEFAULT_JWT_VALIDITY_SECONDS]
+     *                  If this param is negative or if `payload["exp"]` is explicitly set to `null`,
+     *                  the resulting JWT will not have an `exp` field
      * @param algorithm defaults to `ES256K-R`. The signing algorithm for this JWT.
      *                  Supported types are `ES256K` for uport DID and `ES256K-R` for ethr-did and the rest
      *
      */
     suspend fun createJWT(
-        payload: Map<String, Any>,
+        payload: Map<String, Any?>,
         issuerDID: String,
         signer: Signer,
         expiresInSeconds: Long = DEFAULT_JWT_VALIDITY_SECONDS,
         algorithm: String = ES256K_R
     ): String {
-        val mapAdapter = moshi.mapAdapter<String, Any>(String::class.java, Any::class.java)
+        val mapAdapter = moshi.mapAdapter<String, Any?>(String::class.java, Any::class.java)
 
         val mutablePayload = payload.toMutableMap()
 
         val header = JwtHeader(alg = algorithm)
 
         val iatSeconds = Math.floor(timeProvider.nowMs() / 1000.0).toLong()
-        val expSeconds = iatSeconds + expiresInSeconds
-
         mutablePayload["iat"] = iatSeconds
-        mutablePayload["exp"] = payload["exp"] ?: expSeconds
+
+        val expSeconds = iatSeconds + expiresInSeconds
+        if (expiresInSeconds >= 0) {
+            mutablePayload["exp"] = payload["exp"] ?: expSeconds
+        } else {
+            mutablePayload.remove("exp")
+        }
+        if (payload.containsKey("exp") && payload["exp"] == null) {
+            mutablePayload.remove("exp")
+        }
+
         mutablePayload["iss"] = issuerDID
 
         @Suppress("SimplifiableCallChain", "ConvertCallChainIntoSequence")
@@ -199,16 +221,20 @@ class JWTTools(
 
     /**
      * Verifies a jwt [token]
-     * @params jwt token
-     * @throws InvalidJWTException when the current time is not within the time range of payload iat and exp
-     *          when no public key matches are found in the DID document
+     * @param token the jwt token to be verified
+     * @param auth if this param is `true` the public key list that this token is checked against is filtered to the
+     *          entries in the `authentication` entries in the DID document of the issuer of the token.
+     * @param audience the audience that should be able to verify this token. This is usually a DID but can also be a
+     *          callback URL for situations where the token represents a response or a bearer token.
+     * @throws InvalidJWTException when the current time is not within the time range of payload `iat` and `exp`
+     *          , when no public key matches are found in the DID document
+     *          , when the `audience` does not match the intended audience (`aud` field)
      * @return a [JwtPayload] if the verification is successful and `null` if it fails
      */
     suspend fun verify(
         token: String,
         auth: Boolean = false,
-        aud: String? = null,
-        callbackUrl: String? = null
+        audience: String? = null
     ): JwtPayload {
         val (header, payload, signatureBytes) = decode(token)
 
@@ -225,20 +251,18 @@ class JWTTools(
             val payloadAudience = normalizeKnownDID(payload.aud)
             if (UniversalDID.canResolve(payloadAudience)) {
 
-                if (aud == null) {
-                    throw InvalidJWTException("JWT audience is required but your app address has not been configured")
+                if (audience == null) {
+                    throw InvalidJWTException(
+                        "JWT audience is required but your app address has not been configured. " +
+                                "You can provide the proper app address using the `audience` parameter when verifying."
+                    )
                 }
 
-                if (aud != payloadAudience) {
-                    throw InvalidJWTException("JWT audience does not match your DID: aud: ${payloadAudience} != yours: ${aud}")
-                }
-            } else {
-                if (callbackUrl == null) {
-                    throw InvalidJWTException("JWT audience matching your callback url is required but one wasn\'t passed in")
-                }
-
-                if (callbackUrl != payloadAudience) {
-                    throw InvalidJWTException("JWT audience does not match the callback url: aud: ${payloadAudience} != url: ${callbackUrl}")
+                if (audience != payloadAudience) {
+                    throw InvalidJWTException(
+                        "JWT audience does not match your DID. " +
+                                "aud: $payloadAudience != yours: $audience"
+                    )
                 }
             }
         }
@@ -247,32 +271,35 @@ class JWTTools(
 
         val signingInputBytes = token.substringBeforeLast('.').toByteArray(utf8)
 
-        val sigData = signatureBytes.decodeJose()
-
         val signatureIsValid = verificationMethod[header.alg]
-            ?.invoke(publicKeys, sigData, signingInputBytes)
+            ?.invoke(publicKeys, signatureBytes, signingInputBytes)
             ?: throw JWTEncodingException("JWT algorithm ${header.alg} not supported")
 
         if (signatureIsValid) {
             return payload
         } else {
-            throw InvalidJWTException("Signature invalid for JWT. DID document for ${payload.iss} does not have any matching public keys")
+            throw InvalidJWTException(
+                "Signature invalid for JWT. DID document for ${payload.iss} does not have any " +
+                        "matching public keys"
+            )
         }
     }
 
     /**
      * maps known algorithms to the corresponding verification method
      */
-    private val verificationMethod = mapOf(
+    private val verificationMethod: Map<String, VerificationMethod> = mapOf(
         ES256K_R to ::verifyRecoverableES256K,
         ES256K to ::verifyES256K
     )
 
     private fun verifyES256K(
         publicKeys: List<PublicKeyEntry>,
-        sigData: SignatureData,
+        signatureBytes: ByteArray,
         signingInputBytes: ByteArray
     ): Boolean {
+
+        val sigData = signatureBytes.decodeJose()
 
         val messageHash = signingInputBytes.sha256()
 
@@ -285,27 +312,50 @@ class JWTTools(
             PublicKey(pkBytes.toBigInteger()).normalize()
 
         }.filter { publicKey ->
-
-            ecVerify(messageHash, sigData, publicKey)
+            try {
+                ecVerify(messageHash, sigData, publicKey)
+            } catch (ex: IllegalArgumentException) {
+                false
+            }
         }
 
-        return matches.isNotEmpty()
+        fun hasEthereumAddressKeys(publicKeys: List<PublicKeyEntry>): Boolean {
+            return publicKeys.any { it.ethereumAddress != null }
+        }
+
+        if (matches.isEmpty() && hasEthereumAddressKeys(publicKeys)) {
+            return verifyRecoverableES256K(publicKeys, signatureBytes, signingInputBytes)
+        } else {
+            return matches.isNotEmpty()
+        }
+
     }
 
     private fun verifyRecoverableES256K(
         publicKeys: List<PublicKeyEntry>,
-        sigData: SignatureData,
+        signatureBytes: ByteArray,
         signingInputBytes: ByteArray
     ): Boolean {
 
-        val recoveredPubKey: BigInteger = try {
-            signedJwtToKey(signingInputBytes, sigData)
-        } catch (e: SignatureException) {
-            BigInteger.ZERO
+        val signatures = if (signatureBytes.size == SIG_RECOVERABLE_SIZE) {
+            listOf(signatureBytes.decodeJose())
+        } else {
+            listOf(
+                signatureBytes.decodeJose(0),
+                signatureBytes.decodeJose(1)
+            )
         }
 
-        val pubKeyNoPrefix = PublicKey(recoveredPubKey).normalize()
-        val recoveredAddress = pubKeyNoPrefix.toAddress().cleanHex.toLowerCase()
+        val recoveredAddresses = signatures.map { signature ->
+            try {
+                signedJwtToKey(signingInputBytes, signature)
+            } catch (e: SignatureException) {
+                BigInteger.ZERO
+            }
+        }.map { pubKey ->
+            val pubKeyNoPrefix = PublicKey(pubKey).normalize()
+            pubKeyNoPrefix.toAddress().cleanHex.toLowerCase()
+        }
 
         val matches = publicKeys.map { pubKeyEntry ->
 
@@ -318,8 +368,7 @@ class JWTTools(
             (pubKeyEntry.ethereumAddress?.clean0xPrefix() ?: pubKey.toAddress().cleanHex)
 
         }.filter { ethereumAddress ->
-
-            ethereumAddress.toLowerCase() == recoveredAddress
+            ethereumAddress.toLowerCase() in recoveredAddresses
         }
 
         return matches.isNotEmpty()
@@ -333,7 +382,7 @@ class JWTTools(
      * entries in the DIDDocument
      *
      */
-    suspend fun resolveAuthenticator(alg: String, issuer: String, auth: Boolean): List<PublicKeyEntry> {
+    internal suspend fun resolveAuthenticator(alg: String, issuer: String, auth: Boolean): List<PublicKeyEntry> {
 
         if (alg !in verificationMethod.keys) {
             throw JWTEncodingException("JWT algorithm '$alg' not supported")

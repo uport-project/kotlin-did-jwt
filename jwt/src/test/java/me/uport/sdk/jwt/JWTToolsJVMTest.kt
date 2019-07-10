@@ -2,6 +2,7 @@ package me.uport.sdk.jwt
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import io.mockk.coEvery
@@ -46,7 +47,7 @@ class JWTToolsJVMTest {
         tokens.forEach { token ->
             val payload = JWTTools(TestTimeProvider(1535102500000L)).verify(
                 token = token,
-                aud = "did:ethr:0xa9e3232b61bdb672712b9ae33195069d8d651c1a"
+                audience = "did:ethr:0xa9e3232b61bdb672712b9ae33195069d8d651c1a"
             )
             assertThat(payload).isNotNull()
         }
@@ -175,7 +176,7 @@ class JWTToolsJVMTest {
         coAssert {
             JWTTools(TestTimeProvider(1535102500000L)).verify(
                 token = token,
-                aud = "did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154"
+                audience = "did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154"
             )
         }.thrownError {
             isInstanceOf(InvalidJWTException::class)
@@ -423,6 +424,22 @@ class JWTToolsJVMTest {
     }
 
     @Test
+    fun `can verify a ES256K signature with only ethereumAddress in the DID doc`() = runBlocking {
+        val address = "0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed"
+
+        val resolver = spyk(EthrDIDResolver(JsonRPC("")))
+
+        coEvery { resolver.resolve(eq("did:ethr:$address")) } returns
+                EthrDIDTestHelpers.mockDocForAddress(address)
+
+        UniversalDID.registerResolver(resolver)
+
+        val token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJoZWxsbyI6IndvcmxkIiwiaWF0IjoxNTYxOTcxMTE5LCJpc3MiOiJkaWQ6ZXRocjoweGNmMDNkZDBhODk0ZWY3OWNiNWI2MDFhNDNjNGIyNWUzYWU0YzY3ZWQifQ.t5o1vzZExArlrrTVHmwtti7fnicXqvWrX6SS3F-Lu3budH7p6zQHjG8X7EvUTRUxhvr-eENCbXeteSE4rgF7MA"
+        val payload = JWTTools().verify(token)
+        assertThat(payload.iss).isEqualTo("did:ethr:$address")
+    }
+
+    @Test
     fun `can create token from map of claims`() = runBlocking {
 
         val tested = JWTTools(TestTimeProvider(12345678000L))
@@ -452,6 +469,62 @@ class JWTToolsJVMTest {
         assertThat(normalizeKnownDID(ethrDID)).isEqualTo(ethrDID)
         assertThat(normalizeKnownDID(ethrAddress)).isEqualTo(ethrDID)
         assertThat(normalizeKnownDID(invalidDID)).isEqualTo(invalidDID)
+    }
+
+    @Test
+    fun `ignores expiredInSeconds param when exp is already set in payload`() = runBlocking {
+        val tested = JWTTools()
+
+        val payload = mapOf("exp" to 432101234L)
+        val signer = KPSigner("0x1234")
+        val issuerDID = "did:ethr:${signer.getAddress()}"
+
+        val jwt = tested.createJWT(payload, issuerDID, signer, expiresInSeconds = 1234L)
+
+        val (_, dec, _) = tested.decode(jwt)
+        assertThat(dec.exp).isEqualTo(432101234L)
+    }
+
+    @Test
+    fun `sets exp based on expiresInSeconds`() = runBlocking {
+        val tested = JWTTools(TestTimeProvider(1111000L))
+
+        val payload = mapOf("hello" to "world")
+        val signer = KPSigner("0x1234")
+        val issuerDID = "did:ethr:${signer.getAddress()}"
+
+        val jwt = tested.createJWT(payload, issuerDID, signer, expiresInSeconds = 42L)
+
+        val (_, dec, _) = tested.decode(jwt)
+        assertThat(dec.exp).isEqualTo(1153L)
+    }
+
+    @Test
+    fun `removes exp when payload sets it to null`() = runBlocking {
+        val tested = JWTTools()
+
+        val payload = mapOf("exp" to null)
+        val signer = KPSigner("0x1234")
+        val issuerDID = "did:ethr:${signer.getAddress()}"
+
+        val jwt = tested.createJWT(payload, issuerDID, signer)
+
+        val (_, decoded, _) = tested.decodeRaw(jwt)
+        assertThat(decoded.containsKey("exp")).isFalse()
+    }
+
+    @Test
+    fun `removes exp when expiry interval is negative`() = runBlocking {
+        val tested = JWTTools()
+
+        val payload = mapOf("exp" to 1234)
+        val signer = KPSigner("0x1234")
+        val issuerDID = "did:ethr:${signer.getAddress()}"
+
+        val jwt = tested.createJWT(payload, issuerDID, signer, expiresInSeconds = -1)
+
+        val (_, decoded, _) = tested.decodeRaw(jwt)
+        assertThat(decoded.containsKey("exp")).isFalse()
     }
 }
 

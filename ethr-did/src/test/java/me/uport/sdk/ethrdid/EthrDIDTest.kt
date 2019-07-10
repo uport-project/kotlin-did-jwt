@@ -4,8 +4,8 @@ package me.uport.sdk.ethrdid
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import io.mockk.CapturingSlot
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import me.uport.sdk.jsonrpc.JsonRPC
@@ -50,30 +50,33 @@ class EthrDIDTest {
             val signer = KPSigner(originalPrivKey)
             val address = signer.getAddress().prepend0xPrefix()
 
+            val rawTxSlot = CapturingSlot<String>()
+
             val rpc = mockk<JsonRPC> {
-                coEvery { getTransactionCount(any()) } returns BigInteger.ZERO
-                coEvery { getGasPrice() } returns 20_000_000_000L.toBigInteger()
                 coEvery {
+                    //mock the call to getOwner to return itself
                     ethCall(
                         any(),
                         any()
                     )
                 } returns "0x0000000000000000000000001122334455667788990011223344556677889900"
-                coEvery { sendRawTransaction(any()) } returns "mockedTxHash"
+                coEvery { sendRawTransaction(capture(rawTxSlot)) } returns "mockedTxHash"
             }
 
             val ethrDid = EthrDID(address, rpc, rinkebyRegistry, signer)
 
-            val txHash = ethrDid.changeOwner(newAddress)
+            val txHash = ethrDid.changeOwner(newAddress, EthrDID.TransactionOptions(
+                gasLimit = 70_000L.toBigInteger(),
+                gasPrice = 20_000_000_000L.toBigInteger(),
+                nonce = BigInteger.ZERO
+            ))
 
             assertThat(txHash).isEqualTo("mockedTxHash")
 
             val expectedSignedTx =
                 "0xf8aa808504a817c8008301117094dca7ef03e98e0dc2b855be647c39abe984fcf21b80b844f00d4b5d000000000000000000000000f3beac30c498d9e26865f34fcaa57dbb935b0d7400000000000000000000000045c4ebd7ffb86891ba6f9f68452f9f0815aacd8b1ca0eb687cc4a323d4c3471d01d3a0d3d212754539fa9d2f6973acc0f1de275f53e9a0257684845b8d3d5e0c0838c5da007ddc7a0df08722fba53866601821f0aceff4"
 
-            coVerify {
-                rpc.sendRawTransaction(eq(expectedSignedTx))
-            }
+            assertThat(rawTxSlot.captured).isEqualTo(expectedSignedTx)
 
         }
     }
