@@ -61,7 +61,7 @@ class JWTDecodeTest {
         val (header, payload) = JWTTools().decode(validVerificationToken)
         val nameClaim = mapOf("name" to "Bob", "gender" to "male")
         assertThat(header.typ).isEqualTo("JWT")
-        assertThat(payload.claims).isEqualTo(nameClaim)
+        assertThat(payload.responseClaims).isEqualTo(nameClaim)
         assertThat(payload.iss).isEqualTo("did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed")
     }
 

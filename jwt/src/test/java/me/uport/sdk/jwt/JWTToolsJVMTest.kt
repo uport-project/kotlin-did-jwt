@@ -73,7 +73,7 @@ class JWTToolsJVMTest {
         dad = null,
         own = null,
         capabilities = null,
-        claims = null,
+        responseClaims = null,
         ctl = null,
         reg = null,
         rel = null,
@@ -101,7 +101,7 @@ class JWTToolsJVMTest {
         dad = null,
         own = null,
         capabilities = null,
-        claims = null,
+        responseClaims = null,
         ctl = null,
         reg = null,
         rel = null,
@@ -445,7 +445,7 @@ class JWTToolsJVMTest {
         val tested = JWTTools(TestTimeProvider(12345678000L))
 
         val payload = mapOf(
-            "claims" to mapOf("name" to "R Daneel Olivaw")
+            "responseClaims" to mapOf("name" to "R Daneel Olivaw")
         )
 
         val signer = KPSigner("0x54ece214d38fe6b46110a21c69fd55230f09688bf85b95fc7c1e4e160441ece1")
@@ -453,7 +453,7 @@ class JWTToolsJVMTest {
 
         val jwt = tested.createJWT(payload, issuerDID, signer)
         assertThat(jwt)
-            .isEqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJjbGFpbXMiOnsibmFtZSI6IlIgRGFuZWVsIE9saXZhdyJ9LCJpYXQiOjEyMzQ1Njc4LCJleHAiOjEyMzQ1OTc4LCJpc3MiOiJkaWQ6ZXRocjoweDQxMjNjYmQxNDNiNTVjMDZlNDUxZmYyNTNhZjA5Mjg2YjY4N2E5NTAifQ.o6eDKYjHJnak1ylkpe9g8krxvK9UEhKf-1T0EYhH8pGyb8MjOEepRJi8DYlVEnZno0DkVYXQCf3u1i_HThBKtAA")
+            .isEqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJyZXNwb25zZUNsYWltcyI6eyJuYW1lIjoiUiBEYW5lZWwgT2xpdmF3In0sImlhdCI6MTIzNDU2NzgsImV4cCI6MTIzNDU5NzgsImlzcyI6ImRpZDpldGhyOjB4NDEyM2NiZDE0M2I1NWMwNmU0NTFmZjI1M2FmMDkyODZiNjg3YTk1MCJ9.ZQYSH5ZxUOcaZoCPatol6p7aV_scaJ2bpUxgRT3KllAEr-S5iqEvlkQHCuF7_dBig3qioPwEwNU5AiJ8tGxwZgE")
     }
 
     @Test
