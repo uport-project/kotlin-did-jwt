@@ -4,7 +4,7 @@ apply plugin: 'kotlinx-serialization'
 apply plugin: "maven"
 apply plugin: "com.jfrog.bintray"
 
-project.ext.description = "resolver for the https-did method"
+project.ext.description = "resolver for the web-did method"
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"

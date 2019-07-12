@@ -19,7 +19,7 @@ dependencies {
     api project(":universal-did")
     api project(":uport-did")
     api project(":ethr-did")
-    api project(":https-did")
+    api project(":web-did")
     implementation "com.madgag.spongycastle:core:$spongycastle_version"
 
     testImplementation "junit:junit:$junit_version"
