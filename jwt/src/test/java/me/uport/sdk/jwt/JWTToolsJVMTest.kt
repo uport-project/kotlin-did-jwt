@@ -457,7 +457,7 @@ class JWTToolsJVMTest {
     @Test
     fun `fails when verifying invalid jwt`() {
         coAssert {
-            JWTTools().verify("12.34.56")
+            JWTTools().verify("12.345.67")
         }.thrownError {
             isInstanceOf(Exception::class)
         }
