@@ -453,6 +453,15 @@ class JWTToolsJVMTest {
         assertThat(normalizeKnownDID(ethrAddress)).isEqualTo(ethrDID)
         assertThat(normalizeKnownDID(invalidDID)).isEqualTo(invalidDID)
     }
+
+    @Test
+    fun `fails when verifying invalid jwt`() {
+        coAssert {
+            JWTTools().verify("12.34.56")
+        }.thrownError {
+            isInstanceOf(Exception::class)
+        }
+    }
 }
 
 
