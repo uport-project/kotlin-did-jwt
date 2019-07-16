@@ -29,11 +29,7 @@ jobs:
           key: v1-dependencies-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "build.gradle" }}
 
       # run tests!
-      - run: ./gradlew test
-
-      # run test coverage report!
-      - run: ./gradlew build jacocoTestReport
-
+      - run: ./gradlew test jacocoTestReport
 
       # store test results
       - run:
