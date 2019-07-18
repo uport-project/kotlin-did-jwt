@@ -23,6 +23,8 @@ buildscript {
         uport_kotlin_common_version = "0.1.1"
 
         current_release_version = "0.2.0"
+
+        jacoco_version = "0.7.5.201505241946"
     }
 
     repositories {
@@ -72,6 +74,23 @@ detekt {
 
 allprojects {
 
+    apply plugin: 'jacoco'
+
+    jacoco {
+        toolVersion = '0.7.5.201505241946'
+    }
+
+    jacocoTestReport {
+        additionalSourceDirs = files(sourceSets.main.allSource.srcDirs)
+        sourceDirectories = files(sourceSets.main.allSource.srcDirs)
+        classDirectories =  files(sourceSets.main.output)
+        reports {
+            html.enabled = true
+            xml.enabled = true
+            csv.enabled = false
+        }
+    }
+
     repositories {
         google()
         jcenter()
@@ -115,3 +134,23 @@ apply from: "publishing.gradle"
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+
+/*task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
+    dependsOn = subprojects.test
+    additionalSourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs)
+    sourceDirectories = files(subprojects.sourceSets.main.allSource.srcDirs)
+    classDirectories = files(subprojects.sourceSets.main.output)
+    executionData = files(subprojects.jacocoTestReport.executionData)
+    reports {
+        html.enabled = true
+        xml.enabled = true
+        csv.enabled = false
+    }
+}*/
+
+
+
+
+
+
