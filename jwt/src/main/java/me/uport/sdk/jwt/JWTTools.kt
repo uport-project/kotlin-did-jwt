@@ -7,7 +7,6 @@ import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
 import me.uport.sdk.core.*
 import me.uport.sdk.ethrdid.EthrDIDResolver
-import me.uport.sdk.httpsdid.HttpsDIDResolver
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jsonrpc.moshi
 import me.uport.sdk.jwt.JWTUtils.Companion.normalizeKnownDID
@@ -25,6 +24,7 @@ import me.uport.sdk.universaldid.PublicKeyType.Companion.Secp256k1SignatureVerif
 import me.uport.sdk.universaldid.PublicKeyType.Companion.Secp256k1VerificationKey2018
 import me.uport.sdk.universaldid.UniversalDID
 import me.uport.sdk.uportdid.UportDIDResolver
+import me.uport.sdk.httpsdid.WebDIDResolver
 import org.kethereum.crypto.toAddress
 import org.kethereum.encodings.decodeBase58
 import org.kethereum.extensions.toBigInteger
@@ -91,7 +91,7 @@ class JWTTools(
 
         // register default https DID resolver if Universal DID is unable to resolve blank https DID
         if (!UniversalDID.canResolve(blankHttpsDID)) {
-            UniversalDID.registerResolver(HttpsDIDResolver())
+            UniversalDID.registerResolver(WebDIDResolver())
         }
     }
 
