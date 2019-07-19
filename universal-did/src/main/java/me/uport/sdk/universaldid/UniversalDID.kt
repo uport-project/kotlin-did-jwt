@@ -55,11 +55,17 @@ object UniversalDID : DIDResolver {
     override suspend fun resolve(did: String): DIDDocument {
         val (method, _) = parse(did)
 
-        if (method.isBlank()) {
-            val resolver = resolvers.values.find {
+        if (method.isBlank() || !resolvers.containsKey(method)) {
+            //if there is no clear mapping to a resolver, try each one that claims it can resolve
+            return resolvers.filterValues {
                 it.canResolve(did)
-            }
-            return resolver?.resolve(did)
+            }.values.mapNotNull {
+                try {
+                    it.resolve(did)
+                } catch (ex: Exception) {
+                    null
+                }
+            }.firstOrNull()
                 ?: throw IllegalArgumentException("The provided did ($did) could not be resolved by any of the ${resolvers.size} registered resolvers")
         }  //no else clause, carry on
 
