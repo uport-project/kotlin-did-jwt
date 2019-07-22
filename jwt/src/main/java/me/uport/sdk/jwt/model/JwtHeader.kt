@@ -5,7 +5,6 @@ package me.uport.sdk.jwt.model
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
-import kotlinx.serialization.json.JsonException
 
 /**
  * Standard JWT header
@@ -23,11 +22,8 @@ class JwtHeader(
         const val ES256K = "ES256K"
         const val ES256K_R = "ES256K-R"
 
-        fun fromJson(headerString: String): JwtHeader? = try {
+        fun fromJson(headerString: String): JwtHeader =
             jsonAdapter.parse(serializer(), headerString)
-        } catch (ex: JsonException) {
-            null
-        }
 
         private val jsonAdapter = Json(JsonConfiguration(strictMode = false))
     }

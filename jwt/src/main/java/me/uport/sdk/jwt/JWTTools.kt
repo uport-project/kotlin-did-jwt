@@ -1,17 +1,17 @@
-@file:Suppress("KDocUnresolvedReference")
+@file:Suppress("KDocUnresolvedReference", "EXPERIMENTAL_API_USAGE")
 
 package me.uport.sdk.jwt
 
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.JsonDataException
-import com.squareup.moshi.JsonEncodingException
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
+import kotlinx.serialization.json.JsonException
 import me.uport.sdk.core.*
 import me.uport.sdk.ethrdid.EthrDIDResolver
 import me.uport.sdk.httpsdid.WebDIDResolver
 import me.uport.sdk.jsonrpc.JsonRPC
-import me.uport.sdk.jsonrpc.moshi
 import me.uport.sdk.jwt.JWTUtils.Companion.normalizeKnownDID
 import me.uport.sdk.jwt.JWTUtils.Companion.splitToken
+import me.uport.sdk.jwt.model.ArbitraryMapSerializer
 import me.uport.sdk.jwt.model.JwtHeader
 import me.uport.sdk.jwt.model.JwtHeader.Companion.ES256K
 import me.uport.sdk.jwt.model.JwtHeader.Companion.ES256K_R
@@ -124,7 +124,7 @@ class JWTTools(
         expiresInSeconds: Long = DEFAULT_JWT_VALIDITY_SECONDS,
         algorithm: String = ES256K_R
     ): String {
-        val mapAdapter = moshi.mapAdapter<String, Any?>(String::class.java, Any::class.java)
+
 
         val mutablePayload = payload.toMutableMap()
 
@@ -145,8 +145,11 @@ class JWTTools(
 
         mutablePayload["iss"] = issuerDID
 
+        val serializedPayload = Json(JsonConfiguration.Stable)
+            .stringify(ArbitraryMapSerializer, mutablePayload)
+
         @Suppress("SimplifiableCallChain", "ConvertCallChainIntoSequence")
-        val signingInput = listOf(header.toJson(), mapAdapter.toJson(mutablePayload))
+        val signingInput = listOf(header.toJson(), serializedPayload)
             .map { it.toBase64UrlSafe() }
             .joinToString(".")
 
@@ -176,13 +179,9 @@ class JWTTools(
         try {
             //Parse Json
             val header = JwtHeader.fromJson(headerString)
-                ?: throw InvalidJWTException("unable to parse the JWT header for $token")
-            val payload = jwtPayloadAdapter.fromJson(payloadString)
-                ?: throw InvalidJWTException("unable to parse the JWT payload for $token")
+            val payload = JwtPayload.fromJson(payloadString)
             return Triple(header, payload, signatureBytes)
-        } catch (ex: JsonDataException) {
-            throw JWTEncodingException("cannot parse the JWT($token)", ex)
-        } catch (ex: JsonEncodingException) {
+        } catch (ex: JsonException) {
             throw JWTEncodingException("cannot parse the JWT($token)", ex)
         }
     }
@@ -207,14 +206,11 @@ class JWTTools(
         try {
             //Parse Json
             val header = JwtHeader.fromJson(headerString)
-                ?: throw InvalidJWTException("unable to parse the JWT header for $token")
-            val mapAdapter = moshi.mapAdapter<String, Any>(String::class.java, Any::class.java)
 
-            val payload = mapAdapter.fromJson(payloadString)
-                ?: throw InvalidJWTException("unable to parse the JWT payload for $token")
+            val payload = Json.nonstrict.parse(ArbitraryMapSerializer, payloadString)
 
             return Triple(header, payload, signatureBytes)
-        } catch (ex: JsonDataException) {
+        } catch (ex: JsonException) {
             throw JWTEncodingException("cannot parse the JWT($token)", ex)
         }
     }
@@ -410,8 +406,6 @@ class JWTTools(
     }
 
     companion object {
-        //Create adapters with each object
-        val jwtPayloadAdapter: JsonAdapter<JwtPayload> by lazy { moshi.adapter(JwtPayload::class.java) }
 
         /**
          * 5 minutes. The default number of seconds of validity of a JWT, in case no other interval is specified.
