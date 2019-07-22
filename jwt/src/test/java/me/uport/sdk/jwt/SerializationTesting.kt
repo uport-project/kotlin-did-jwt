@@ -1,5 +1,7 @@
 @file:Suppress("MemberVisibilityCanBePrivate", "EXPERIMENTAL_API_USAGE")
 
+package me.uport.sdk.jwt
+
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import kotlinx.serialization.SerialName
@@ -12,7 +14,6 @@ class SerializationTesting {
 
     @Serializable
     data class ClassWithSerializer(
-
         //test serializtion of annotated types
         @SerialName("@context")
         val context: List<String>
@@ -20,14 +21,10 @@ class SerializationTesting {
 
     @Serializable
     data class CompoundTestObject(
-
         //use custom serializers for arbitrary map types
         @Serializable(with = ArbitraryMapSerializer::class)
         val generic: Map<String, Any?>
     )
-
-
-
 
     @Test
     fun `can serialize object with any map`() {
@@ -52,7 +49,8 @@ class SerializationTesting {
 
     @Test
     fun `can deserialize known object`() {
-        val input = """{"generic":{"hello":"world","missing":null,"some number":4321,"number as string":"1234","boolean":false,"boolean as string":"true","custom object":{"@context":["asdf"]},"obj":{"a":"b","c":null}}}"""
+        val input =
+            """{"generic":{"hello":"world","missing":null,"some number":4321,"number as string":"1234","boolean":false,"boolean as string":"true","custom object":{"@context":["asdf"]},"obj":{"a":"b","c":null}}}"""
         val parsed = Json.nonstrict.parse(CompoundTestObject.serializer(), input)
         assertThat(parsed.generic).isEqualTo(
             mapOf(

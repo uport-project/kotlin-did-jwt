@@ -10,7 +10,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$kotlin_serialization_version"
-    implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
 
     api "com.github.komputing.KEthereum:model:$kethereum_version"
     api "com.github.komputing.KEthereum:crypto:$kethereum_version"
