@@ -61,7 +61,7 @@ data class JwtPayload(
     val acc: String? = null //Fuel token used to authenticate on above fct url
 ) {
     companion object {
-        fun fromJson(headerString: String): JwtPayload = jsonAdapter.parse(serializer(), headerString)
+        fun fromJson(payloadString: String): JwtPayload = jsonAdapter.parse(serializer(), payloadString)
 
         private val jsonAdapter = Json(JsonConfiguration(strictMode = false))
     }
