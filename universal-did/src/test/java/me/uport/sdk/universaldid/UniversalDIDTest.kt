@@ -93,4 +93,11 @@ class UniversalDIDTest {
         }
     }
 
+    @Test
+    fun `serializes to basic doc`() {
+        val docString = DIDDocumentImpl("test context", "example document").toJson()
+        //language=json
+        assertThat(docString).isEqualTo("""{"@context":"test context","id":"example document","publicKey":[],"authentication":[],"service":[]}""")
+    }
+
 }

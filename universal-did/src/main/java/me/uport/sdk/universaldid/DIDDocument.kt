@@ -1,7 +1,10 @@
+@file:Suppress("EXPERIMENTAL_API_USAGE")
+
 package me.uport.sdk.universaldid
 
 import kotlinx.serialization.*
-
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 
 /**
  * Abstraction for DID documents
@@ -14,6 +17,50 @@ interface DIDDocument {
     val service: List<ServiceEntry>
 }
 
+/**
+ * Encapsulates the fields of a Decentralized Identity Document
+ * This is a shorthand implementation usable in most cases
+ */
+@Serializable
+data class DIDDocumentImpl(
+    @SerialName("@context")
+    override val context: String = "https://w3id.org/did/v1",
+
+    @SerialName("id")
+    override val id: String, //ex: "did:https:example.com#owner"
+
+    @SerialName("publicKey")
+    override val publicKey: List<PublicKeyEntry> = emptyList(),
+
+    @SerialName("authentication")
+    override val authentication: List<AuthenticationEntry> = emptyList(),
+
+    @SerialName("service")
+    override val service: List<ServiceEntry> = emptyList()
+
+) : DIDDocument {
+
+    /**
+     * Serializes this [DIDDocument] into a JSON string
+     */
+    fun toJson(): String = JSON
+        .stringify(serializer(), this)
+
+    companion object {
+
+        private val JSON = Json(JsonConfiguration(
+            encodeDefaults = true,
+            strictMode = false,
+            useArrayPolymorphism = false
+        ))
+
+        /**
+         * Attempts to deserialize a given [json] string into a [DIDDocument]
+         */
+        fun fromJson(json: String) = JSON.parse(serializer(), json)
+    }
+
+}
 
 @Serializable
 data class PublicKeyEntry(

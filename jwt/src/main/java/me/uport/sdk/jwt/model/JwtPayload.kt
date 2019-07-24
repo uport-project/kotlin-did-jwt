@@ -1,7 +1,13 @@
+@file:Suppress("EXPERIMENTAL_API_USAGE")
+
 package me.uport.sdk.jwt.model
 
-import com.squareup.moshi.Json
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 
+@Serializable
 data class JwtPayload(
 
     /**
@@ -31,16 +37,19 @@ data class JwtPayload(
     val req: String? = null, //original jwt request, REQUIRED for sign selective disclosure responses
     val nad: String? = null, //The MNID of the Ethereum account requested using act in the Selective Disclosure Request
     val dad: String? = null, //The devicekey as a regular hex encoded ethereum address as requested using act='devicekey' in the Selective Disclosure Request
-    //val own: String?, //The self signed claims requested from a user.
-    @Json(name = "own") val own: Map<String, String>? = null,
+
+    @SerialName("own")
+    val own: Map<String, String>? = null,
+
     val capabilities: List<String>? = null, //An array of JWT tokens giving client app the permissions requested. Currently a token allowing them to send push notifications
 
     /**
      * Specific to Verification
      * Also includes iss, sub, iat, exp, claim
      */
-    //val claims: Map<String, Any>?, //An object containing one or more claims about sub eg: {"name":"Carol Crypteau"}
-    @Json(name = "claim") val claims: Map<String, Any>? = null,
+    @Serializable(with = ArbitraryMapSerializer::class)
+    @SerialName("claim")
+    val claims: Map<String, Any>? = null,
     /**
      * Specific to Private Chain
      * Also includes dad
@@ -50,4 +59,10 @@ data class JwtPayload(
     val rel: String? = null, //Url of relay service for providing gas on private network
     val fct: String? = null, //Url of fueling service for providing gas on private network
     val acc: String? = null //Fuel token used to authenticate on above fct url
-)
+) {
+    companion object {
+        fun fromJson(payloadString: String): JwtPayload = jsonAdapter.parse(serializer(), payloadString)
+
+        private val jsonAdapter = Json(JsonConfiguration(strictMode = false))
+    }
+}
