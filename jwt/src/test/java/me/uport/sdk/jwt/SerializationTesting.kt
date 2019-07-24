@@ -57,9 +57,9 @@ class SerializationTesting {
                 "hello" to "world",
                 "missing" to null,
                 "some number" to 4321L,
-                "number as string" to 1234L,
+                "number as string" to "1234",
                 "boolean" to false,
-                "boolean as string" to true,
+                "boolean as string" to "true",
                 "custom object" to mapOf("@context" to listOf("asdf")),
                 "obj" to mapOf(
                     "a" to "b",

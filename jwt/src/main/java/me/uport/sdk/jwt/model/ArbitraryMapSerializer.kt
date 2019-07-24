@@ -15,10 +15,6 @@ import kotlinx.serialization.modules.getContextualOrDefault
  *
  * Using `@Serializable` objects in the tree respects their declared serializers.
  *
- * **De-serialization is not reliable for primitive types.**
- * Primitives that can be represented as `Boolean` or `Long` will be coerced into those types,
- * even if they are actually Strings in the original representation.
- *
  */
 object ArbitraryMapSerializer : KSerializer<Map<String, Any?>> {
 
@@ -59,8 +55,13 @@ object ArbitraryMapSerializer : KSerializer<Map<String, Any?>> {
         is JsonNull -> null
         is JsonObject -> this.toPrimitiveMap()
         is JsonArray -> this.map { it.toPrimitive() }
-        //FIXME: how do I get this to use the proper primitive type?
-        is JsonPrimitive -> booleanOrNull ?: longOrNull ?: doubleOrNull ?: contentOrNull
+        is JsonLiteral -> {
+            if (isString) {
+                contentOrNull
+            } else {
+                booleanOrNull ?: longOrNull ?: doubleOrNull
+            }
+        }
         else -> null
     }
 
