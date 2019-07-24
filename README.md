@@ -134,6 +134,11 @@ so that only tokens intended for your app are considered valid.
 
 ## CHANGELOG
 
+* 0.3.0
+    - [breaking] remove deprecated `https-did` module, now replaced by `web-did` (#14)
+    - add test coverage metrics (#10)
+    - add support for arbitrary maps with `@Serializer`s as JWT payloads (#16)
+    - remove moshi dependency (#16)
 * 0.2.1
     - add support for web DID, deprecating https DID (#5)
     - allow creation of JWTs with no expiry (#6)
