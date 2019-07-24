@@ -125,13 +125,12 @@ class JWTTools(
         algorithm: String = ES256K_R
     ): String {
 
-
         val mutablePayload = payload.toMutableMap()
 
         val header = JwtHeader(alg = algorithm)
 
         val iatSeconds = floor(timeProvider.nowMs() / 1000.0).toLong()
-        mutablePayload["iat"] = iatSeconds
+        mutablePayload["iat"] = payload["iat"] ?: iatSeconds
 
         val expSeconds = iatSeconds + expiresInSeconds
         if (expiresInSeconds >= 0) {
