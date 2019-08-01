@@ -54,7 +54,7 @@ allprojects {
 In your application `build.gradle` file, add:
 
 ```groovy
-def did_jwt_version = "0.2.1"
+def did_jwt_version = "0.3.1"
 dependencies {
     //...
     implementation "com.github.uport-project.kotlin-did-jwt:jwt:$did_jwt_version"
@@ -134,6 +134,8 @@ so that only tokens intended for your app are considered valid.
 
 ## CHANGELOG
 
+* 0.3.1
+    - allow override or removal of `iat` field when creating JWTs (#17)
 * 0.3.0
     - [breaking] remove deprecated `https-did` module, now replaced by `web-did` (#14)
     - add test coverage metrics (#10)
