@@ -1,10 +1,7 @@
 package me.uport.sdk.jwt
 
 import assertk.assertThat
-import assertk.assertions.isEqualTo
-import assertk.assertions.isFalse
-import assertk.assertions.isInstanceOf
-import assertk.assertions.isNotNull
+import assertk.assertions.*
 import io.mockk.coEvery
 import io.mockk.mockkObject
 import io.mockk.spyk
@@ -532,13 +529,32 @@ class JWTToolsJVMTest {
         val tested = JWTTools()
 
         val payload = mapOf("iat" to null)
-        val signer = KPSigner("0x1234")
-        val issuerDID = "did:ethr:${signer.getAddress()}"
 
-        val jwt = tested.createJWT(payload, issuerDID, signer)
+        val jwt = tested.createJWT(payload, "did:ex:ex", KPSigner("0x1234"))
 
         val (_, decoded, _) = tested.decodeRaw(jwt)
         assertThat(decoded.containsKey("iat")).isFalse()
+    }
+
+    @Test
+    fun `iat set by default when not specified`() = runBlocking {
+        val tested = JWTTools()
+
+        val jwt = tested.createJWT(emptyMap(), "did:ex:ex", KPSigner("0x1234"))
+
+        val (_, decoded, _) = tested.decodeRaw(jwt)
+        assertThat(decoded.containsKey("iat")).isTrue()
+    }
+
+    @Test
+    fun `default iat is overridden by payload`() = runBlocking {
+        val tested = JWTTools()
+
+        val payload = mapOf("iat" to 5678L)
+        val jwt = tested.createJWT(payload, "did:ex:ex", KPSigner("0x1234"))
+
+        val (_, decoded, _) = tested.decodeRaw(jwt)
+        assertThat(decoded["iat"]).isEqualTo(5678L)
     }
 }
 
