@@ -130,7 +130,11 @@ class JWTTools(
         val header = JwtHeader(alg = algorithm)
 
         val iatSeconds = floor(timeProvider.nowMs() / 1000.0).toLong()
-        mutablePayload["iat"] = payload["iat"] ?: iatSeconds
+        if (payload.containsKey("iat") && payload["iat"] == null) {
+            mutablePayload.remove("iat")
+        } else {
+            mutablePayload["iat"] = payload["iat"] ?: iatSeconds
+        }
 
         val expSeconds = iatSeconds + expiresInSeconds
         if (expiresInSeconds >= 0) {
