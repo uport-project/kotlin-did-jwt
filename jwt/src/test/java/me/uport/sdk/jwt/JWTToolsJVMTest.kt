@@ -526,6 +526,20 @@ class JWTToolsJVMTest {
         val (_, decoded, _) = tested.decodeRaw(jwt)
         assertThat(decoded.containsKey("exp")).isFalse()
     }
+
+    @Test
+    fun `removes iat when explicitly set as null`() = runBlocking {
+        val tested = JWTTools()
+
+        val payload = mapOf("iat" to null)
+        val signer = KPSigner("0x1234")
+        val issuerDID = "did:ethr:${signer.getAddress()}"
+
+        val jwt = tested.createJWT(payload, issuerDID, signer)
+
+        val (_, decoded, _) = tested.decodeRaw(jwt)
+        assertThat(decoded.containsKey("iat")).isFalse()
+    }
 }
 
 
