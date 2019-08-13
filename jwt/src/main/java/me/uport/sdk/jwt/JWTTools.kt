@@ -238,8 +238,16 @@ class JWTTools(
     ): JwtPayload {
         val (header, payload, signatureBytes) = decode(token)
 
-        if (payload.iat != null && payload.iat > (timeProvider.nowMs() / 1000 + TIME_SKEW)) {
-            throw InvalidJWTException("Jwt not valid yet (issued in the future) iat: ${payload.iat}")
+        val nowSkewed = (timeProvider.nowMs() / 1000 + TIME_SKEW)
+
+        if (payload.nbf != null) {
+            if (payload.nbf > nowSkewed) {
+                throw InvalidJWTException("Jwt not valid before nbf: ${payload.nbf}")
+            }
+        } else {
+            if (payload.iat != null && payload.iat > nowSkewed) {
+                throw InvalidJWTException("Jwt not valid yet (issued in the future) iat: ${payload.iat}")
+            }
         }
 
         if (payload.exp != null && payload.exp <= (timeProvider.nowMs() / 1000 - TIME_SKEW)) {
