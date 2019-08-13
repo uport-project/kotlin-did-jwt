@@ -15,6 +15,7 @@ data class JwtPayload(
      */
     val iss: String = "", //Cannot be null for signature verification
     val iat: Long? = null,
+    val nbf: Long? = null,
     val sub: String? = null,
     val aud: String? = null,
     val exp: Long? = null,
