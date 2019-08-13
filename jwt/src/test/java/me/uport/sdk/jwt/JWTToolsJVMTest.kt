@@ -556,6 +556,38 @@ class JWTToolsJVMTest {
         val (_, decoded, _) = tested.decodeRaw(jwt)
         assertThat(decoded["iat"]).isEqualTo(5678L)
     }
+
+    @Test
+    fun `default iss is overridden by payload`() = runBlocking {
+        val tested = JWTTools()
+
+        val payload = mapOf("iss" to "example.issuer")
+        val jwt = tested.createJWT(payload, "did:ex:ex", KPSigner("0x1234"))
+
+        val (_, decoded, _) = tested.decodeRaw(jwt)
+        assertThat(decoded["iss"]).isEqualTo("example.issuer")
+    }
+
+    @Test
+    fun `default iss is removed by payload`() = runBlocking {
+        val tested = JWTTools()
+
+        val payload = mapOf("iss" to null)
+        val jwt = tested.createJWT(payload, "did:ex:ex", KPSigner("0x1234"))
+
+        val (_, decoded, _) = tested.decodeRaw(jwt)
+        assertThat(decoded.containsKey("iss")).isFalse()
+    }
+
+    @Test
+    fun `iss is set by default`() = runBlocking {
+        val tested = JWTTools()
+
+        val jwt = tested.createJWT(emptyMap(), "did:ex:ex", KPSigner("0x1234"))
+
+        val (_, decoded, _) = tested.decodeRaw(jwt)
+        assertThat(decoded["iss"]).isEqualTo("did:ex:ex")
+    }
 }
 
 

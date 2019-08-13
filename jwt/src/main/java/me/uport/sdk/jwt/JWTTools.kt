@@ -146,7 +146,13 @@ class JWTTools(
             mutablePayload.remove("exp")
         }
 
-        mutablePayload["iss"] = issuerDID
+        if (payload.containsKey("iss") && payload["iss"] == null) {
+            mutablePayload.remove("iss")
+        } else if (payload.containsKey("iss")) {
+            mutablePayload["iss"] = payload["iss"]
+        } else {
+            mutablePayload["iss"] = issuerDID
+        }
 
         val serializedPayload = Json(JsonConfiguration.Stable)
             .stringify(ArbitraryMapSerializer, mutablePayload)
