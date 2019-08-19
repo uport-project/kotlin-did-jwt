@@ -58,7 +58,7 @@ open class EthrDIDResolver(
         }
 
         val normalizedDid = normalizeDid(did)
-        val identity = parseIdentity(normalizedDid)
+        val identity = extractAddress(normalizedDid)
         val ethrdidContract = EthrDID(identity, rpc, registryAddress, Signer.blank)
         val owner = ethrdidContract.lookupOwner(false)
         val history = getHistory(identity)
@@ -295,12 +295,12 @@ open class EthrDIDResolver(
         //language=RegExp
         private val identityExtractPattern = "^did:ethr:(0x[0-9a-fA-F]{40})".toRegex()
 
-        //language=RegExp
-        private val didParsePattern = "^(did:)?((\\w+):)?((\\w+):)?((0x)([0-9a-fA-F]{40}))".toRegex()
-
-        private fun parseIdentity(normalizedDid: String) = identityExtractPattern
+        internal fun extractAddress(normalizedDid: String) = identityExtractPattern
             .find(normalizedDid)
             ?.destructured?.component1() ?: ""
+
+        //language=RegExp
+        private val didParsePattern = "^(did:)?((\\w+):)?((\\w+):)?((0x)([0-9a-fA-F]{40}))".toRegex()
 
         internal fun normalizeDid(did: String): String {
             val matchResult = didParsePattern.find(did) ?: return ""
