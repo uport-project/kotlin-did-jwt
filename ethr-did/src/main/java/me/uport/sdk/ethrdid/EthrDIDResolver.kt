@@ -293,11 +293,11 @@ open class EthrDIDResolver(
         }
 
         //language=RegExp
-        private val identityExtractPattern = "^did:ethr:(0x[0-9a-fA-F]{40})".toRegex()
+        private val identityExtractPattern = "^did:ethr:((\\w+):)?(0x[0-9a-fA-F]{40})".toRegex()
 
         internal fun extractAddress(normalizedDid: String) = identityExtractPattern
             .find(normalizedDid)
-            ?.destructured?.component1() ?: ""
+            ?.destructured?.component3() ?: ""
 
         //language=RegExp
         private val didParsePattern = "^(did:)?((\\w+):)?((\\w+):)?((0x)([0-9a-fA-F]{40}))".toRegex()
