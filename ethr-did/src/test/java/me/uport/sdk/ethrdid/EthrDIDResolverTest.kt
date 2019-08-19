@@ -434,4 +434,30 @@ class EthrDIDResolverTest {
             assertThat(address).isEqualTo("0xb9c5714089478a327f09197987f16f9e5d936e8a")
         }
     }
+
+    @Test
+    fun `can extract network from networked DIDs`() {
+        val validNetworkedDIDs = mapOf(
+            "did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a" to "",
+            "did:ethr:0xB9C5714089478a327F09197987f16f9E5d936E8a" to "",
+            "did:ethr:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner" to "",
+            "did:ethr:mainnet:0xb9c5714089478a327f09197987f16f9e5d936e8a" to "mainnet",
+            "did:ethr:mainnet:0xB9C5714089478a327F09197987f16f9E5d936E8a" to "mainnet",
+            "did:ethr:mainnet:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner" to "mainnet",
+            "did:ethr:rinkeby:0xb9c5714089478a327f09197987f16f9e5d936e8a" to "rinkeby",
+            "did:ethr:rinkeby:0xB9C5714089478a327F09197987f16f9E5d936E8a" to "rinkeby",
+            "did:ethr:rinkeby:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner" to "rinkeby",
+            "did:ethr:0x1:0xb9c5714089478a327f09197987f16f9e5d936e8a" to "0x1",
+            "did:ethr:0x1:0xB9C5714089478a327F09197987f16f9E5d936E8a" to "0x1",
+            "did:ethr:0x1:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner" to "0x1",
+            "did:ethr:0x04:0xb9c5714089478a327f09197987f16f9e5d936e8a" to "0x04",
+            "did:ethr:0x04:0xB9C5714089478a327F09197987f16f9E5d936E8a" to "0x04",
+            "did:ethr:0x04:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner" to "0x04"
+        )
+        validNetworkedDIDs.forEach {(did, expectedNetwork) ->
+            val extractedNetwork = EthrDIDResolver.extractNetwork(did).toLowerCase()
+            println("extracting address from `$did` got `$extractedNetwork`")
+            assertThat(extractedNetwork).isEqualTo(expectedNetwork)
+        }
+    }
 }

@@ -295,16 +295,20 @@ open class EthrDIDResolver(
         //language=RegExp
         private val identityExtractPattern = "^did:ethr:((\\w+):)?(0x[0-9a-fA-F]{40})".toRegex()
 
-        internal fun extractAddress(normalizedDid: String) = identityExtractPattern
+        internal fun extractAddress(normalizedDid: String): String = identityExtractPattern
             .find(normalizedDid)
             ?.destructured?.component3() ?: ""
+
+        internal fun extractNetwork(normalizedDid: String): String = identityExtractPattern
+            .find(normalizedDid)
+            ?.destructured?.component2() ?: ""
 
         //language=RegExp
         private val didParsePattern = "^(did:)?((\\w+):)?((\\w+):)?((0x)([0-9a-fA-F]{40}))".toRegex()
 
         internal fun normalizeDid(did: String): String {
             val matchResult = didParsePattern.find(did) ?: return ""
-            val (didHeader, _, didType, _, network, _, _, hexDigits) = matchResult.destructured
+            val (didHeader, _, didType, _, _, _, _, hexDigits) = matchResult.destructured
             if (didType.isNotBlank() && didType != "ethr") {
                 //should forward to another resolver
                 return ""
