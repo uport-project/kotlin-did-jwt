@@ -362,6 +362,7 @@ class EthrDIDResolverTest {
             "did:ethr:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner"
         )
 
+
         val invalidDids = listOf(
             "0xb9c5714089478a327f09197987f16f9e5d936e",
             "B9C5714089478a327F09197987f16f9E5d936E8a",
@@ -381,4 +382,30 @@ class EthrDIDResolverTest {
         }
     }
 
+    @Test
+    fun `can normalize networked DIDs`() {
+        val validNetworkedDIDs = listOf(
+            "did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a",
+            "did:ethr:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner",
+            "did:ethr:mainnet:0xb9c5714089478a327f09197987f16f9e5d936e8a",
+            "did:ethr:mainnet:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:mainnet:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner",
+            "did:ethr:rinkeby:0xb9c5714089478a327f09197987f16f9e5d936e8a",
+            "did:ethr:rinkeby:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:rinkeby:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner",
+            "did:ethr:0x1:0xb9c5714089478a327f09197987f16f9e5d936e8a",
+            "did:ethr:0x1:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:0x1:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner",
+            "did:ethr:0x04:0xb9c5714089478a327f09197987f16f9e5d936e8a",
+            "did:ethr:0x04:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:0x04:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner"
+        )
+        validNetworkedDIDs.forEach {
+            val normalizedDid = EthrDIDResolver.normalizeDid(it).toLowerCase()
+            println("normalizing `$it` got `$normalizedDid`")
+            assertThat(normalizedDid).isNotEmpty()
+            assertThat(normalizedDid).doesNotContain("#owner")
+        }
+    }
 }
