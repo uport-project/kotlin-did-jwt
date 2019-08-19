@@ -251,7 +251,7 @@ open class EthrDIDResolver(
         val authEntries = mapOf<String, AuthenticationEntry>().toMutableMap()
 
         var delegateIndex = delegateCount
-        val delegateType = event.delegatetype.bytes.toString(utf8).replace("\u0000","")
+        val delegateType = event.delegatetype.bytes.toString(utf8).replace("\u0000", "")
         val delegate = event.delegate.value.toHexStringNoPrefix().prepend0xPrefix()
         val key = "DIDDelegateChanged-$delegateType-$delegate"
         val validTo = event.validto.value.toLong()
@@ -296,7 +296,7 @@ open class EthrDIDResolver(
         private val identityExtractPattern = "^did:ethr:(0x[0-9a-fA-F]{40})".toRegex()
 
         //language=RegExp
-        private val didParsePattern = "^(did:)?((\\w+):)?((0x)([0-9a-fA-F]{40}))".toRegex()
+        private val didParsePattern = "^(did:)?((\\w+):)?((\\w+):)?((0x)([0-9a-fA-F]{40}))".toRegex()
 
         private fun parseIdentity(normalizedDid: String) = identityExtractPattern
             .find(normalizedDid)
@@ -304,7 +304,7 @@ open class EthrDIDResolver(
 
         internal fun normalizeDid(did: String): String {
             val matchResult = didParsePattern.find(did) ?: return ""
-            val (didHeader, _, didType, _, _, hexDigits) = matchResult.destructured
+            val (didHeader, _, didType, _, network, _, _, hexDigits) = matchResult.destructured
             if (didType.isNotBlank() && didType != "ethr") {
                 //should forward to another resolver
                 return ""
