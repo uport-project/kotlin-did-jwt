@@ -38,7 +38,10 @@ class EthrDIDResolverTest {
         } returns "0x0000000000000000000000000000000000000000000000000000000000000000"
 
         val imaginaryAddress = "0x1234"
-        val lastChanged = EthrDIDResolver(rpc).lastChanged(imaginaryAddress, rpc, "0xregistry")
+        val lastChanged = EthrDIDResolver.Builder()
+            .addNetwork(EthrDIDNetwork("", "0xregistry", rpc))
+            .build()
+            .lastChanged(imaginaryAddress, rpc, "0xregistry")
 
         assertThat(encodedCallSlot.captured).isEqualTo("0xf96d0f9f0000000000000000000000000000000000000000000000000000000000001234")
         assertThat(lastChanged.hexToBigInteger()).isEqualTo(BigInteger.ZERO)
@@ -56,7 +59,10 @@ class EthrDIDResolverTest {
         } returns "0x00000000000000000000000000000000000000000000000000000000002a8a7d"
 
         val realAddress = "0xf3beac30c498d9e26865f34fcaa57dbb935b0d74"
-        val lastChanged = EthrDIDResolver(rpc).lastChanged(realAddress, rpc, "0xregistry")
+        val lastChanged = EthrDIDResolver.Builder()
+            .addNetwork(EthrDIDNetwork("", "0xregistry", rpc))
+            .build()
+            .lastChanged(realAddress, rpc, "0xregistry")
 
         assertThat(encodedCallSlot.captured).isEqualTo("0xf96d0f9f000000000000000000000000f3beac30c498d9e26865f34fcaa57dbb935b0d74")
         assertThat(lastChanged.hexToBigInteger()).isNotEqualTo(BigInteger.ZERO)
@@ -171,7 +177,9 @@ class EthrDIDResolverTest {
         )
         coEvery { rpc.getLogs(any(), any(), any(), any()) }.returnsMany(cannedResponses)
 
-        val resolver = EthrDIDResolver(rpc)
+        val resolver = EthrDIDResolver.Builder()
+            .addNetwork(EthrDIDNetwork("", "0xregistry", rpc))
+            .build()
         val events = resolver.getHistory(realAddress, rpc, "0xregistry")
         assertThat(events).hasSize(3)
     }
@@ -214,7 +222,9 @@ class EthrDIDResolverTest {
             emptyList()
         )
 
-        val resolver = EthrDIDResolver(rpc)
+        val resolver = EthrDIDResolver.Builder()
+            .addNetwork(EthrDIDNetwork("", "0xregistry", rpc))
+            .build()
         val ddo = resolver.resolve("0x62d283fe6939c01fc88f02c6d2c9a547cc3e2656")
 
         val expectedDDO = EthrDIDDocument.fromJson(
@@ -307,7 +317,10 @@ class EthrDIDResolverTest {
         val rpc = JsonRPC("")
 
         assertThat {
-            EthrDIDResolver(rpc).wrapDidDocument("did:ethr:$identity", owner, listOf(event))
+            EthrDIDResolver.Builder()
+                .addNetwork(EthrDIDNetwork("", "0xregistry", rpc))
+                .build()
+                .wrapDidDocument("did:ethr:$identity", owner, listOf(event))
         }.doesNotThrowAnyException()
     }
 
@@ -345,7 +358,10 @@ class EthrDIDResolverTest {
         //canned response for getLogs
         coEvery { http.urlPost(any(), any(), any()) } returns """{"jsonrpc":"2.0","id":1,"result":[]}"""
 
-        val resolver = EthrDIDResolver(rpc)
+        val resolver =
+            EthrDIDResolver.Builder()
+                .addNetwork(EthrDIDNetwork("", "0xregistry", rpc))
+                .build()
         val ddo = resolver.resolve("did:ethr:0x$addressHex")
         assertThat(ddo).isEqualTo(referenceDDO)
     }
