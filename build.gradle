@@ -19,7 +19,7 @@ buildscript {
         kmnid_version = "0.3.2"
         kethereum_version = "0.75.1"
         spongycastle_version = "1.58.0.0"
-        uport_kotlin_common_version = "0e122c74ec445c254ddae9399292c6e853ac8ae9"
+        uport_kotlin_common_version = "0.1.1"
 
         current_release_version = "0.3.1"
     }

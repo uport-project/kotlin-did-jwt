@@ -2,6 +2,7 @@
 
 package me.uport.sdk.ethrdid
 
+import me.uport.sdk.core.EthNetwork
 import me.uport.sdk.core.ITimeProvider
 import me.uport.sdk.core.SystemTimeProvider
 import me.uport.sdk.core.toBase64
@@ -35,11 +36,68 @@ import java.util.*
  *
  * Example ethr did: "did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a"
  */
-open class EthrDIDResolver(
-    private val rpc: JsonRPC,
-    val registryAddress: String = DEFAULT_REGISTRY_ADDRESS,
-    private val timeProvider: ITimeProvider = SystemTimeProvider
-) : DIDResolver {
+open class EthrDIDResolver : DIDResolver {
+
+    private val _registryMap: RegistryMap
+    private val _timeProvider: ITimeProvider
+
+    private constructor(registryMap: RegistryMap, clock: ITimeProvider) {
+        _timeProvider = clock
+        this._registryMap = registryMap
+    }
+
+    @Deprecated(
+        "Constructing the resolver directly has been deprecated " +
+                "in favor of the Builder pattern that can supply multi-network configurations.",
+        ReplaceWith(
+            """EthrDIDResolver.Builder().addNetwork(EthrDIDNetwork("", registryAddress, rpc, "0x1")).build()""",
+            "me.uport.sdk.ethrdid.EthrDIDResolver.Companion.DEFAULT_REGISTRY_ADDRESS"
+        )
+    )
+    constructor(
+        rpc: JsonRPC,
+        registryAddress: String = DEFAULT_REGISTRY_ADDRESS,
+        timeProvider: ITimeProvider = SystemTimeProvider
+    ) {
+        val net = EthrDIDNetwork(DEFAULT_NETWORK_NAME, registryAddress, rpc, "0x1")
+        this._timeProvider = timeProvider
+        this._registryMap = RegistryMap().registerNetwork(net)
+    }
+
+    /**
+     * Builds an [EthrDIDResolver]
+     * This class allows configuration of multiple ethereum networks that this resolver can access.
+     */
+    class Builder {
+        private var _clock: ITimeProvider? = null
+        private val _networks = emptyList<EthrDIDNetwork>().toMutableList()
+
+        fun setTimeProvider(timeProvider: ITimeProvider): Builder {
+            _clock = timeProvider
+            return this
+        }
+
+        fun addNetwork(network: EthrDIDNetwork): Builder {
+            _networks.add(network)
+            return this
+        }
+
+        fun addNetwork(network: EthNetwork): Builder {
+            _networks.add(network.toEthrDIDNetwork())
+            return this
+        }
+
+        fun build(): EthrDIDResolver {
+            val clock = _clock ?: SystemTimeProvider
+            return EthrDIDResolver(buildRegistryMap(_networks), clock)
+        }
+
+        companion object {
+            private fun buildRegistryMap(networkConfigs: MutableList<EthrDIDNetwork>) = RegistryMap().apply {
+                networkConfigs.forEach { registerNetwork(it) }
+            }
+        }
+    }
 
     override val method = "ethr"
 
@@ -52,16 +110,28 @@ open class EthrDIDResolver(
      * Resolves a given ethereum address or DID string into a corresponding [EthrDIDDocument]
      */
     override suspend fun resolve(did: String): EthrDIDDocument {
-
-        if (registryAddress.isBlank()) {
-            throw IllegalArgumentException("ethr DID registry address is blank. please check your Configuration")
+        val networkIdentifier = extractNetwork(did).run {
+            if (this.isBlank()) DEFAULT_NETWORK_NAME else this
         }
+
+        val didNetworkConfig = try {
+            _registryMap[networkIdentifier]
+        } catch (e: IllegalArgumentException) {
+            throw IllegalArgumentException(
+                "Missing registry configuration for `$networkIdentifier`." +
+                        " To resolve did:ethr:$networkIdentifier:0x... you need to register an `EthrDIDNetwork`" +
+                        " in the EthrDIDResolver.Builder"
+            )
+        }
+
+        val rpc = didNetworkConfig.rpc
+        val registryAddress = didNetworkConfig.registryAddress
 
         val normalizedDid = normalizeDid(did)
         val identity = extractAddress(normalizedDid)
-        val ethrdidContract = EthrDID(identity, rpc, registryAddress, Signer.blank)
-        val owner = ethrdidContract.lookupOwner(false)
-        val history = getHistory(identity)
+        val ethrDidContract = EthrDID(identity, rpc, registryAddress, Signer.blank)
+        val owner = ethrDidContract.lookupOwner(false)
+        val history = getHistory(identity, rpc, registryAddress)
         return wrapDidDocument(normalizedDid, owner, history)
     }
 
@@ -70,7 +140,11 @@ open class EthrDIDResolver(
      *
      * @hide
      */
-    internal suspend fun lastChanged(identity: String): String {
+    internal suspend fun lastChanged(
+        identity: String,
+        rpc: JsonRPC,
+        registryAddress: String
+    ): String {
         val encodedCall = EthereumDIDRegistry.Changed.encode(Solidity.Address(identity.hexToBigInteger()))
         return try {
             rpc.ethCall(registryAddress, encodedCall)
@@ -90,10 +164,14 @@ open class EthrDIDResolver(
      * @hide
      */
     @Suppress("TooGenericExceptionCaught")
-    internal suspend fun getHistory(identity: String): List<Any> {
+    internal suspend fun getHistory(
+        identity: String,
+        rpc: JsonRPC,
+        registryAddress: String
+    ): List<Any> {
         val lastChangedQueue: Queue<BigInteger> = PriorityQueue()
         val events = emptyList<Any>().toMutableList()
-        lastChangedQueue.add(lastChanged(identity).hexToBigInteger())
+        lastChangedQueue.add(lastChanged(identity, rpc, registryAddress).hexToBigInteger())
         do {
             val lastChange = lastChangedQueue.remove()
             val logs = rpc.getLogs(registryAddress, listOf(null, identity.hexToBytes32()), lastChange, lastChange)
@@ -196,7 +274,7 @@ open class EthrDIDResolver(
 
         var delegateIndex = delegateCount
         val validTo = event.validto.value.toLong()
-        if (validTo < timeProvider.nowMs() / 1000L) {
+        if (validTo < _timeProvider.nowMs() / 1000L) {
             return (pkEntries to serviceEntries)
         }
         val name = event.name.byteArray.bytes32ToString()
@@ -256,7 +334,7 @@ open class EthrDIDResolver(
         val key = "DIDDelegateChanged-$delegateType-$delegate"
         val validTo = event.validto.value.toLong()
 
-        if (validTo >= timeProvider.nowMs() / 1000L) {
+        if (validTo >= _timeProvider.nowMs() / 1000L) {
             delegateIndex++
 
             when (delegateType) {
@@ -319,6 +397,8 @@ open class EthrDIDResolver(
             }
             return "did:ethr:0x$hexDigits"
         }
+
+        private const val DEFAULT_NETWORK_NAME = "" //empty string
 
     }
 }

@@ -11,7 +11,6 @@ import io.mockk.slot
 import io.mockk.spyk
 import kotlinx.coroutines.runBlocking
 import me.uport.sdk.core.HttpClient
-import me.uport.sdk.core.Networks
 import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDOwnerChanged
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jsonrpc.JsonRpcLogItem
@@ -28,7 +27,7 @@ class EthrDIDResolverTest {
 
     @Test
     fun `last change is blank for new address`() = runBlocking {
-        val rpc = spyk(JsonRPC(Networks.rinkeby.rpcUrl))
+        val rpc = spyk(JsonRPC(""))
         val encodedCallSlot = slot<String>()
 
         coEvery {
@@ -39,7 +38,7 @@ class EthrDIDResolverTest {
         } returns "0x0000000000000000000000000000000000000000000000000000000000000000"
 
         val imaginaryAddress = "0x1234"
-        val lastChanged = EthrDIDResolver(rpc).lastChanged(imaginaryAddress)
+        val lastChanged = EthrDIDResolver(rpc).lastChanged(imaginaryAddress, rpc, "0xregistry")
 
         assertThat(encodedCallSlot.captured).isEqualTo("0xf96d0f9f0000000000000000000000000000000000000000000000000000000000001234")
         assertThat(lastChanged.hexToBigInteger()).isEqualTo(BigInteger.ZERO)
@@ -47,7 +46,7 @@ class EthrDIDResolverTest {
 
     @Test
     fun `last change is non-zero for real address with changed owner`() = runBlocking {
-        val rpc = spyk(JsonRPC(Networks.rinkeby.rpcUrl))
+        val rpc = spyk(JsonRPC(""))
         val encodedCallSlot = slot<String>()
         coEvery {
             rpc.ethCall(
@@ -57,7 +56,7 @@ class EthrDIDResolverTest {
         } returns "0x00000000000000000000000000000000000000000000000000000000002a8a7d"
 
         val realAddress = "0xf3beac30c498d9e26865f34fcaa57dbb935b0d74"
-        val lastChanged = EthrDIDResolver(rpc).lastChanged(realAddress)
+        val lastChanged = EthrDIDResolver(rpc).lastChanged(realAddress, rpc, "0xregistry")
 
         assertThat(encodedCallSlot.captured).isEqualTo("0xf96d0f9f000000000000000000000000f3beac30c498d9e26865f34fcaa57dbb935b0d74")
         assertThat(lastChanged.hexToBigInteger()).isNotEqualTo(BigInteger.ZERO)
@@ -67,9 +66,9 @@ class EthrDIDResolverTest {
     @Test
     fun `can parse getLogs response`() = runBlocking {
         val http = mockk<HttpClient>()
-        val rpc = JsonRPC(Networks.rinkeby.rpcUrl, http)
+        val rpc = JsonRPC("", http)
         val realAddress = "0xf3beac30c498d9e26865f34fcaa57dbb935b0d74"
-        val resolver = EthrDIDResolver(rpc)
+//        val resolver = EthrDIDResolver(rpc)
         val lastChanged = "0x00000000000000000000000000000000000000000000000000000000002a8a7d".hexToBigInteger()
 
         //language=json
@@ -78,7 +77,7 @@ class EthrDIDResolverTest {
         coEvery { http.urlPost(any(), any(), any()) } returns cannedLogsResponse
 
         val logResponse =
-            rpc.getLogs(resolver.registryAddress, listOf(null, realAddress.hexToBytes32()), lastChanged, lastChanged)
+            rpc.getLogs("0xregistry", listOf(null, realAddress.hexToBytes32()), lastChanged, lastChanged)
 
         assertThat(logResponse).all {
             isNotNull()
@@ -116,7 +115,7 @@ class EthrDIDResolverTest {
     fun `can parse multiple event logs`() = runBlocking {
         val realAddress = "0xf3beac30c498d9e26865f34fcaa57dbb935b0d74"
 
-        val rpc = spyk(JsonRPC(Networks.rinkeby.rpcUrl))
+        val rpc = spyk(JsonRPC(""))
         coEvery { rpc.ethCall(any(), eq("0xf96d0f9f000000000000000000000000f3beac30c498d9e26865f34fcaa57dbb935b0d74")) }
             .returns("0x00000000000000000000000000000000000000000000000000000000002a8a7d")
         val cannedResponses: List<List<JsonRpcLogItem>> = listOf(
@@ -173,7 +172,7 @@ class EthrDIDResolverTest {
         coEvery { rpc.getLogs(any(), any(), any(), any()) }.returnsMany(cannedResponses)
 
         val resolver = EthrDIDResolver(rpc)
-        val events = resolver.getHistory(realAddress)
+        val events = resolver.getHistory(realAddress, rpc, "0xregistry")
         assertThat(events).hasSize(3)
     }
 
@@ -305,7 +304,7 @@ class EthrDIDResolverTest {
             previouschange = Solidity.UInt256(BigInteger.ZERO)
         )
 
-        val rpc = JsonRPC(Networks.rinkeby.rpcUrl)
+        val rpc = JsonRPC("")
 
         assertThat {
             EthrDIDResolver(rpc).wrapDidDocument("did:ethr:$identity", owner, listOf(event))
@@ -328,7 +327,7 @@ class EthrDIDResolverTest {
 
         val addressHex = "b9c5714089478a327f09197987f16f9e5d936e8a"
 
-        val rpc = spyk(JsonRPC(Networks.rinkeby.rpcUrl, http))
+        val rpc = spyk(JsonRPC("http://localhost:8545", http))
         //canned response for get owner query
         coEvery {
             rpc.ethCall(
@@ -454,7 +453,7 @@ class EthrDIDResolverTest {
             "did:ethr:0x04:0xB9C5714089478a327F09197987f16f9E5d936E8a" to "0x04",
             "did:ethr:0x04:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner" to "0x04"
         )
-        validNetworkedDIDs.forEach {(did, expectedNetwork) ->
+        validNetworkedDIDs.forEach { (did, expectedNetwork) ->
             val extractedNetwork = EthrDIDResolver.extractNetwork(did).toLowerCase()
             println("extracting address from `$did` got `$extractedNetwork`")
             assertThat(extractedNetwork).isEqualTo(expectedNetwork)
