@@ -93,8 +93,17 @@ open class EthrDIDResolver : DIDResolver {
         }
 
         companion object {
+
             private fun buildRegistryMap(networkConfigs: MutableList<EthrDIDNetwork>) = RegistryMap().apply {
+                //register given networks
                 networkConfigs.forEach { registerNetwork(it) }
+                //if no default was provided, try to copy mainnet
+                (getOrNull("") ?: getOrNull("mainnet") ?: getOrNull("0x1"))
+                    ?.let {
+                        registerNetwork(
+                            EthrDIDNetwork("", it.registryAddress, it.rpc, it.chainId)
+                        )
+                    }
             }
         }
     }

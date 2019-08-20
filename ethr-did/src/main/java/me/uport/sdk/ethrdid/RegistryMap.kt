@@ -26,6 +26,12 @@ internal class RegistryMap {
 
     }
 
+    fun getOrNull(query: String): EthrDIDNetwork? = try {
+        this[query]
+    } catch (ex: IllegalArgumentException) {
+        null
+    }
+
     companion object {
         private fun normalizeQuantity(id: String) = id.clean0xPrefix().trimStart('0').prepend0xPrefix()
     }

@@ -12,7 +12,7 @@ import me.uport.sdk.jsonrpc.JsonRPC
  *
  * Please see https://github.com/uport-project/ethr-did-registry#contract-deployments for the known registry addresses.
  */
-class EthrDIDNetwork(
+class EthrDIDNetwork (
     /**
      * name of the ethereum network (ex: "mainnet", "rinkeby")
      */
