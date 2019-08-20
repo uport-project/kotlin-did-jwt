@@ -6,6 +6,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.json.JsonException
 import me.uport.sdk.core.*
+import me.uport.sdk.ethrdid.EthrDIDNetwork
 import me.uport.sdk.ethrdid.EthrDIDResolver
 import me.uport.sdk.httpsdid.WebDIDResolver
 import me.uport.sdk.jsonrpc.JsonRPC
@@ -81,7 +82,16 @@ class JWTTools(
             val defaultRPC = JsonRPC(preferredNetwork?.rpcUrl ?: Networks.mainnet.rpcUrl)
             val defaultRegistry = preferredNetwork?.ethrDidRegistry
                 ?: Networks.mainnet.ethrDidRegistry
-            UniversalDID.registerResolver(EthrDIDResolver(defaultRPC, defaultRegistry))
+            UniversalDID.registerResolver(
+                EthrDIDResolver.Builder().addNetwork(
+                    EthrDIDNetwork(
+                        "",
+                        defaultRegistry,
+                        defaultRPC,
+                        "0x1"
+                    )
+                ).build()
+            )
         }
 
         // register default Uport DID resolver if Universal DID is unable to resolve blank Uport DID
