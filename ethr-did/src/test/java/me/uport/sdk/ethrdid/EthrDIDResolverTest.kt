@@ -17,6 +17,7 @@ import me.uport.sdk.jsonrpc.JsonRpcLogItem
 import me.uport.sdk.jwt.test.EthrDIDTestHelpers
 import me.uport.sdk.signer.hexToBytes32
 import me.uport.sdk.signer.utf8
+import me.uport.sdk.testhelpers.coAssert
 import org.junit.Test
 import org.kethereum.extensions.hexToBigInteger
 import pm.gnosis.model.Solidity
@@ -74,7 +75,6 @@ class EthrDIDResolverTest {
         val http = mockk<HttpClient>()
         val rpc = JsonRPC("", http)
         val realAddress = "0xf3beac30c498d9e26865f34fcaa57dbb935b0d74"
-//        val resolver = EthrDIDResolver(rpc)
         val lastChanged = "0x00000000000000000000000000000000000000000000000000000000002a8a7d".hexToBigInteger()
 
         //language=json
@@ -475,4 +475,133 @@ class EthrDIDResolverTest {
             assertThat(extractedNetwork).isEqualTo(expectedNetwork)
         }
     }
+
+    @Test
+    fun `can resolve generic did when only provided with mainnet config`() {
+        val http = mockk<HttpClient>()
+        val referenceDDO = EthrDIDTestHelpers.mockDocForAddress("0xb9c5714089478a327f09197987f16f9e5d936e8a")
+
+        val addressHex = "b9c5714089478a327f09197987f16f9e5d936e8a"
+
+        val rpc = spyk(JsonRPC("mainnetRPC", http))
+        //canned response for get owner query
+        coEvery {
+            rpc.ethCall(
+                any(),
+                eq("0x8733d4e8000000000000000000000000$addressHex")
+            )
+        } returns "0x000000000000000000000000$addressHex"
+        //canned response for last changed query
+        coEvery {
+            rpc.ethCall(
+                any(),
+                eq("0xf96d0f9f000000000000000000000000$addressHex")
+            )
+        } returns "0x0000000000000000000000000000000000000000000000000000000000000000"
+        //canned response for getLogs
+        coEvery { http.urlPost(eq("mainnetRPC"), any(), any()) } returns """{"jsonrpc":"2.0","id":1,"result":[]}"""
+
+
+        val resolver = EthrDIDResolver.Builder()
+            .addNetwork(EthrDIDNetwork("mainnet", "mockregistry", rpc, "0x1"))
+            .build()
+
+        coAssert {
+            val ddo = resolver.resolve("did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a")
+            assertThat(ddo).isEqualTo(referenceDDO)
+        }.doesNotThrowAnyException()
+    }
+
+    @Test
+    fun `can resolve networked dids`() = runBlocking {
+        val http = mockk<HttpClient>()
+        val referenceDDO = EthrDIDTestHelpers.mockDocForAddress("0xb9c5714089478a327f09197987f16f9e5d936e8a")
+
+        val addressHex = "b9c5714089478a327f09197987f16f9e5d936e8a"
+
+        val rpc = spyk(JsonRPC("mainnetRPC", http))
+        //canned response for get owner query
+        coEvery {
+            rpc.ethCall(
+                any(),
+                eq("0x8733d4e8000000000000000000000000$addressHex")
+            )
+        } returns "0x000000000000000000000000$addressHex"
+        //canned response for last changed query
+        coEvery {
+            rpc.ethCall(
+                any(),
+                eq("0xf96d0f9f000000000000000000000000$addressHex")
+            )
+        } returns "0x0000000000000000000000000000000000000000000000000000000000000000"
+        //canned response for getLogs
+        coEvery { http.urlPost(any(), any(), any()) } returns """{"jsonrpc":"2.0","id":1,"result":[]}"""
+
+
+        val resolver = EthrDIDResolver.Builder()
+            .addNetwork(EthrDIDNetwork("mainnet", "0xregistry", rpc, "0x1"))
+            .addNetwork(EthrDIDNetwork("rinkeby", "0xregistry", rpc, "0x4"))
+            .build()
+
+        val genericDDO = resolver.resolve("did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a")
+        val mainnetDDO = resolver.resolve("did:ethr:mainnet:0xb9c5714089478a327f09197987f16f9e5d936e8a")
+        val mainnetDDO0x1 = resolver.resolve("did:ethr:0x1:0xb9c5714089478a327f09197987f16f9e5d936e8a")
+        val rinkebyDDO = resolver.resolve("did:ethr:rinkeby:0xb9c5714089478a327f09197987f16f9e5d936e8a")
+        val rinkebyDDO0x04 = resolver.resolve("did:ethr:0x04:0xb9c5714089478a327f09197987f16f9e5d936e8a")
+
+        assertThat(genericDDO).isEqualTo(referenceDDO)
+        assertThat(mainnetDDO).isEqualTo(referenceDDO)
+        assertThat(mainnetDDO0x1).isEqualTo(referenceDDO)
+        assertThat(rinkebyDDO).isEqualTo(referenceDDO)
+        assertThat(rinkebyDDO0x04).isEqualTo(referenceDDO)
+    }
+
+    @Test
+    fun `can resolve generic did when only provided with 0x1 config`() {
+        val http = mockk<HttpClient>()
+        val referenceDDO = EthrDIDTestHelpers.mockDocForAddress("0xb9c5714089478a327f09197987f16f9e5d936e8a")
+
+        val addressHex = "b9c5714089478a327f09197987f16f9e5d936e8a"
+
+        val rpc = spyk(JsonRPC("mainnetRPC", http))
+        //canned response for get owner query
+        coEvery {
+            rpc.ethCall(
+                eq("0xregistry"),
+                eq("0x8733d4e8000000000000000000000000$addressHex")
+            )
+        } returns "0x000000000000000000000000$addressHex"
+        //canned response for last changed query
+        coEvery {
+            rpc.ethCall(
+                eq("0xregistry"),
+                eq("0xf96d0f9f000000000000000000000000$addressHex")
+            )
+        } returns "0x0000000000000000000000000000000000000000000000000000000000000000"
+        //canned response for getLogs
+        coEvery { http.urlPost(eq("mainnetRPC"), any(), any()) } returns """{"jsonrpc":"2.0","id":1,"result":[]}"""
+
+
+        val resolver = EthrDIDResolver.Builder()
+            .addNetwork(EthrDIDNetwork("__default__", "0xregistry", rpc, "0x01"))
+            .build()
+
+        coAssert {
+            val ddo = resolver.resolve("did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a")
+            assertThat(ddo).isEqualTo(referenceDDO)
+        }.doesNotThrowAnyException()
+    }
+
+    @Test
+    fun `throws when missing config`() {
+        val resolver = EthrDIDResolver.Builder().build()
+
+        coAssert {
+            resolver.resolve("did:ethr:unknown:0xb9c5714089478a327f09197987f16f9e5d936e8a")
+        }.thrownError {
+            isInstanceOf(IllegalArgumentException::class)
+            hasMessage("Missing registry configuration for `unknown`. To resolve did:ethr:unknown:0x... you need to register an `EthrDIDNetwork` in the EthrDIDResolver.Builder")
+        }
+    }
+
 }
