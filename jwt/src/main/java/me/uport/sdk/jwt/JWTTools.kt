@@ -83,14 +83,9 @@ class JWTTools(
             val defaultRegistry = preferredNetwork?.ethrDidRegistry
                 ?: Networks.mainnet.ethrDidRegistry
             UniversalDID.registerResolver(
-                EthrDIDResolver.Builder().addNetwork(
-                    EthrDIDNetwork(
-                        "",
-                        defaultRegistry,
-                        defaultRPC,
-                        "0x1"
-                    )
-                ).build()
+                EthrDIDResolver.Builder()
+                    .addNetwork(EthrDIDNetwork("", defaultRegistry, defaultRPC, "0x1"))
+                    .build()
             )
         }
 
