@@ -11,6 +11,7 @@ import io.mockk.slot
 import io.mockk.spyk
 import kotlinx.coroutines.runBlocking
 import me.uport.sdk.core.HttpClient
+import me.uport.sdk.core.Networks
 import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDOwnerChanged
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jsonrpc.JsonRpcLogItem
@@ -374,7 +375,13 @@ class EthrDIDResolverTest {
             "0xB9C5714089478a327F09197987f16f9E5d936E8a",
             "did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a",
             "did:ethr:0xB9C5714089478a327F09197987f16f9E5d936E8a",
-            "did:ethr:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner"
+            "did:ethr:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner",
+            "did:ethr:mainnet:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner",
+            "did:ethr:mainnet:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:0x1:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner",
+            "did:ethr:0x1:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:0x01:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:0x01:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner"
         )
 
 
@@ -515,7 +522,6 @@ class EthrDIDResolverTest {
     @Test
     fun `can resolve networked dids`() = runBlocking {
         val http = mockk<HttpClient>()
-        val referenceDDO = EthrDIDTestHelpers.mockDocForAddress("0xb9c5714089478a327f09197987f16f9e5d936e8a")
 
         val addressHex = "b9c5714089478a327f09197987f16f9e5d936e8a"
 
@@ -546,14 +552,17 @@ class EthrDIDResolverTest {
         val genericDDO = resolver.resolve("did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a")
         val mainnetDDO = resolver.resolve("did:ethr:mainnet:0xb9c5714089478a327f09197987f16f9e5d936e8a")
         val mainnetDDO0x1 = resolver.resolve("did:ethr:0x1:0xb9c5714089478a327f09197987f16f9e5d936e8a")
-        val rinkebyDDO = resolver.resolve("did:ethr:rinkeby:0xb9c5714089478a327f09197987f16f9e5d936e8a")
-        val rinkebyDDO0x04 = resolver.resolve("did:ethr:0x04:0xb9c5714089478a327f09197987f16f9e5d936e8a")
 
+        val referenceDDO = EthrDIDTestHelpers.mockDocForAddress("0xb9c5714089478a327f09197987f16f9e5d936e8a")
         assertThat(genericDDO).isEqualTo(referenceDDO)
         assertThat(mainnetDDO).isEqualTo(referenceDDO)
         assertThat(mainnetDDO0x1).isEqualTo(referenceDDO)
-        assertThat(rinkebyDDO).isEqualTo(referenceDDO)
-        assertThat(rinkebyDDO0x04).isEqualTo(referenceDDO)
+
+        val rinkebyDDO = resolver.resolve("did:ethr:rinkeby:0xb9c5714089478a327f09197987f16f9e5d936e8a")
+        val rinkebyDDO0x04 = resolver.resolve("did:ethr:0x04:0xb9c5714089478a327f09197987f16f9e5d936e8a")
+
+        assertThat(rinkebyDDO).isEqualTo(EthrDIDTestHelpers.mockDocForAddress("did:ethr:rinkeby:0xb9c5714089478a327f09197987f16f9e5d936e8a"))
+        assertThat(rinkebyDDO0x04).isEqualTo(EthrDIDTestHelpers.mockDocForAddress("did:ethr:0x04:0xb9c5714089478a327f09197987f16f9e5d936e8a"))
     }
 
     @Test
@@ -601,6 +610,88 @@ class EthrDIDResolverTest {
         }.thrownError {
             isInstanceOf(IllegalArgumentException::class)
             hasMessage("Missing registry configuration for `unknown`. To resolve did:ethr:unknown:0x... you need to register an `EthrDIDNetwork` in the EthrDIDResolver.Builder")
+        }
+    }
+
+    @Test
+    fun `canResolve reports true on registered networks without mainnet or default`() {
+        val dids = listOf(
+            "did:ethr:rinkeby:0xb9c5714089478a327f09197987f16f9e5d936e8a",
+            "did:ethr:rinkeby:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:rinkeby:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner",
+            "did:ethr:0x2a:0xb9c5714089478a327f09197987f16f9e5d936e8a",
+            "did:ethr:0x2a:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:0x2a:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner",
+            "did:ethr:0x04:0xb9c5714089478a327f09197987f16f9e5d936e8a",
+            "did:ethr:0x04:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:0x04:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner"
+        )
+
+        val resolver = EthrDIDResolver.Builder()
+            .addNetwork(Networks.rinkeby)
+            .addNetwork(Networks.kovan)
+            .addNetwork(Networks.ropsten)
+            .build()
+        dids.forEach {
+            assertThat(resolver.canResolve(it)).isTrue()
+        }
+    }
+
+    @Test
+    fun `canResolve reports true on registered networks`() {
+        val dids = listOf(
+            "did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a",
+            "did:ethr:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner",
+            "did:ethr:mainnet:0xb9c5714089478a327f09197987f16f9e5d936e8a",
+            "did:ethr:mainnet:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:mainnet:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner",
+            "did:ethr:rinkeby:0xb9c5714089478a327f09197987f16f9e5d936e8a",
+            "did:ethr:rinkeby:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:rinkeby:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner",
+            "did:ethr:0x1:0xb9c5714089478a327f09197987f16f9e5d936e8a",
+            "did:ethr:0x1:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:0x1:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner",
+            "did:ethr:0x04:0xb9c5714089478a327f09197987f16f9e5d936e8a",
+            "did:ethr:0x04:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:0x04:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner"
+        )
+
+        val resolver = EthrDIDResolver.Builder()
+            .addNetwork(Networks.mainnet)
+            .addNetwork(Networks.rinkeby)
+            .addNetwork(Networks.kovan)
+            .addNetwork(Networks.ropsten)
+            .build()
+        dids.forEach {
+            assertThat(resolver.canResolve(it)).isTrue()
+        }
+    }
+
+    @Test
+    fun `canResolve reports false on unregistered networks`() {
+        val dids = listOf(
+            "did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a",
+            "did:ethr:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner",
+            "did:ethr:mainnet:0xb9c5714089478a327f09197987f16f9e5d936e8a",
+            "did:ethr:mainnet:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:mainnet:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner",
+            "did:ethr:rinkeby:0xb9c5714089478a327f09197987f16f9e5d936e8a",
+            "did:ethr:rinkeby:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:rinkeby:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner",
+            "did:ethr:0x1:0xb9c5714089478a327f09197987f16f9e5d936e8a",
+            "did:ethr:0x1:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:0x1:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner",
+            "did:ethr:0x04:0xb9c5714089478a327f09197987f16f9e5d936e8a",
+            "did:ethr:0x04:0xB9C5714089478a327F09197987f16f9E5d936E8a",
+            "did:ethr:0x04:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner"
+        )
+
+        val resolver = EthrDIDResolver.Builder()
+            .build()
+        dids.forEach {
+            assertThat(resolver.canResolve(it)).isFalse()
         }
     }
 

@@ -113,7 +113,9 @@ open class EthrDIDResolver : DIDResolver {
 
     override fun canResolve(potentialDID: String): Boolean {
         //if it can be normalized, then it matches either an ethereum address or a full ethr-did
-        return normalizeDid(potentialDID).isNotBlank()
+        val did = normalizeDid(potentialDID)
+        val network = extractNetwork(did)
+        return did.isNotBlank() && _registryMap.getOrNull(network) != null
     }
 
     /**
@@ -396,7 +398,7 @@ open class EthrDIDResolver : DIDResolver {
 
         internal fun normalizeDid(did: String): String {
             val matchResult = didParsePattern.find(did) ?: return ""
-            val (didHeader, _, didType, _, _, _, _, hexDigits) = matchResult.destructured
+            val (didHeader, _, didType, _, network, _, _, hexDigits) = matchResult.destructured
             if (didType.isNotBlank() && didType != "ethr") {
                 //should forward to another resolver
                 return ""
@@ -405,7 +407,10 @@ open class EthrDIDResolver : DIDResolver {
                 //doesn't really look like a did if it only specifies type and not "did:"
                 return ""
             }
-            return "did:ethr:0x$hexDigits"
+            return if (network.isBlank() || network in listOf("mainnet", "0x1", "0x01"))
+                "did:ethr:0x$hexDigits"
+            else
+                "did:ethr:$network:0x$hexDigits"
         }
 
         private const val DEFAULT_NETWORK_NAME = "" //empty string
