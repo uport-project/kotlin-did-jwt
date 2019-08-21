@@ -2,6 +2,7 @@ package me.uport.sdk.jwt.test
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
 import me.uport.sdk.ethrdid.EthrDIDDocument
 import me.uport.sdk.universaldid.AuthenticationEntry
 import me.uport.sdk.universaldid.PublicKeyEntry
@@ -104,5 +105,14 @@ class EthrDIDTestHelpersTest {
         val ddo = EthrDIDTestHelpers.mockDocForAddress("did:ethr:mainnet:$address")
 
         assertThat(ddo).isEqualTo(referenceDDO)
+    }
+
+    @Test
+    fun `throws error when given improper input`() {
+        assertThat {
+            EthrDIDTestHelpers.mockDocForAddress("bla bla")
+        }.thrownError {
+            isInstanceOf(IllegalArgumentException::class)
+        }
     }
 }
