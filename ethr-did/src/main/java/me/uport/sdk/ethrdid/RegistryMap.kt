@@ -33,6 +33,25 @@ internal class RegistryMap {
     }
 
     companion object {
+
         private fun normalizeQuantity(id: String) = id.clean0xPrefix().trimStart('0').prepend0xPrefix()
+
+        /**
+         * build a usable registry map from a list of network configurations.
+         * In case it is not defined in the list, this method also tries to define
+         * a default network based on any network resembling `mainnet`
+         */
+        fun fromNetworks(networkConfigs: MutableList<EthrDIDNetwork>) = RegistryMap().apply {
+            //register given networks
+            networkConfigs.forEach { registerNetwork(it) }
+            //if no default was provided, try to copy mainnet
+            (getOrNull("") ?: getOrNull("mainnet") ?: getOrNull("0x1"))
+                ?.let {
+                    registerNetwork(
+                        EthrDIDNetwork("", it.registryAddress, it.rpc, it.chainId)
+                    )
+                }
+        }
     }
 }
+

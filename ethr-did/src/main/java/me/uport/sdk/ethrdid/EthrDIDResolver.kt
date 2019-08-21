@@ -65,50 +65,6 @@ open class EthrDIDResolver : DIDResolver {
         this._registryMap = RegistryMap().registerNetwork(net)
     }
 
-    /**
-     * Builds an [EthrDIDResolver]
-     * This class allows configuration of multiple ethereum networks that this resolver can access.
-     */
-    class Builder {
-        private var _clock: ITimeProvider? = null
-        private val _networks = emptyList<EthrDIDNetwork>().toMutableList()
-
-        fun setTimeProvider(timeProvider: ITimeProvider): Builder {
-            _clock = timeProvider
-            return this
-        }
-
-        fun addNetwork(network: EthrDIDNetwork): Builder {
-            _networks.add(network)
-            return this
-        }
-
-        fun addNetwork(network: EthNetwork): Builder {
-            _networks.add(network.toEthrDIDNetwork())
-            return this
-        }
-
-        fun build(): EthrDIDResolver {
-            val clock = _clock ?: SystemTimeProvider
-            return EthrDIDResolver(buildRegistryMap(_networks), clock)
-        }
-
-        companion object {
-
-            private fun buildRegistryMap(networkConfigs: MutableList<EthrDIDNetwork>) = RegistryMap().apply {
-                //register given networks
-                networkConfigs.forEach { registerNetwork(it) }
-                //if no default was provided, try to copy mainnet
-                (getOrNull("") ?: getOrNull("mainnet") ?: getOrNull("0x1"))
-                    ?.let {
-                        registerNetwork(
-                            EthrDIDNetwork("", it.registryAddress, it.rpc, it.chainId)
-                        )
-                    }
-            }
-        }
-    }
-
     override val method = "ethr"
 
     override fun canResolve(potentialDID: String): Boolean {
@@ -415,5 +371,58 @@ open class EthrDIDResolver : DIDResolver {
 
         private const val DEFAULT_NETWORK_NAME = "" //empty string
 
+    }
+
+    /**
+     * Builds an [EthrDIDResolver]
+     * This class allows configuration of multiple ethereum networks that this resolver can access.
+     */
+    class Builder {
+        private var _clock: ITimeProvider? = null
+        private val _networks = emptyList<EthrDIDNetwork>().toMutableList()
+
+        /**
+         * Allows the use of a different clock than the system time.
+         * This is usable for "was valid at" type of queries, and for deterministic checks.
+         */
+        fun setTimeProvider(timeProvider: ITimeProvider): Builder {
+            _clock = timeProvider
+            return this
+        }
+
+        /**
+         * Adds a network configuration that can be used to resolve ethr-DIDs
+         * into their corresponding DID documents based on the network specific
+         * ERC 1056 registry.
+         *
+         * This is the preferred method of configuration because it supports
+         * abstraction of the blockchain access method.
+         */
+        fun addNetwork(network: EthrDIDNetwork): Builder {
+            _networks.add(network)
+            return this
+        }
+
+        /**
+         * Adds a network configuration that can be used to resolve ethr-DIDs
+         * into their corresponding DID documents based on the network specific
+         * ERC 1056 registry.
+         *
+         * This method is usable when only JSON RPC over http is available;
+         * If blockchain access needs to be abstracted or mocked, please use
+         * [EthrDIDNetwork]
+         */
+        fun addNetwork(network: EthNetwork): Builder {
+            _networks.add(network.toEthrDIDNetwork())
+            return this
+        }
+
+        /**
+         * Constructs the final EthrDIDResolver instance based on the networks and clock provided.
+         */
+        fun build(): EthrDIDResolver {
+            val clock = _clock ?: SystemTimeProvider
+            return EthrDIDResolver(RegistryMap.fromNetworks(_networks), clock)
+        }
     }
 }

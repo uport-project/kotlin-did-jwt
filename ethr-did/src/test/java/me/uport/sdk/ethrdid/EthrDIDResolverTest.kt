@@ -478,7 +478,7 @@ class EthrDIDResolverTest {
         )
         validNetworkedDIDs.forEach { (did, expectedNetwork) ->
             val extractedNetwork = EthrDIDResolver.extractNetwork(did).toLowerCase()
-            println("extracting address from `$did` got `$extractedNetwork`")
+            println("extracting network from `$did` got `$extractedNetwork`")
             assertThat(extractedNetwork).isEqualTo(expectedNetwork)
         }
     }
