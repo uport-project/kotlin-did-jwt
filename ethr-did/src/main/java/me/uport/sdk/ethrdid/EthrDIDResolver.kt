@@ -48,7 +48,8 @@ open class EthrDIDResolver : DIDResolver {
 
     @Deprecated(
         "Constructing the resolver directly has been deprecated " +
-                "in favor of the Builder pattern that can supply multi-network configurations.",
+                "in favor of the Builder pattern that can supply multi-network configurations." +
+                "This will be removed in the next major release.",
         ReplaceWith(
             """EthrDIDResolver.Builder().addNetwork(EthrDIDNetwork("", registryAddress, rpc, "0x1")).build()""",
             "me.uport.sdk.ethrdid.EthrDIDResolver.Companion.DEFAULT_REGISTRY_ADDRESS"
@@ -123,7 +124,7 @@ open class EthrDIDResolver : DIDResolver {
             if (this.isBlank()) DEFAULT_NETWORK_NAME else this
         }
 
-        val didNetworkConfig = try {
+        val ethNetworkConfig = try {
             _registryMap[networkIdentifier]
         } catch (e: IllegalArgumentException) {
             throw IllegalArgumentException(
@@ -133,8 +134,8 @@ open class EthrDIDResolver : DIDResolver {
             )
         }
 
-        val rpc = didNetworkConfig.rpc
-        val registryAddress = didNetworkConfig.registryAddress
+        val rpc = ethNetworkConfig.rpc
+        val registryAddress = ethNetworkConfig.registryAddress
 
         val normalizedDid = normalizeDid(did)
         val identity = extractAddress(normalizedDid)

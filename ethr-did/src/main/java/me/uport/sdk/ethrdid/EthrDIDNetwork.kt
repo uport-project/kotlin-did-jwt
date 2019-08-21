@@ -38,7 +38,7 @@ class EthrDIDNetwork (
 )
 
 /**
- * converts
+ * converts a network description to an [EthrDIDNetwork] instance
  */
 fun EthNetwork.toEthrDIDNetwork() =
     EthrDIDNetwork(
