@@ -13,11 +13,15 @@ import kotlinx.coroutines.runBlocking
 import me.uport.sdk.core.HttpClient
 import me.uport.sdk.core.Networks
 import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDOwnerChanged
+import me.uport.sdk.jsonrpc.JSON_RPC_INTERNAL_ERROR_CODE
 import me.uport.sdk.jsonrpc.JsonRPC
+import me.uport.sdk.jsonrpc.JsonRpcException
 import me.uport.sdk.jsonrpc.JsonRpcLogItem
 import me.uport.sdk.jwt.test.EthrDIDTestHelpers
 import me.uport.sdk.signer.hexToBytes32
 import me.uport.sdk.signer.utf8
+import me.uport.sdk.testhelpers.coAssert
+import me.uport.sdk.universaldid.DidResolverError
 import org.junit.Test
 import org.kethereum.extensions.hexToBigInteger
 import pm.gnosis.model.Solidity
@@ -443,6 +447,34 @@ class EthrDIDResolverTest {
         invalidDids.forEach {
             val normalizedDid = EthrDIDResolver.normalizeDid(it)
             assertThat(normalizedDid).isEmpty()
+        }
+    }
+
+
+    @Test
+    fun `throws when registry is not configured`() {
+        val rpc = mockk<JsonRPC>()
+        val resolver = EthrDIDResolver(rpc, "")
+        coAssert {
+            resolver.resolve("did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a")
+        }.thrownError {
+            isInstanceOf(IllegalArgumentException::class)
+        }
+    }
+
+    @Test
+    fun `throws DidResolverError when RPC returns error`() {
+        val rpc = mockk<JsonRPC>()
+
+        coEvery {
+            rpc.ethCall(any(), any())
+        } throws JsonRpcException(JSON_RPC_INTERNAL_ERROR_CODE, "fake error")
+
+        val resolver = EthrDIDResolver(rpc)
+        coAssert {
+            resolver.lastChanged("0xb9c5714089478a327f09197987f16f9e5d936e8a")
+        }.thrownError {
+            isInstanceOf(DidResolverError::class)
         }
     }
 
