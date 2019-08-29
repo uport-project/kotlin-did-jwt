@@ -13,11 +13,15 @@ import kotlinx.coroutines.runBlocking
 import me.uport.sdk.core.HttpClient
 import me.uport.sdk.core.Networks
 import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDOwnerChanged
+import me.uport.sdk.jsonrpc.JSON_RPC_INTERNAL_ERROR_CODE
 import me.uport.sdk.jsonrpc.JsonRPC
+import me.uport.sdk.jsonrpc.JsonRpcException
 import me.uport.sdk.jsonrpc.JsonRpcLogItem
 import me.uport.sdk.jwt.test.EthrDIDTestHelpers
 import me.uport.sdk.signer.hexToBytes32
 import me.uport.sdk.signer.utf8
+import me.uport.sdk.testhelpers.coAssert
+import me.uport.sdk.universaldid.DidResolverError
 import org.junit.Test
 import org.kethereum.extensions.hexToBigInteger
 import pm.gnosis.model.Solidity
@@ -70,7 +74,8 @@ class EthrDIDResolverTest {
         val rpc = JsonRPC(Networks.rinkeby.rpcUrl, http)
         val realAddress = "0xf3beac30c498d9e26865f34fcaa57dbb935b0d74"
         val resolver = EthrDIDResolver(rpc)
-        val lastChanged = "0x00000000000000000000000000000000000000000000000000000000002a8a7d".hexToBigInteger()
+        val lastChanged =
+            "0x00000000000000000000000000000000000000000000000000000000002a8a7d".hexToBigInteger()
 
         //language=json
         val cannedLogsResponse =
@@ -78,7 +83,12 @@ class EthrDIDResolverTest {
         coEvery { http.urlPost(any(), any(), any()) } returns cannedLogsResponse
 
         val logResponse =
-            rpc.getLogs(resolver.registryAddress, listOf(null, realAddress.hexToBytes32()), lastChanged, lastChanged)
+            rpc.getLogs(
+                resolver.registryAddress,
+                listOf(null, realAddress.hexToBytes32()),
+                lastChanged,
+                lastChanged
+            )
 
         assertThat(logResponse).all {
             isNotNull()
@@ -117,7 +127,12 @@ class EthrDIDResolverTest {
         val realAddress = "0xf3beac30c498d9e26865f34fcaa57dbb935b0d74"
 
         val rpc = spyk(JsonRPC(Networks.rinkeby.rpcUrl))
-        coEvery { rpc.ethCall(any(), eq("0xf96d0f9f000000000000000000000000f3beac30c498d9e26865f34fcaa57dbb935b0d74")) }
+        coEvery {
+            rpc.ethCall(
+                any(),
+                eq("0xf96d0f9f000000000000000000000000f3beac30c498d9e26865f34fcaa57dbb935b0d74")
+            )
+        }
             .returns("0x00000000000000000000000000000000000000000000000000000000002a8a7d")
         val cannedResponses: List<List<JsonRpcLogItem>> = listOf(
             listOf(
@@ -184,12 +199,18 @@ class EthrDIDResolverTest {
 
         coEvery {
             //mock the lookup owner call to return itself
-            rpc.ethCall(any(), eq("0x8733d4e800000000000000000000000062d283fe6939c01fc88f02c6d2c9a547cc3e2656"))
+            rpc.ethCall(
+                any(),
+                eq("0x8733d4e800000000000000000000000062d283fe6939c01fc88f02c6d2c9a547cc3e2656")
+            )
         }.returns("0x00000000000000000000000062d283fe6939c01fc88f02c6d2c9a547cc3e2656")
 
         coEvery {
             //mock the lastChanged call to point to block number 4680310 (0x476A76)
-            rpc.ethCall(any(), eq("0xf96d0f9f00000000000000000000000062d283fe6939c01fc88f02c6d2c9a547cc3e2656"))
+            rpc.ethCall(
+                any(),
+                eq("0xf96d0f9f00000000000000000000000062d283fe6939c01fc88f02c6d2c9a547cc3e2656")
+            )
         }.returns("0x0000000000000000000000000000000000000000000000000000000000476A76")
 
         coEvery {
@@ -246,6 +267,47 @@ class EthrDIDResolverTest {
               "@context": "https://w3id.org/did/v1"
             }""".trimIndent()
         )
+
+        assertThat(ddo).isEqualTo(expectedDDO)
+    }
+
+    @Test
+    fun `resolves with default doc when the RPC logs are blank or corrupted`() = runBlocking {
+        val rpc = mockk<JsonRPC>()
+
+        coEvery {
+            //mock the lookup owner call to return itself
+            rpc.ethCall(
+                any(),
+                eq("0x8733d4e800000000000000000000000062d283fe6939c01fc88f02c6d2c9a547cc3e2656")
+            )
+        }.returns("0x00000000000000000000000062d283fe6939c01fc88f02c6d2c9a547cc3e2656")
+
+        coEvery {
+            //mock the lastChanged call to point to block numbers 9 and 8
+            rpc.ethCall(
+                any(),
+                eq("0xf96d0f9f00000000000000000000000062d283fe6939c01fc88f02c6d2c9a547cc3e2656")
+            )
+        }.returnsMany(
+            listOf(
+                "0x0000000000000000000000000000000000000000000000000000000000000009",
+                "0x0000000000000000000000000000000000000000000000000000000000000008"
+            )
+        )
+
+        coEvery {
+            rpc.getLogs(address = any(), topics = any(), fromBlock = any(), toBlock = any())
+        }.returnsMany(
+            emptyList(),
+            emptyList()
+        )
+
+        val resolver = EthrDIDResolver(rpc)
+        val ddo = resolver.resolve("0x62d283fe6939c01fc88f02c6d2c9a547cc3e2656")
+
+        val expectedDDO = EthrDIDTestHelpers
+            .mockDocForAddress("0x62d283fe6939c01fc88f02c6d2c9a547cc3e2656")
 
         assertThat(ddo).isEqualTo(expectedDDO)
     }
@@ -324,7 +386,8 @@ class EthrDIDResolverTest {
     fun `can resolve real did`() = runBlocking {
         val http = mockk<HttpClient>()
 
-        val referenceDDO = EthrDIDTestHelpers.mockDocForAddress("0xb9c5714089478a327f09197987f16f9e5d936e8a")
+        val referenceDDO =
+            EthrDIDTestHelpers.mockDocForAddress("0xb9c5714089478a327f09197987f16f9e5d936e8a")
 
         val addressHex = "b9c5714089478a327f09197987f16f9e5d936e8a"
 
@@ -344,7 +407,13 @@ class EthrDIDResolverTest {
             )
         } returns "0x0000000000000000000000000000000000000000000000000000000000000000"
         //canned response for getLogs
-        coEvery { http.urlPost(any(), any(), any()) } returns """{"jsonrpc":"2.0","id":1,"result":[]}"""
+        coEvery {
+            http.urlPost(
+                any(),
+                any(),
+                any()
+            )
+        } returns """{"jsonrpc":"2.0","id":1,"result":[]}"""
 
         val resolver = EthrDIDResolver(rpc)
         val ddo = resolver.resolve("did:ethr:0x$addressHex")
@@ -378,6 +447,34 @@ class EthrDIDResolverTest {
         invalidDids.forEach {
             val normalizedDid = EthrDIDResolver.normalizeDid(it)
             assertThat(normalizedDid).isEmpty()
+        }
+    }
+
+
+    @Test
+    fun `throws when registry is not configured`() {
+        val rpc = mockk<JsonRPC>()
+        val resolver = EthrDIDResolver(rpc, "")
+        coAssert {
+            resolver.resolve("did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a")
+        }.thrownError {
+            isInstanceOf(IllegalArgumentException::class)
+        }
+    }
+
+    @Test
+    fun `throws DidResolverError when RPC returns error`() {
+        val rpc = mockk<JsonRPC>()
+
+        coEvery {
+            rpc.ethCall(any(), any())
+        } throws JsonRpcException(JSON_RPC_INTERNAL_ERROR_CODE, "fake error")
+
+        val resolver = EthrDIDResolver(rpc)
+        coAssert {
+            resolver.lastChanged("0xb9c5714089478a327f09197987f16f9e5d936e8a")
+        }.thrownError {
+            isInstanceOf(DidResolverError::class)
         }
     }
 

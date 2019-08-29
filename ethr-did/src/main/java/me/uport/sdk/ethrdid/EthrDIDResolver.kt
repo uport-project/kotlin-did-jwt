@@ -7,6 +7,7 @@ import me.uport.sdk.core.SystemTimeProvider
 import me.uport.sdk.core.toBase64
 import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDAttributeChanged
 import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDDelegateChanged
+import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDOwnerChanged
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jsonrpc.JsonRpcException
 import me.uport.sdk.signer.Signer
@@ -53,9 +54,7 @@ open class EthrDIDResolver(
      */
     override suspend fun resolve(did: String): EthrDIDDocument {
 
-        if (registryAddress.isBlank()) {
-            throw IllegalArgumentException("ethr DID registry address is blank. please check your Configuration")
-        }
+        require(registryAddress.isNotBlank()) { "ethr DID registry address is blank. please check your Configuration" }
 
         val normalizedDid = normalizeDid(did)
         val identity = parseIdentity(normalizedDid)
@@ -95,28 +94,28 @@ open class EthrDIDResolver(
         val events = emptyList<Any>().toMutableList()
         lastChangedQueue.add(lastChanged(identity).hexToBigInteger())
         do {
-            val lastChange = lastChangedQueue.remove()
+            val lastChange = lastChangedQueue.poll() ?: break
             val logs = rpc.getLogs(registryAddress, listOf(null, identity.hexToBytes32()), lastChange, lastChange)
             logs.forEach {
                 val topics: List<String> = it.topics
                 val data: String = it.data
 
                 try {
-                    val event = EthereumDIDRegistry.Events.DIDOwnerChanged.decode(topics, data)
+                    val event = DIDOwnerChanged.decode(topics, data)
                     lastChangedQueue.add(event.previouschange.value)
                     events.add(event)
                 } catch (err: Exception) { /*nop*/
                 }
 
                 try {
-                    val event = EthereumDIDRegistry.Events.DIDAttributeChanged.decode(topics, data)
+                    val event = DIDAttributeChanged.decode(topics, data)
                     lastChangedQueue.add(event.previouschange.value)
                     events.add(event)
                 } catch (err: Exception) { /*nop*/
                 }
 
                 try {
-                    val event = EthereumDIDRegistry.Events.DIDDelegateChanged.decode(topics, data)
+                    val event = DIDDelegateChanged.decode(topics, data)
                     lastChangedQueue.add(event.previouschange.value)
                     events.add(event)
                 } catch (err: Exception) { /*nop*/
@@ -125,7 +124,7 @@ open class EthrDIDResolver(
             }
 
 
-        } while (lastChange != null && lastChange != BigInteger.ZERO)
+        } while (lastChange != BigInteger.ZERO)
 
         return events
     }

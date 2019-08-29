@@ -2,6 +2,7 @@
 
 package me.uport.sdk.jwt.model
 
+import kotlinx.serialization.ContextualSerialization
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -50,7 +51,7 @@ data class JwtPayload(
      */
     @Serializable(with = ArbitraryMapSerializer::class)
     @SerialName("claim")
-    val claims: Map<String, Any>? = null,
+    val claims: Map<String, @ContextualSerialization Any>? = null,
     /**
      * Specific to Private Chain
      * Also includes dad
@@ -62,7 +63,8 @@ data class JwtPayload(
     val acc: String? = null //Fuel token used to authenticate on above fct url
 ) {
     companion object {
-        fun fromJson(payloadString: String): JwtPayload = jsonAdapter.parse(serializer(), payloadString)
+        fun fromJson(payloadString: String): JwtPayload =
+            jsonAdapter.parse(serializer(), payloadString)
 
         private val jsonAdapter = Json(JsonConfiguration(strictMode = false))
     }
