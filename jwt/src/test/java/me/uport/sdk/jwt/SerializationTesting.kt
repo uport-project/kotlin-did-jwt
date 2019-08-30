@@ -4,6 +4,7 @@ package me.uport.sdk.jwt
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import kotlinx.serialization.ContextualSerialization
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -23,7 +24,7 @@ class SerializationTesting {
     data class CompoundTestObject(
         //use custom serializers for arbitrary map types
         @Serializable(with = ArbitraryMapSerializer::class)
-        val generic: Map<String, Any?>
+        val generic: Map<String, @ContextualSerialization Any?>
     )
 
     @Test
