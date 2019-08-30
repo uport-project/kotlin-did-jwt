@@ -31,6 +31,8 @@ class TimestampTests {
     @Before
     fun `mock DID documents before every test`() {
         val jrpc = mockk<JsonRPC>()
+        //intentionally suppress deprecation here to test that the old constructor still works
+        @Suppress("DEPRECATION")
         val resolver = spyk(EthrDIDResolver(jrpc))
         coEvery {
             resolver.resolve(any())
