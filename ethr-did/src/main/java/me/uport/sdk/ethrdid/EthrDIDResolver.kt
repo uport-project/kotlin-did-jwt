@@ -96,11 +96,15 @@ open class EthrDIDResolver : DIDResolver {
         val rpc = ethNetworkConfig.rpc
         val registryAddress = ethNetworkConfig.registryAddress
 
+        require(registryAddress.isNotBlank()) {
+            "The registry address configured for network `$networkIdentifier` is blank."
+        }
+
         val normalizedDid = normalizeDid(did)
-        val identity = extractAddress(normalizedDid)
-        val ethrDidContract = EthrDID(identity, rpc, registryAddress, Signer.blank)
+        val identityAddress = extractAddress(normalizedDid)
+        val ethrDidContract = EthrDID(identityAddress, rpc, registryAddress, Signer.blank)
         val owner = ethrDidContract.lookupOwner(false)
-        val history = getHistory(identity, rpc, registryAddress)
+        val history = getHistory(identityAddress, rpc, registryAddress)
         return wrapDidDocument(normalizedDid, owner, history)
     }
 
@@ -114,7 +118,8 @@ open class EthrDIDResolver : DIDResolver {
         rpc: JsonRPC,
         registryAddress: String
     ): String {
-        val encodedCall = EthereumDIDRegistry.Changed.encode(Solidity.Address(identity.hexToBigInteger()))
+        val encodedCall =
+            EthereumDIDRegistry.Changed.encode(Solidity.Address(identity.hexToBigInteger()))
         return try {
             rpc.ethCall(registryAddress, encodedCall)
         } catch (err: JsonRpcException) {
@@ -143,7 +148,12 @@ open class EthrDIDResolver : DIDResolver {
         lastChangedQueue.add(lastChanged(identity, rpc, registryAddress).hexToBigInteger())
         do {
             val lastChange = lastChangedQueue.poll() ?: break
-            val logs = rpc.getLogs(registryAddress, listOf(null, identity.hexToBytes32()), lastChange, lastChange)
+            val logs = rpc.getLogs(
+                registryAddress,
+                listOf(null, identity.hexToBytes32()),
+                lastChange,
+                lastChange
+            )
             logs.forEach {
                 val topics: List<String> = it.topics
                 val data: String = it.data
@@ -182,7 +192,11 @@ open class EthrDIDResolver : DIDResolver {
      *
      * @hide
      */
-    internal fun wrapDidDocument(ownerDID: String, ownerAddress: String, history: List<Any>): EthrDIDDocument {
+    internal fun wrapDidDocument(
+        ownerDID: String,
+        ownerAddress: String,
+        history: List<Any>
+    ): EthrDIDDocument {
 
         val pkEntries = mapOf<String, PublicKeyEntry>().toMutableMap().apply {
             put(
@@ -291,7 +305,11 @@ open class EthrDIDResolver : DIDResolver {
     }
 
     @Suppress("StringLiteralDuplication")
-    private fun processDelegateChanged(event: DIDDelegateChanged.Arguments, delegateCount: Int, ownerDID: String):
+    private fun processDelegateChanged(
+        event: DIDDelegateChanged.Arguments,
+        delegateCount: Int,
+        ownerDID: String
+    ):
             Pair<MutableMap<String, PublicKeyEntry>, MutableMap<String, AuthenticationEntry>> {
 
         val pkEntries = mapOf<String, PublicKeyEntry>().toMutableMap()
@@ -351,7 +369,8 @@ open class EthrDIDResolver : DIDResolver {
             ?.destructured?.component2() ?: ""
 
         //language=RegExp
-        private val didParsePattern = "^(did:)?((\\w+):)?((\\w+):)?((0x)([0-9a-fA-F]{40}))".toRegex()
+        private val didParsePattern =
+            "^(did:)?((\\w+):)?((\\w+):)?((0x)([0-9a-fA-F]{40}))".toRegex()
 
         internal fun normalizeDid(did: String): String {
             val matchResult = didParsePattern.find(did) ?: return ""

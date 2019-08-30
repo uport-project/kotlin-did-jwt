@@ -79,7 +79,8 @@ class EthrDIDResolverTest {
         val http = mockk<HttpClient>()
         val rpc = JsonRPC("", http)
         val realAddress = "0xf3beac30c498d9e26865f34fcaa57dbb935b0d74"
-        val lastChanged = "0x00000000000000000000000000000000000000000000000000000000002a8a7d".hexToBigInteger()
+        val lastChanged =
+            "0x00000000000000000000000000000000000000000000000000000000002a8a7d".hexToBigInteger()
 
         //language=json
         val cannedLogsResponse =
@@ -87,7 +88,12 @@ class EthrDIDResolverTest {
         coEvery { http.urlPost(any(), any(), any()) } returns cannedLogsResponse
 
         val logResponse =
-            rpc.getLogs("0xregistry", listOf(null, realAddress.hexToBytes32()), lastChanged, lastChanged)
+            rpc.getLogs(
+                "0xregistry",
+                listOf(null, realAddress.hexToBytes32()),
+                lastChanged,
+                lastChanged
+            )
 
         assertThat(logResponse).all {
             isNotNull()
@@ -126,7 +132,12 @@ class EthrDIDResolverTest {
         val realAddress = "0xf3beac30c498d9e26865f34fcaa57dbb935b0d74"
 
         val rpc = spyk(JsonRPC(""))
-        coEvery { rpc.ethCall(any(), eq("0xf96d0f9f000000000000000000000000f3beac30c498d9e26865f34fcaa57dbb935b0d74")) }
+        coEvery {
+            rpc.ethCall(
+                any(),
+                eq("0xf96d0f9f000000000000000000000000f3beac30c498d9e26865f34fcaa57dbb935b0d74")
+            )
+        }
             .returns("0x00000000000000000000000000000000000000000000000000000000002a8a7d")
         val cannedResponses: List<List<JsonRpcLogItem>> = listOf(
             listOf(
@@ -301,7 +312,8 @@ class EthrDIDResolverTest {
             emptyList()
         )
 
-        val resolver = EthrDIDResolver(rpc)
+        val resolver = EthrDIDResolver.Builder()
+            .addNetwork(EthrDIDNetwork("", "0xregistry", rpc, "0x1")).build()
         val ddo = resolver.resolve("0x62d283fe6939c01fc88f02c6d2c9a547cc3e2656")
 
         val expectedDDO = EthrDIDTestHelpers
@@ -543,7 +555,8 @@ class EthrDIDResolverTest {
     @Test
     fun `can resolve generic did when only provided with mainnet config`() {
         val http = mockk<HttpClient>()
-        val referenceDDO = EthrDIDTestHelpers.mockDocForAddress("0xb9c5714089478a327f09197987f16f9e5d936e8a")
+        val referenceDDO =
+            EthrDIDTestHelpers.mockDocForAddress("0xb9c5714089478a327f09197987f16f9e5d936e8a")
 
         val addressHex = "b9c5714089478a327f09197987f16f9e5d936e8a"
 
@@ -563,7 +576,13 @@ class EthrDIDResolverTest {
             )
         } returns "0x0000000000000000000000000000000000000000000000000000000000000000"
         //canned response for getLogs
-        coEvery { http.urlPost(eq("mainnetRPC"), any(), any()) } returns """{"jsonrpc":"2.0","id":1,"result":[]}"""
+        coEvery {
+            http.urlPost(
+                eq("mainnetRPC"),
+                any(),
+                any()
+            )
+        } returns """{"jsonrpc":"2.0","id":1,"result":[]}"""
 
 
         val resolver = EthrDIDResolver.Builder()
@@ -598,7 +617,13 @@ class EthrDIDResolverTest {
             )
         } returns "0x0000000000000000000000000000000000000000000000000000000000000000"
         //canned response for getLogs
-        coEvery { http.urlPost(any(), any(), any()) } returns """{"jsonrpc":"2.0","id":1,"result":[]}"""
+        coEvery {
+            http.urlPost(
+                any(),
+                any(),
+                any()
+            )
+        } returns """{"jsonrpc":"2.0","id":1,"result":[]}"""
 
 
         val resolver = EthrDIDResolver.Builder()
@@ -607,16 +632,21 @@ class EthrDIDResolverTest {
             .build()
 
         val genericDDO = resolver.resolve("did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a")
-        val mainnetDDO = resolver.resolve("did:ethr:mainnet:0xb9c5714089478a327f09197987f16f9e5d936e8a")
-        val mainnetDDO0x1 = resolver.resolve("did:ethr:0x1:0xb9c5714089478a327f09197987f16f9e5d936e8a")
+        val mainnetDDO =
+            resolver.resolve("did:ethr:mainnet:0xb9c5714089478a327f09197987f16f9e5d936e8a")
+        val mainnetDDO0x1 =
+            resolver.resolve("did:ethr:0x1:0xb9c5714089478a327f09197987f16f9e5d936e8a")
 
-        val referenceDDO = EthrDIDTestHelpers.mockDocForAddress("0xb9c5714089478a327f09197987f16f9e5d936e8a")
+        val referenceDDO =
+            EthrDIDTestHelpers.mockDocForAddress("0xb9c5714089478a327f09197987f16f9e5d936e8a")
         assertThat(genericDDO).isEqualTo(referenceDDO)
         assertThat(mainnetDDO).isEqualTo(referenceDDO)
         assertThat(mainnetDDO0x1).isEqualTo(referenceDDO)
 
-        val rinkebyDDO = resolver.resolve("did:ethr:rinkeby:0xb9c5714089478a327f09197987f16f9e5d936e8a")
-        val rinkebyDDO0x04 = resolver.resolve("did:ethr:0x04:0xb9c5714089478a327f09197987f16f9e5d936e8a")
+        val rinkebyDDO =
+            resolver.resolve("did:ethr:rinkeby:0xb9c5714089478a327f09197987f16f9e5d936e8a")
+        val rinkebyDDO0x04 =
+            resolver.resolve("did:ethr:0x04:0xb9c5714089478a327f09197987f16f9e5d936e8a")
 
         assertThat(rinkebyDDO).isEqualTo(EthrDIDTestHelpers.mockDocForAddress("did:ethr:rinkeby:0xb9c5714089478a327f09197987f16f9e5d936e8a"))
         assertThat(rinkebyDDO0x04).isEqualTo(EthrDIDTestHelpers.mockDocForAddress("did:ethr:0x04:0xb9c5714089478a327f09197987f16f9e5d936e8a"))
@@ -625,7 +655,8 @@ class EthrDIDResolverTest {
     @Test
     fun `can resolve generic did when only provided with 0x1 config`() {
         val http = mockk<HttpClient>()
-        val referenceDDO = EthrDIDTestHelpers.mockDocForAddress("0xb9c5714089478a327f09197987f16f9e5d936e8a")
+        val referenceDDO =
+            EthrDIDTestHelpers.mockDocForAddress("0xb9c5714089478a327f09197987f16f9e5d936e8a")
 
         val addressHex = "b9c5714089478a327f09197987f16f9e5d936e8a"
 
@@ -645,7 +676,13 @@ class EthrDIDResolverTest {
             )
         } returns "0x0000000000000000000000000000000000000000000000000000000000000000"
         //canned response for getLogs
-        coEvery { http.urlPost(eq("mainnetRPC"), any(), any()) } returns """{"jsonrpc":"2.0","id":1,"result":[]}"""
+        coEvery {
+            http.urlPost(
+                eq("mainnetRPC"),
+                any(),
+                any()
+            )
+        } returns """{"jsonrpc":"2.0","id":1,"result":[]}"""
 
 
         val resolver = EthrDIDResolver.Builder()
@@ -756,7 +793,10 @@ class EthrDIDResolverTest {
     @Test
     fun `throws when registry is not configured`() {
         val rpc = mockk<JsonRPC>()
-        val resolver = EthrDIDResolver(rpc, "")
+        val resolver =
+            EthrDIDResolver.Builder()
+                .addNetwork(EthrDIDNetwork("", "", rpc, "0x1"))
+                .build()
         coAssert {
             resolver.resolve("did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a")
         }.thrownError {
@@ -772,9 +812,10 @@ class EthrDIDResolverTest {
             rpc.ethCall(any(), any())
         } throws JsonRpcException(JSON_RPC_INTERNAL_ERROR_CODE, "fake error")
 
-        val resolver = EthrDIDResolver(rpc)
+        val resolver = EthrDIDResolver.Builder()
+            .addNetwork(EthrDIDNetwork("", "0xregistry", rpc, "0x1")).build()
         coAssert {
-            resolver.lastChanged("0xb9c5714089478a327f09197987f16f9e5d936e8a")
+            resolver.lastChanged("0xb9c5714089478a327f09197987f16f9e5d936e8a", rpc, "0xregistry")
         }.thrownError {
             isInstanceOf(DidResolverError::class)
         }
