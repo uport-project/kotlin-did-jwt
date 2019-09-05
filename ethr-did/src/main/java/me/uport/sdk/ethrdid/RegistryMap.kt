@@ -1,7 +1,7 @@
 package me.uport.sdk.ethrdid
 
-import org.walleth.khex.clean0xPrefix
-import org.walleth.khex.prepend0xPrefix
+import org.komputing.khex.extensions.clean0xPrefix
+import org.komputing.khex.extensions.prepend0xPrefix
 
 /**
  * This encapsulates a mapping of names and chainIDs to [EthrDIDNetwork] configuration instances

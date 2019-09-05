@@ -32,8 +32,8 @@ import org.kethereum.extensions.toBigInteger
 import org.kethereum.hashes.sha256
 import org.kethereum.model.PUBLIC_KEY_SIZE
 import org.kethereum.model.PublicKey
-import org.walleth.khex.clean0xPrefix
-import org.walleth.khex.hexToByteArray
+import org.komputing.khex.extensions.clean0xPrefix
+import org.komputing.khex.extensions.hexToByteArray
 import java.math.BigInteger
 import java.security.SignatureException
 import kotlin.math.floor

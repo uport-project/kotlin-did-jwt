@@ -11,7 +11,7 @@ import kotlinx.coroutines.runBlocking
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.signer.KPSigner
 import org.junit.Test
-import org.walleth.khex.prepend0xPrefix
+import org.komputing.khex.extensions.prepend0xPrefix
 import java.math.BigInteger
 
 class EthrDIDTest {

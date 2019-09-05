@@ -11,7 +11,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$kotlin_serialization_version"
 
-    api "com.github.uport-project.kotlin-common:core:$uport_kotlin_common_version"
+    implementation "com.github.uport-project.kotlin-common:core:$uport_kotlin_common_version"
     api project(":universal-did")
 
     testImplementation "junit:junit:$junit_version"

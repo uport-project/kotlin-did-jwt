@@ -13,10 +13,10 @@ import kotlinx.coroutines.runBlocking
 import me.uport.sdk.core.HttpClient
 import me.uport.sdk.core.Networks
 import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDOwnerChanged
-import me.uport.sdk.jsonrpc.JSON_RPC_INTERNAL_ERROR_CODE
 import me.uport.sdk.jsonrpc.JsonRPC
-import me.uport.sdk.jsonrpc.JsonRpcException
-import me.uport.sdk.jsonrpc.JsonRpcLogItem
+import me.uport.sdk.jsonrpc.model.JsonRpcLogItem
+import me.uport.sdk.jsonrpc.model.exceptions.JSON_RPC_INTERNAL_ERROR_CODE
+import me.uport.sdk.jsonrpc.model.exceptions.JsonRpcException
 import me.uport.sdk.jwt.test.EthrDIDTestHelpers
 import me.uport.sdk.signer.hexToBytes32
 import me.uport.sdk.signer.utf8
