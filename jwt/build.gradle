@@ -11,9 +11,9 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$kotlin_serialization_version"
 
-    api "com.github.komputing.KEthereum:model:$kethereum_version"
-    api "com.github.komputing.KEthereum:crypto:$kethereum_version"
-    api "com.github.komputing.KEthereum:extensions:$kethereum_version"
+    api "com.github.komputing.kethereum:model:$kethereum_version"
+    api "com.github.komputing.kethereum:crypto:$kethereum_version"
+    api "com.github.komputing.kethereum:extensions:$kethereum_version"
 
     api "com.github.uport-project.kotlin-common:jsonrpc:$uport_kotlin_common_version"
     api "com.github.uport-project.kotlin-common:core:$uport_kotlin_common_version"
