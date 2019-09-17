@@ -14,8 +14,8 @@ dependencies {
 
     implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$bivrost_version"
 
-    api "com.github.komputing.KEthereum:extensions:$kethereum_version"
-    api "com.github.komputing.KEthereum:model:$kethereum_version"
+    api "com.github.komputing.kethereum:extensions:$kethereum_version"
+    api "com.github.komputing.kethereum:model:$kethereum_version"
 
     api "com.github.uport-project.kotlin-common:jsonrpc:$uport_kotlin_common_version"
     api "com.github.uport-project.kotlin-common:signer-common:$uport_kotlin_common_version"
