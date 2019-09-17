@@ -5,6 +5,8 @@
 
 This is the Kotlin implementation of the basic JWT methods for DID-JWTs
 
+[FAQ and helpdesk support](http://bit.ly/uPort_helpdesk)
+
 # did-jwt
 
 The kotlin-did-JWT library allows you to sign and verify
