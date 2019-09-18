@@ -16,10 +16,10 @@ dependencies {
 
     api "com.github.komputing.kethereum:extensions:$kethereum_version"
     api "com.github.komputing.kethereum:model:$kethereum_version"
+    api "com.github.komputing.khex:extensions-jvm:$khex_version"
     implementation "com.github.komputing.kethereum:base58:$kethereum_version"
     implementation "com.github.komputing.kethereum:crypto:$kethereum_version"
     implementation "com.github.komputing.kethereum:crypto_impl_spongycastle:$kethereum_version"
-    implementation "com.github.komputing.khex:extensions-jvm:$khex_version"
 
     implementation "com.github.uport-project.kotlin-common:core:$uport_kotlin_common_version"
     implementation "com.github.uport-project.kotlin-common:jsonrpc:$uport_kotlin_common_version"

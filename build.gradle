@@ -16,11 +16,11 @@ buildscript {
         okhttp_version = "3.14.1"
 
         bivrost_version = "v0.7.1"
-        kmnid_version = "0.4.0"
+        kmnid_version = "0.4.1"
         kethereum_version = "0.76.1"
         khex_version = "1.0.0-RC3"
         spongycastle_version = "1.58.0.0"
-        uport_kotlin_common_version = "0.3.0"
+        uport_kotlin_common_version = "0.3.1"
 
         current_release_version = "0.3.1"
     }
