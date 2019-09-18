@@ -21,9 +21,9 @@ dependencies {
     implementation "com.github.komputing.kethereum:crypto:$kethereum_version"
     implementation "com.github.komputing.kethereum:crypto_impl_spongycastle:$kethereum_version"
 
-    implementation "com.github.uport-project.kotlin-common:core:$uport_kotlin_common_version"
-    implementation "com.github.uport-project.kotlin-common:jsonrpc:$uport_kotlin_common_version"
-    implementation "com.github.uport-project.kotlin-common:signer-common:$uport_kotlin_common_version"
+    api "com.github.uport-project.kotlin-common:core:$uport_kotlin_common_version"
+    api "com.github.uport-project.kotlin-common:jsonrpc:$uport_kotlin_common_version"
+    api "com.github.uport-project.kotlin-common:signer-common:$uport_kotlin_common_version"
 
     api project(":universal-did")
 

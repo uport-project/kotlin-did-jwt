@@ -18,7 +18,7 @@ dependencies {
     implementation "com.github.komputing.kethereum:base58:$kethereum_version"
 
     implementation "com.github.uport-project.kotlin-common:jsonrpc:$uport_kotlin_common_version"
-    implementation "com.github.uport-project.kotlin-common:core:$uport_kotlin_common_version"
+    api "com.github.uport-project.kotlin-common:core:$uport_kotlin_common_version"
     implementation "com.github.uport-project:kmnid:$kmnid_version"
 
     api project(":universal-did")
