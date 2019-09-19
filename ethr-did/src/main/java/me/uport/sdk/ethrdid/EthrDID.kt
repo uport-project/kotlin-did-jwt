@@ -10,9 +10,9 @@ import me.uport.sdk.universaldid.PublicKeyType
 import org.kethereum.extensions.hexToBigInteger
 import org.kethereum.model.Address
 import org.kethereum.model.createTransactionWithDefaults
-import org.walleth.khex.hexToByteArray
-import org.walleth.khex.prepend0xPrefix
-import org.walleth.khex.toHexString
+import org.komputing.khex.extensions.hexToByteArray
+import org.komputing.khex.extensions.prepend0xPrefix
+import org.komputing.khex.extensions.toHexString
 import pm.gnosis.model.Solidity
 import java.math.BigInteger
 

@@ -10,7 +10,7 @@ import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDAttributeChanged
 import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDDelegateChanged
 import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDOwnerChanged
 import me.uport.sdk.jsonrpc.JsonRPC
-import me.uport.sdk.jsonrpc.JsonRpcException
+import me.uport.sdk.jsonrpc.model.exceptions.JsonRpcException
 import me.uport.sdk.signer.Signer
 import me.uport.sdk.signer.bytes32ToString
 import me.uport.sdk.signer.hexToBytes32
@@ -23,9 +23,9 @@ import me.uport.sdk.universaldid.PublicKeyType.Companion.veriKey
 import org.kethereum.encodings.encodeToBase58String
 import org.kethereum.extensions.hexToBigInteger
 import org.kethereum.extensions.toHexStringNoPrefix
-import org.walleth.khex.hexToByteArray
-import org.walleth.khex.prepend0xPrefix
-import org.walleth.khex.toHexString
+import org.komputing.khex.extensions.hexToByteArray
+import org.komputing.khex.extensions.prepend0xPrefix
+import org.komputing.khex.extensions.toHexString
 import pm.gnosis.model.Solidity
 import java.math.BigInteger
 import java.util.*

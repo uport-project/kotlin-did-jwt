@@ -13,7 +13,7 @@ import me.uport.sdk.universaldid.PublicKeyType.Companion.Curve25519EncryptionPub
 import me.uport.sdk.universaldid.PublicKeyType.Companion.Secp256k1SignatureAuthentication2018
 import me.uport.sdk.universaldid.PublicKeyType.Companion.Secp256k1VerificationKey2018
 import me.uport.sdk.uportdid.UportDIDResolver.Companion.parseDIDString
-import org.walleth.khex.clean0xPrefix
+import org.komputing.khex.extensions.clean0xPrefix
 
 /**
  * A class that encapsulates the legacy uport-did profile document

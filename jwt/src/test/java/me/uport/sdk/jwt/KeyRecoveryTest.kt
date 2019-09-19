@@ -13,7 +13,7 @@ import org.kethereum.extensions.hexToBigInteger
 import org.kethereum.extensions.toHexStringNoPrefix
 import org.kethereum.hashes.sha256
 import org.kethereum.model.PrivateKey
-import org.walleth.khex.toHexString
+import org.komputing.khex.extensions.toHexString
 
 class KeyRecoveryTest {
 

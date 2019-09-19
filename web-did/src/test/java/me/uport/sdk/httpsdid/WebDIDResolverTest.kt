@@ -19,40 +19,40 @@ class WebDIDResolverTest {
 
     //language=json
     private val exampleDidDocString = """{
-      "@context": "https://w3id.org/did/v1",
-      "id": "did:web:example.com",
-      "publicKey": [
-        {
-          "id": "did:web:example.com#owner",
-          "type": "Secp256k1VerificationKey2018",
-          "owner": "did:web:example.com",
-          "publicKeyHex": "04613bb3a4874d27032618f020614c21cbe4c4e4781687525f6674089f9bd3d6c7f6eb13569053d31715a3ba32e0b791b97922af6387f087d6b5548c06944ab061"
-        }
-      ],
-      "authentication": [
-        {
-          "type": "Secp256k1SignatureAuthentication2018",
-          "publicKey": "did:web:example.com#owner"
-        }
-      ],
-      "service": []
-    }""".trimIndent()
+  "@context": "https://w3id.org/did/v1",
+  "id": "did:web:uport.me",
+  "publicKey": [
+    {
+      "id": "did:web:uport.me#owner",
+      "type": "Secp256k1VerificationKey2018",
+      "owner": "did:web:uport.me",
+      "publicKeyHex": "042b0af9b3ae6c7c3a90b01a3879d9518081bc0dcdf038488db9cb109b082a77d97ea3373e3dfde0eccd9adbdce11d0302ea5c098dbb0b310234c86895c8641622"
+    }
+  ],
+  "authentication": [
+    {
+      "type": "Secp256k1SignatureAuthentication2018",
+      "publicKey": "did:web:uport.me#owner"
+    }
+  ],
+  "service": []
+}""".trimIndent()
 
     private val exampleDidDoc = DIDDocumentImpl(
         context = "https://w3id.org/did/v1",
-        id = "did:web:example.com",
+        id = "did:web:uport.me",
         publicKey = listOf(
             PublicKeyEntry(
-                id = "did:web:example.com#owner",
+                id = "did:web:uport.me#owner",
                 type = PublicKeyType.Secp256k1VerificationKey2018,
-                owner = "did:web:example.com",
-                publicKeyHex = "04613bb3a4874d27032618f020614c21cbe4c4e4781687525f6674089f9bd3d6c7f6eb13569053d31715a3ba32e0b791b97922af6387f087d6b5548c06944ab061"
+                owner = "did:web:uport.me",
+                publicKeyHex = "042b0af9b3ae6c7c3a90b01a3879d9518081bc0dcdf038488db9cb109b082a77d97ea3373e3dfde0eccd9adbdce11d0302ea5c098dbb0b310234c86895c8641622"
             )
         ),
         authentication = listOf(
             AuthenticationEntry(
                 type = PublicKeyType.Secp256k1SignatureAuthentication2018,
-                publicKey = "did:web:example.com#owner"
+                publicKey = "did:web:uport.me#owner"
             )
         ),
         service = emptyList()
@@ -103,24 +103,25 @@ class WebDIDResolverTest {
     }
 
     @Test
-    fun `fails when the endpoint doesn't provide a DID document for deprecated https method`() = runBlocking {
-        val http = mockk<HttpClient>()
-        val tested = WebDIDResolver(http)
-        coEvery { http.urlGet(any()) } returns ""
+    fun `fails when the endpoint doesn't provide a DID document for deprecated https method`() =
+        runBlocking {
+            val http = mockk<HttpClient>()
+            val tested = WebDIDResolver(http)
+            coEvery { http.urlGet(any()) } returns ""
 
-        coAssert {
-            tested.resolve("did:https:example.com")
-        }.thrownError {
-            isInstanceOf(
-                listOf(
-                    IllegalArgumentException::class,
-                    IOException::class,
-                    SerializationException::class,
-                    DidResolverError::class
+            coAssert {
+                tested.resolve("did:https:example.com")
+            }.thrownError {
+                isInstanceOf(
+                    listOf(
+                        IllegalArgumentException::class,
+                        IOException::class,
+                        SerializationException::class,
+                        DidResolverError::class
+                    )
                 )
-            )
+            }
         }
-    }
 
     @Test
     fun `resolves document for deprecated https method`() = runBlocking {

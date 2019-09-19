@@ -1,6 +1,9 @@
 package me.uport.sdk.jwt.test
 
 import me.uport.sdk.ethrdid.EthrDIDDocument
+import me.uport.sdk.universaldid.AuthenticationEntry
+import me.uport.sdk.universaldid.PublicKeyEntry
+import me.uport.sdk.universaldid.PublicKeyType
 
 open class EthrDIDTestHelpers {
 
@@ -14,22 +17,25 @@ open class EthrDIDTestHelpers {
             val matchResult = didParsePattern.find(potentialDID)
                 ?: throw IllegalArgumentException("can't parse potentialDID or did")
             val (_, _, _, _, network, address) = matchResult.destructured
-            val did = if (network.isBlank() || network == "mainnet") "did:ethr:$address" else "did:ethr:$network:$address"
+            val did =
+                if (network.isBlank() || network == "mainnet") "did:ethr:$address" else "did:ethr:$network:$address"
 
-            return EthrDIDDocument.fromJson(
-                """
-            {
-              "@context": "https://w3id.org/did/v1",
-              "id": "$did",
-              "publicKey": [{
-                   "id": "$did#owner",
-                   "type": "Secp256k1VerificationKey2018",
-                   "owner": "$did",
-                   "ethereumAddress": "$address"}],
-              "authentication": [{
-                   "type": "Secp256k1SignatureAuthentication2018",
-                   "publicKey": "$did#owner"}]
-            }""".trimIndent()
+            return EthrDIDDocument(
+                id = did,
+                publicKey = listOf(
+                    PublicKeyEntry(
+                        id = "$did#owner",
+                        type = PublicKeyType.Secp256k1VerificationKey2018,
+                        owner = did,
+                        ethereumAddress = address
+                    )
+                ),
+                authentication = listOf(
+                    AuthenticationEntry(
+                        type = PublicKeyType.Secp256k1SignatureAuthentication2018,
+                        publicKey = "$did#owner"
+                    )
+                )
             )
         }
     }
