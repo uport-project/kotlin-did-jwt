@@ -14,15 +14,22 @@ dependencies {
 
     implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$bivrost_version"
 
-    api "com.github.komputing.KEthereum:extensions:$kethereum_version"
-    api "com.github.komputing.KEthereum:model:$kethereum_version"
+    api "com.github.komputing.kethereum:extensions:$kethereum_version"
+    api "com.github.komputing.kethereum:model:$kethereum_version"
+    api "com.github.komputing.khex:extensions-jvm:$khex_version"
+    implementation "com.github.komputing.kethereum:base58:$kethereum_version"
+    implementation "com.github.komputing.kethereum:crypto:$kethereum_version"
+    implementation "com.github.komputing.kethereum:crypto_impl_spongycastle:$kethereum_version"
 
+    api "com.github.uport-project.kotlin-common:core:$uport_kotlin_common_version"
     api "com.github.uport-project.kotlin-common:jsonrpc:$uport_kotlin_common_version"
     api "com.github.uport-project.kotlin-common:signer-common:$uport_kotlin_common_version"
+
     api project(":universal-did")
 
     testImplementation "junit:junit:$junit_version"
     testImplementation "io.mockk:mockk:$mockk_version"
     testImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"
     testImplementation project(":jwt-test")
+    testImplementation "com.github.uport-project.kotlin-common:test-helpers:$uport_kotlin_common_version"
 }

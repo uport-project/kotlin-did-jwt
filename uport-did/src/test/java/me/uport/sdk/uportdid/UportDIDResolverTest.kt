@@ -19,7 +19,7 @@ import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.universaldid.PublicKeyType.Companion.Curve25519EncryptionPublicKey
 import me.uport.sdk.universaldid.PublicKeyType.Companion.Secp256k1VerificationKey2018
 import org.junit.Test
-import org.walleth.khex.clean0xPrefix
+import org.komputing.khex.extensions.clean0xPrefix
 
 class UportDIDResolverTest {
 
@@ -116,7 +116,7 @@ class UportDIDResolverTest {
             name = null
         )
 
-        val ddo = UportDIDResolver(rpc).getProfileDocumentFor(mnid = "2ozs2ntCXceKkAQKX4c9xp2zPS8pvkJhVqC")
+        val ddo = UportDIDResolver(rpc, http).getProfileDocumentFor(mnid = "2ozs2ntCXceKkAQKX4c9xp2zPS8pvkJhVqC")
 
         assertThat(ddo).isEqualTo(expectedDDO)
     }

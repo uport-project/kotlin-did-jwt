@@ -6,6 +6,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.json.JsonException
 import me.uport.sdk.core.*
+import me.uport.sdk.ethrdid.EthrDIDNetwork
 import me.uport.sdk.ethrdid.EthrDIDResolver
 import me.uport.sdk.httpsdid.WebDIDResolver
 import me.uport.sdk.jsonrpc.JsonRPC
@@ -31,8 +32,8 @@ import org.kethereum.extensions.toBigInteger
 import org.kethereum.hashes.sha256
 import org.kethereum.model.PUBLIC_KEY_SIZE
 import org.kethereum.model.PublicKey
-import org.walleth.khex.clean0xPrefix
-import org.walleth.khex.hexToByteArray
+import org.komputing.khex.extensions.clean0xPrefix
+import org.komputing.khex.extensions.hexToByteArray
 import java.math.BigInteger
 import java.security.SignatureException
 import kotlin.math.floor
@@ -81,7 +82,11 @@ class JWTTools(
             val defaultRPC = JsonRPC(preferredNetwork?.rpcUrl ?: Networks.mainnet.rpcUrl)
             val defaultRegistry = preferredNetwork?.ethrDidRegistry
                 ?: Networks.mainnet.ethrDidRegistry
-            UniversalDID.registerResolver(EthrDIDResolver(defaultRPC, defaultRegistry))
+            UniversalDID.registerResolver(
+                EthrDIDResolver.Builder()
+                    .addNetwork(EthrDIDNetwork("", defaultRegistry, defaultRPC, "0x1"))
+                    .build()
+            )
         }
 
         // register default Uport DID resolver if Universal DID is unable to resolve blank Uport DID
@@ -146,7 +151,13 @@ class JWTTools(
             mutablePayload.remove("exp")
         }
 
-        mutablePayload["iss"] = issuerDID
+        if (payload.containsKey("iss") && payload["iss"] == null) {
+            mutablePayload.remove("iss")
+        } else if (payload.containsKey("iss")) {
+            mutablePayload["iss"] = payload["iss"]
+        } else {
+            mutablePayload["iss"] = issuerDID
+        }
 
         val serializedPayload = Json(JsonConfiguration.Stable)
             .stringify(ArbitraryMapSerializer, mutablePayload)
@@ -238,8 +249,16 @@ class JWTTools(
     ): JwtPayload {
         val (header, payload, signatureBytes) = decode(token)
 
-        if (payload.iat != null && payload.iat > (timeProvider.nowMs() / 1000 + TIME_SKEW)) {
-            throw InvalidJWTException("Jwt not valid yet (issued in the future) iat: ${payload.iat}")
+        val nowSkewed = (timeProvider.nowMs() / 1000 + TIME_SKEW)
+
+        if (payload.nbf != null) {
+            if (payload.nbf > nowSkewed) {
+                throw InvalidJWTException("Jwt not valid before nbf: ${payload.nbf}")
+            }
+        } else {
+            if (payload.iat != null && payload.iat > nowSkewed) {
+                throw InvalidJWTException("Jwt not valid yet (issued in the future) iat: ${payload.iat}")
+            }
         }
 
         if (payload.exp != null && payload.exp <= (timeProvider.nowMs() / 1000 - TIME_SKEW)) {

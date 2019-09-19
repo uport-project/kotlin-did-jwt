@@ -5,6 +5,8 @@
 
 This is the Kotlin implementation of the basic JWT methods for DID-JWTs
 
+[FAQ and helpdesk support](http://bit.ly/uPort_helpdesk)
+
 # did-jwt
 
 The kotlin-did-JWT library allows you to sign and verify
@@ -54,7 +56,7 @@ allprojects {
 In your application `build.gradle` file, add:
 
 ```groovy
-def did_jwt_version = "0.3.1"
+def did_jwt_version = "0.3.2"
 dependencies {
     //...
     implementation "com.github.uport-project.kotlin-did-jwt:jwt:$did_jwt_version"
@@ -134,6 +136,10 @@ so that only tokens intended for your app are considered valid.
 
 ## CHANGELOG
 
+* 0.3.2
+    - feat: support multi-network ethr-did ( #20 )
+    - refactor: use lowercase coordinates for kethereum libs ( #21 )
+    - refactor: use kethereum 0.76.1 and kotlin-common 0.3.1 ( #22 )
 * 0.3.1
     - allow override or removal of `iat` field when creating JWTs (#17)
 * 0.3.0

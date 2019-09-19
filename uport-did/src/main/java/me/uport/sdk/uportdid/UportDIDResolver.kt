@@ -4,17 +4,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import me.uport.mnid.Account
 import me.uport.mnid.MNID
+import me.uport.sdk.core.HttpClient
 import me.uport.sdk.core.Networks
 import me.uport.sdk.jsonrpc.JsonRPC
-import me.uport.sdk.jsonrpc.JsonRpcException
+import me.uport.sdk.jsonrpc.model.exceptions.JsonRpcException
 import me.uport.sdk.universaldid.BlankDocumentError
 import me.uport.sdk.universaldid.DIDDocument
 import me.uport.sdk.universaldid.DIDResolver
 import me.uport.sdk.universaldid.DidResolverError
 import org.kethereum.encodings.encodeToBase58String
 import org.kethereum.extensions.hexToBigInteger
-import org.walleth.khex.clean0xPrefix
-import org.walleth.khex.hexToByteArray
+import org.komputing.khex.extensions.clean0xPrefix
+import org.komputing.khex.extensions.hexToByteArray
 import pm.gnosis.model.Solidity
 
 /**
@@ -26,7 +27,8 @@ import pm.gnosis.model.Solidity
  * Example mnid: "2nQtiQG6Cgm1GYTBaaKAgr76uY7iSexUkqX"
  */
 open class UportDIDResolver(
-    private val rpc: JsonRPC
+    private val rpc: JsonRPC,
+    private val httpClient : HttpClient = HttpClient()
 ) : DIDResolver {
     override val method: String = "uport"
 
@@ -84,11 +86,18 @@ open class UportDIDResolver(
         return try {
             rpc.ethCall(registryAddress, encodedFunctionCall)
         } catch (err: JsonRpcException) {
-            throw DidResolverError("RPC endpoint returned an error during uPort registry query", err)
+            throw DidResolverError(
+                "RPC endpoint returned an error during uPort registry query",
+                err
+            )
         }
     }
 
-    internal fun encodeRegistryGetCall(registrationIdentifier: String, issuer: Account, subject: Account): String {
+    internal fun encodeRegistryGetCall(
+        registrationIdentifier: String,
+        issuer: Account,
+        subject: Account
+    ): String {
         val solRegistryIdentifier = Solidity.Bytes32(registrationIdentifier.toByteArray())
         val solIssuer = Solidity.Address(issuer.address.hexToBigInteger())
         val solSubject = Solidity.Address(subject.address.hexToBigInteger())
@@ -114,7 +123,7 @@ open class UportDIDResolver(
 
         val url = "https://ipfs.infura.io/ipfs/$ipfsHash"
 
-        return rpc.httpClient.urlGet(url)
+        return httpClient.urlGet(url)
     }
 
     /**

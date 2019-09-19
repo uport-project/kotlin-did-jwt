@@ -2,13 +2,15 @@
 
 package me.uport.sdk.ethrdid
 
+import me.uport.sdk.core.EthNetwork
 import me.uport.sdk.core.ITimeProvider
 import me.uport.sdk.core.SystemTimeProvider
 import me.uport.sdk.core.toBase64
 import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDAttributeChanged
 import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDDelegateChanged
+import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDOwnerChanged
 import me.uport.sdk.jsonrpc.JsonRPC
-import me.uport.sdk.jsonrpc.JsonRpcException
+import me.uport.sdk.jsonrpc.model.exceptions.JsonRpcException
 import me.uport.sdk.signer.Signer
 import me.uport.sdk.signer.bytes32ToString
 import me.uport.sdk.signer.hexToBytes32
@@ -21,9 +23,9 @@ import me.uport.sdk.universaldid.PublicKeyType.Companion.veriKey
 import org.kethereum.encodings.encodeToBase58String
 import org.kethereum.extensions.hexToBigInteger
 import org.kethereum.extensions.toHexStringNoPrefix
-import org.walleth.khex.hexToByteArray
-import org.walleth.khex.prepend0xPrefix
-import org.walleth.khex.toHexString
+import org.komputing.khex.extensions.hexToByteArray
+import org.komputing.khex.extensions.prepend0xPrefix
+import org.komputing.khex.extensions.toHexString
 import pm.gnosis.model.Solidity
 import java.math.BigInteger
 import java.util.*
@@ -35,33 +37,74 @@ import java.util.*
  *
  * Example ethr did: "did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a"
  */
-open class EthrDIDResolver(
-    private val rpc: JsonRPC,
-    val registryAddress: String = DEFAULT_REGISTRY_ADDRESS,
-    private val timeProvider: ITimeProvider = SystemTimeProvider
-) : DIDResolver {
+open class EthrDIDResolver : DIDResolver {
+
+    private val _registryMap: RegistryMap
+    private val _timeProvider: ITimeProvider
+
+    private constructor(registryMap: RegistryMap, clock: ITimeProvider) {
+        _timeProvider = clock
+        this._registryMap = registryMap
+    }
+
+    @Deprecated(
+        "Constructing the resolver directly has been deprecated " +
+                "in favor of the Builder pattern that can supply multi-network configurations." +
+                "This will be removed in the next major release.",
+        ReplaceWith(
+            """EthrDIDResolver.Builder().addNetwork(EthrDIDNetwork("", registryAddress, rpc, "0x1")).build()""",
+            "me.uport.sdk.ethrdid.EthrDIDResolver.Companion.DEFAULT_REGISTRY_ADDRESS"
+        )
+    )
+    constructor(
+        rpc: JsonRPC,
+        registryAddress: String = DEFAULT_REGISTRY_ADDRESS,
+        timeProvider: ITimeProvider = SystemTimeProvider
+    ) {
+        val net = EthrDIDNetwork(DEFAULT_NETWORK_NAME, registryAddress, rpc, "0x1")
+        this._timeProvider = timeProvider
+        this._registryMap = RegistryMap().registerNetwork(net)
+    }
 
     override val method = "ethr"
 
     override fun canResolve(potentialDID: String): Boolean {
         //if it can be normalized, then it matches either an ethereum address or a full ethr-did
-        return normalizeDid(potentialDID).isNotBlank()
+        val did = normalizeDid(potentialDID)
+        val network = extractNetwork(did)
+        return did.isNotBlank() && _registryMap.getOrNull(network) != null
     }
 
     /**
      * Resolves a given ethereum address or DID string into a corresponding [EthrDIDDocument]
      */
     override suspend fun resolve(did: String): EthrDIDDocument {
+        val networkIdentifier = extractNetwork(did).run {
+            if (this.isBlank()) DEFAULT_NETWORK_NAME else this
+        }
 
-        if (registryAddress.isBlank()) {
-            throw IllegalArgumentException("ethr DID registry address is blank. please check your Configuration")
+        val ethNetworkConfig = try {
+            _registryMap[networkIdentifier]
+        } catch (e: IllegalArgumentException) {
+            throw IllegalArgumentException(
+                "Missing registry configuration for `$networkIdentifier`." +
+                        " To resolve did:ethr:$networkIdentifier:0x... you need to register an `EthrDIDNetwork`" +
+                        " in the EthrDIDResolver.Builder"
+            )
+        }
+
+        val rpc = ethNetworkConfig.rpc
+        val registryAddress = ethNetworkConfig.registryAddress
+
+        require(registryAddress.isNotBlank()) {
+            "The registry address configured for network `$networkIdentifier` is blank."
         }
 
         val normalizedDid = normalizeDid(did)
-        val identity = parseIdentity(normalizedDid)
-        val ethrdidContract = EthrDID(identity, rpc, registryAddress, Signer.blank)
-        val owner = ethrdidContract.lookupOwner(false)
-        val history = getHistory(identity)
+        val identityAddress = extractAddress(normalizedDid)
+        val ethrDidContract = EthrDID(identityAddress, rpc, registryAddress, Signer.blank)
+        val owner = ethrDidContract.lookupOwner(false)
+        val history = getHistory(identityAddress, rpc, registryAddress)
         return wrapDidDocument(normalizedDid, owner, history)
     }
 
@@ -70,8 +113,13 @@ open class EthrDIDResolver(
      *
      * @hide
      */
-    internal suspend fun lastChanged(identity: String): String {
-        val encodedCall = EthereumDIDRegistry.Changed.encode(Solidity.Address(identity.hexToBigInteger()))
+    internal suspend fun lastChanged(
+        identity: String,
+        rpc: JsonRPC,
+        registryAddress: String
+    ): String {
+        val encodedCall =
+            EthereumDIDRegistry.Changed.encode(Solidity.Address(identity.hexToBigInteger()))
         return try {
             rpc.ethCall(registryAddress, encodedCall)
         } catch (err: JsonRpcException) {
@@ -90,33 +138,42 @@ open class EthrDIDResolver(
      * @hide
      */
     @Suppress("TooGenericExceptionCaught")
-    internal suspend fun getHistory(identity: String): List<Any> {
+    internal suspend fun getHistory(
+        identity: String,
+        rpc: JsonRPC,
+        registryAddress: String
+    ): List<Any> {
         val lastChangedQueue: Queue<BigInteger> = PriorityQueue()
         val events = emptyList<Any>().toMutableList()
-        lastChangedQueue.add(lastChanged(identity).hexToBigInteger())
+        lastChangedQueue.add(lastChanged(identity, rpc, registryAddress).hexToBigInteger())
         do {
-            val lastChange = lastChangedQueue.remove()
-            val logs = rpc.getLogs(registryAddress, listOf(null, identity.hexToBytes32()), lastChange, lastChange)
+            val lastChange = lastChangedQueue.poll() ?: break
+            val logs = rpc.getLogs(
+                registryAddress,
+                listOf(null, identity.hexToBytes32()),
+                lastChange,
+                lastChange
+            )
             logs.forEach {
                 val topics: List<String> = it.topics
                 val data: String = it.data
 
                 try {
-                    val event = EthereumDIDRegistry.Events.DIDOwnerChanged.decode(topics, data)
+                    val event = DIDOwnerChanged.decode(topics, data)
                     lastChangedQueue.add(event.previouschange.value)
                     events.add(event)
                 } catch (err: Exception) { /*nop*/
                 }
 
                 try {
-                    val event = EthereumDIDRegistry.Events.DIDAttributeChanged.decode(topics, data)
+                    val event = DIDAttributeChanged.decode(topics, data)
                     lastChangedQueue.add(event.previouschange.value)
                     events.add(event)
                 } catch (err: Exception) { /*nop*/
                 }
 
                 try {
-                    val event = EthereumDIDRegistry.Events.DIDDelegateChanged.decode(topics, data)
+                    val event = DIDDelegateChanged.decode(topics, data)
                     lastChangedQueue.add(event.previouschange.value)
                     events.add(event)
                 } catch (err: Exception) { /*nop*/
@@ -125,7 +182,7 @@ open class EthrDIDResolver(
             }
 
 
-        } while (lastChange != null && lastChange != BigInteger.ZERO)
+        } while (lastChange != BigInteger.ZERO)
 
         return events
     }
@@ -135,7 +192,11 @@ open class EthrDIDResolver(
      *
      * @hide
      */
-    internal fun wrapDidDocument(ownerDID: String, ownerAddress: String, history: List<Any>): EthrDIDDocument {
+    internal fun wrapDidDocument(
+        ownerDID: String,
+        ownerAddress: String,
+        history: List<Any>
+    ): EthrDIDDocument {
 
         val pkEntries = mapOf<String, PublicKeyEntry>().toMutableMap().apply {
             put(
@@ -196,7 +257,7 @@ open class EthrDIDResolver(
 
         var delegateIndex = delegateCount
         val validTo = event.validto.value.toLong()
-        if (validTo < timeProvider.nowMs() / 1000L) {
+        if (validTo < _timeProvider.nowMs() / 1000L) {
             return (pkEntries to serviceEntries)
         }
         val name = event.name.byteArray.bytes32ToString()
@@ -244,19 +305,23 @@ open class EthrDIDResolver(
     }
 
     @Suppress("StringLiteralDuplication")
-    private fun processDelegateChanged(event: DIDDelegateChanged.Arguments, delegateCount: Int, ownerDID: String):
+    private fun processDelegateChanged(
+        event: DIDDelegateChanged.Arguments,
+        delegateCount: Int,
+        ownerDID: String
+    ):
             Pair<MutableMap<String, PublicKeyEntry>, MutableMap<String, AuthenticationEntry>> {
 
         val pkEntries = mapOf<String, PublicKeyEntry>().toMutableMap()
         val authEntries = mapOf<String, AuthenticationEntry>().toMutableMap()
 
         var delegateIndex = delegateCount
-        val delegateType = event.delegatetype.bytes.toString(utf8).replace("\u0000","")
+        val delegateType = event.delegatetype.bytes.toString(utf8).replace("\u0000", "")
         val delegate = event.delegate.value.toHexStringNoPrefix().prepend0xPrefix()
         val key = "DIDDelegateChanged-$delegateType-$delegate"
         val validTo = event.validto.value.toLong()
 
-        if (validTo >= timeProvider.nowMs() / 1000L) {
+        if (validTo >= _timeProvider.nowMs() / 1000L) {
             delegateIndex++
 
             when (delegateType) {
@@ -293,18 +358,23 @@ open class EthrDIDResolver(
         }
 
         //language=RegExp
-        private val identityExtractPattern = "^did:ethr:(0x[0-9a-fA-F]{40})".toRegex()
+        private val identityExtractPattern = "^did:ethr:((\\w+):)?(0x[0-9a-fA-F]{40})".toRegex()
+
+        internal fun extractAddress(normalizedDid: String): String = identityExtractPattern
+            .find(normalizedDid)
+            ?.destructured?.component3() ?: ""
+
+        internal fun extractNetwork(normalizedDid: String): String = identityExtractPattern
+            .find(normalizedDid)
+            ?.destructured?.component2() ?: ""
 
         //language=RegExp
-        private val didParsePattern = "^(did:)?((\\w+):)?((0x)([0-9a-fA-F]{40}))".toRegex()
-
-        private fun parseIdentity(normalizedDid: String) = identityExtractPattern
-            .find(normalizedDid)
-            ?.destructured?.component1() ?: ""
+        private val didParsePattern =
+            "^(did:)?((\\w+):)?((\\w+):)?((0x)([0-9a-fA-F]{40}))".toRegex()
 
         internal fun normalizeDid(did: String): String {
             val matchResult = didParsePattern.find(did) ?: return ""
-            val (didHeader, _, didType, _, _, hexDigits) = matchResult.destructured
+            val (didHeader, _, didType, _, network, _, _, hexDigits) = matchResult.destructured
             if (didType.isNotBlank() && didType != "ethr") {
                 //should forward to another resolver
                 return ""
@@ -313,8 +383,66 @@ open class EthrDIDResolver(
                 //doesn't really look like a did if it only specifies type and not "did:"
                 return ""
             }
-            return "did:ethr:0x$hexDigits"
+            return if (network.isBlank() || network in listOf("mainnet", "0x1", "0x01"))
+                "did:ethr:0x$hexDigits"
+            else
+                "did:ethr:$network:0x$hexDigits"
         }
 
+        private const val DEFAULT_NETWORK_NAME = "" //empty string
+
+    }
+
+    /**
+     * Builds an [EthrDIDResolver]
+     * This class allows configuration of multiple ethereum networks that this resolver can access.
+     */
+    class Builder {
+        private var _clock: ITimeProvider? = null
+        private val _networks = emptyList<EthrDIDNetwork>().toMutableList()
+
+        /**
+         * Allows the use of a different clock than the system time.
+         * This is usable for "was valid at" type of queries, and for deterministic checks.
+         */
+        fun setTimeProvider(timeProvider: ITimeProvider): Builder {
+            _clock = timeProvider
+            return this
+        }
+
+        /**
+         * Adds a network configuration that can be used to resolve ethr-DIDs
+         * into their corresponding DID documents based on the network specific
+         * ERC 1056 registry.
+         *
+         * This is the preferred method of configuration because it supports
+         * abstraction of the blockchain access method.
+         */
+        fun addNetwork(network: EthrDIDNetwork): Builder {
+            _networks.add(network)
+            return this
+        }
+
+        /**
+         * Adds a network configuration that can be used to resolve ethr-DIDs
+         * into their corresponding DID documents based on the network specific
+         * ERC 1056 registry.
+         *
+         * This method is usable when only JSON RPC over http is available;
+         * If blockchain access needs to be abstracted or mocked, please use
+         * [EthrDIDNetwork]
+         */
+        fun addNetwork(network: EthNetwork): Builder {
+            _networks.add(network.toEthrDIDNetwork())
+            return this
+        }
+
+        /**
+         * Constructs the final EthrDIDResolver instance based on the networks and clock provided.
+         */
+        fun build(): EthrDIDResolver {
+            val clock = _clock ?: SystemTimeProvider
+            return EthrDIDResolver(RegistryMap.fromNetworks(_networks), clock)
+        }
     }
 }
