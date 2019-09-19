@@ -138,8 +138,9 @@ so that only tokens intended for your app are considered valid.
 
 * 0.3.2
     - feat: support multi-network ethr-did ( #20 )
-    - refactor: use lowercase coordinates for kethereum libs ( #21 )
+    - bugfix: crash in ethr-did-resolver when nodes don't reply with logs ( #21 )
     - refactor: use kethereum 0.76.1 and kotlin-common 0.3.1 ( #22 )
+    - refactor: use lowercase coordinates for kethereum libs ( #25 )
 * 0.3.1
     - allow override or removal of `iat` field when creating JWTs (#17)
 * 0.3.0
