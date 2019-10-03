@@ -22,6 +22,9 @@ import me.uport.sdk.signer.hexToBytes32
 import me.uport.sdk.signer.utf8
 import me.uport.sdk.testhelpers.coAssert
 import me.uport.sdk.universaldid.DidResolverError
+import me.uport.sdk.universaldid.PublicKeyEntry
+import me.uport.sdk.universaldid.PublicKeyType
+import me.uport.sdk.universaldid.ServiceEntry
 import org.junit.Test
 import org.kethereum.extensions.hexToBigInteger
 import pm.gnosis.model.Solidity
@@ -802,6 +805,37 @@ class EthrDIDResolverTest {
         }.thrownError {
             isInstanceOf(IllegalArgumentException::class)
         }
+    }
+
+    @Test
+    fun `parses attribute changed event with trailing null chars`() = runBlocking {
+        val resolver = EthrDIDResolver.Builder().build()
+
+        val event = EthereumDIDRegistry.Events.DIDAttributeChanged.Arguments(
+            identity = Solidity.Address(BigInteger("1318742768210968905798991064222156353846287247782")),
+            name = Solidity.Bytes32("0x6469642f7075622f736563703235366b312f766572694b65792f686578000000".hexToByteArray()),
+            value = Solidity.Bytes("0x0295dda1dca7f80e308ef60155ddeac00e46b797fd40ef407f422e88d2467a27eb".hexToByteArray()),
+            validto = Solidity.UInt256(BigInteger("12004335415")),
+            previouschange = Solidity.UInt256(BigInteger.ZERO)
+        )
+
+        val res: Pair<Map<String, PublicKeyEntry>, Map<String, ServiceEntry>> =
+            resolver.processAttributeChanged(
+                event,
+                0,
+                "did:ethr:0xE6Fe788d8ca214A080b0f6aC7F48480b2AEfa9a6"
+            )
+
+        assertThat(res).isEqualTo(
+            mapOf(
+                "DIDAttributeChanged-did/pub/secp256k1/veriKey/hex-0x0295dda1dca7f80e308ef60155ddeac00e46b797fd40ef407f422e88d2467a27eb" to PublicKeyEntry(
+                    id = "did:ethr:0xE6Fe788d8ca214A080b0f6aC7F48480b2AEfa9a6#delegate-1",
+                    type = PublicKeyType("secp256k1VerificationKey2018"),
+                    owner = "did:ethr:0xE6Fe788d8ca214A080b0f6aC7F48480b2AEfa9a6",
+                    publicKeyHex = "0x0295dda1dca7f80e308ef60155ddeac00e46b797fd40ef407f422e88d2467a27eb"
+                )
+            ) to emptyMap<String, ServiceEntry>()
+        )
     }
 
     @Test
