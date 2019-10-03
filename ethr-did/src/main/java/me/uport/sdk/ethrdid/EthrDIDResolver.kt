@@ -247,7 +247,7 @@ open class EthrDIDResolver : DIDResolver {
         )
     }
 
-    private fun processAttributeChanged(
+    internal fun processAttributeChanged(
         event: DIDAttributeChanged.Arguments,
         delegateCount: Int,
         normalizedDid: String
@@ -260,7 +260,7 @@ open class EthrDIDResolver : DIDResolver {
         if (validTo < _timeProvider.nowMs() / 1000L) {
             return (pkEntries to serviceEntries)
         }
-        val name = event.name.byteArray.bytes32ToString()
+        val name = event.name.byteArray.bytes32ToString().replace("\u0000", "")
         val key = "DIDAttributeChanged-$name-${event.value.items.toHexString()}"
 
         //language=RegExp
