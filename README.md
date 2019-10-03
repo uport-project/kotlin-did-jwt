@@ -136,6 +136,9 @@ so that only tokens intended for your app are considered valid.
 
 ## CHANGELOG
 
+* 0.3.3
+    - refactor: use kethereum 0.76.2 ( 1f730e39 )
+    - bugfix: resolve publicKey entries with null chars in their names ( #27 )
 * 0.3.2
     - feat: support multi-network ethr-did ( #20 )
     - bugfix: crash in ethr-did-resolver when nodes don't reply with logs ( #21 )
