@@ -242,6 +242,14 @@ class JWTTools(
      *          , when the `audience` does not match the intended audience (`aud` field)
      * @return a [JwtPayload] if the verification is successful and `null` if it fails
      */
+    @Deprecated(
+        "Verifying a jwt token using the Universal Resolver is deprecated " +
+                "in favor of using a local resolver passed in as a method parameter." +
+                "This will be removed in the next major release.",
+        ReplaceWith(
+            """verify(token: String, auth: Boolean = false, audience: String? = null, resolver: DIDResolver)"""
+        )
+    )
     suspend fun verify(
         token: String,
         auth: Boolean = false,
