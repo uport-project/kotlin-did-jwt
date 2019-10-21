@@ -409,6 +409,14 @@ class JWTTools(
      * entries in the DIDDocument
      *
      */
+    @Deprecated(
+        "Verifying a jwt token using the Universal Resolver is deprecated " +
+                "in favor of using a local resolver passed in as a method parameter." +
+                "This will be removed in the next major release.",
+        ReplaceWith(
+            """resolveAuthenticator(alg: String, issuer: String, auth: Boolean, resolver: DIDResolver)"""
+        )
+    )
     internal suspend fun resolveAuthenticator(alg: String, issuer: String, auth: Boolean): List<PublicKeyEntry> {
 
         if (alg !in verificationMethod.keys) {
@@ -453,6 +461,5 @@ class JWTTools(
             EcdsaPublicKeySecp256k1
         )
     }
-
 }
 
