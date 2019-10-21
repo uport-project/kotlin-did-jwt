@@ -242,6 +242,7 @@ class JWTTools(
      *          , when the `audience` does not match the intended audience (`aud` field)
      * @return a [JwtPayload] if the verification is successful and `null` if it fails
      */
+    @Suppress("DEPRECATION")
     @Deprecated(
         "Verifying a jwt token using the Universal Resolver is deprecated " +
                 "in favor of using a local resolver passed in as a method parameter." +
@@ -295,6 +296,84 @@ class JWTTools(
         }
 
         val publicKeys = resolveAuthenticator(header.alg, payload.iss, auth)
+
+        val signingInputBytes = token.substringBeforeLast('.').toByteArray(utf8)
+
+        val signatureIsValid = verificationMethod[header.alg]
+            ?.invoke(publicKeys, signatureBytes, signingInputBytes)
+            ?: throw JWTEncodingException("JWT algorithm ${header.alg} not supported")
+
+        if (signatureIsValid) {
+            return payload
+        } else {
+            throw InvalidJWTException(
+                "Signature invalid for JWT. DID document for ${payload.iss} does not have any " +
+                        "matching public keys"
+            )
+        }
+    }
+
+    /**
+     * Verifies a jwt [token]
+     * @param token the jwt token to be verified
+     *
+     * @param auth if this param is `true` the public key list that this token is checked against is filtered to the
+     *          entries in the `authentication` entries in the DID document of the issuer of the token.
+     * @param audience the audience that should be able to verify this token. This is usually a DID but can also be a
+     *          callback URL for situations where the token represents a response or a bearer token.
+     * @param resolver the resolver that should be used locally in the verify method to resolve the DIDs.
+     *
+     * @throws InvalidJWTException when the current time is not within the time range of payload `iat` and `exp`
+     *          , when no public key matches are found in the DID document
+     *          , when the `audience` does not match the intended audience (`aud` field)
+     * @return a [JwtPayload] if the verification is successful and `null` if it fails
+     */
+    suspend fun verify(
+        token: String,
+        auth: Boolean = false,
+        audience: String? = null,
+        resolver: DIDResolver
+    ): JwtPayload {
+        val (header, payload, signatureBytes) = decode(token)
+
+        val nowSkewed = (timeProvider.nowMs() / 1000 + TIME_SKEW)
+
+        if (payload.nbf != null) {
+            if (payload.nbf > nowSkewed) {
+                throw InvalidJWTException("Jwt not valid before nbf: ${payload.nbf}")
+            }
+        } else {
+            if (payload.iat != null && payload.iat > nowSkewed) {
+                throw InvalidJWTException("Jwt not valid yet (issued in the future) iat: ${payload.iat}")
+            }
+        }
+
+        if (payload.exp != null && payload.exp <= (timeProvider.nowMs() / 1000 - TIME_SKEW)) {
+            throw InvalidJWTException("JWT has expired: exp: ${payload.exp}")
+        }
+
+        if (payload.aud != null) {
+
+            val payloadAudience = normalizeKnownDID(payload.aud)
+            if (resolver.canResolve(payloadAudience)) {
+
+                if (audience == null) {
+                    throw InvalidJWTException(
+                        "JWT audience is required but your app address has not been configured. " +
+                                "You can provide the proper app address using the `audience` parameter when verifying."
+                    )
+                }
+
+                if (audience != payloadAudience) {
+                    throw InvalidJWTException(
+                        "JWT audience does not match your DID. " +
+                                "aud: $payloadAudience != yours: $audience"
+                    )
+                }
+            }
+        }
+
+        val publicKeys = resolveAuthenticator(header.alg, payload.iss, auth, resolver)
 
         val signingInputBytes = token.substringBeforeLast('.').toByteArray(utf8)
 
@@ -409,6 +488,7 @@ class JWTTools(
      * entries in the DIDDocument
      *
      */
+    @Suppress("DEPRECATION")
     @Deprecated(
         "Verifying a jwt token using the Universal Resolver is deprecated " +
                 "in favor of using a local resolver passed in as a method parameter." +
@@ -424,6 +504,42 @@ class JWTTools(
         }
 
         val doc: DIDDocument = UniversalDID.resolve(issuer)
+
+        val authenticationKeys: List<String> = if (auth) {
+            doc.authentication.map { it.publicKey }
+        } else {
+            emptyList() // return an empty list
+        }
+
+        val authenticators = doc.publicKey.filter {
+
+            // filter public keys which belong to the list of supported key types
+            supportedKeyTypes.contains(it.type) && (!auth || (authenticationKeys.contains(it.id)))
+        }
+
+        if (auth && (authenticators.isEmpty())) throw InvalidJWTException("DID document for $issuer does not have public keys suitable for authenticating user")
+        if (authenticators.isEmpty()) throw InvalidJWTException("DID document for $issuer does not have public keys for $alg")
+
+        return authenticators
+    }
+
+    /**
+     * This method obtains a [DIDDocument] corresponding to the [issuer] and returns a list of [PublicKeyEntry]
+     * that can be used to check JWT signatures
+     *
+     * @param [auth] decide if the returned list should also be filtered against the `authentication`
+     * entries in the DIDDocument
+     *
+     * @param [resolver] the resolver that should be used locally in the verify method to resolve the DIDs.
+     *
+     */
+    internal suspend fun resolveAuthenticator(alg: String, issuer: String, auth: Boolean, resolver: DIDResolver): List<PublicKeyEntry> {
+
+        if (alg !in verificationMethod.keys) {
+            throw JWTEncodingException("JWT algorithm '$alg' not supported")
+        }
+
+        val doc: DIDDocument = resolver.resolve(issuer)
 
         val authenticationKeys: List<String> = if (auth) {
             doc.authentication.map { it.publicKey }
