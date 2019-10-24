@@ -330,9 +330,9 @@ class JWTTools(
      */
     suspend fun verify(
         token: String,
+        resolver: DIDResolver,
         auth: Boolean = false,
-        audience: String? = null,
-        resolver: DIDResolver
+        audience: String? = null
     ): JwtPayload {
         val (header, payload, signatureBytes) = decode(token)
 
