@@ -6,7 +6,6 @@ import io.mockk.coEvery
 import io.mockk.mockkObject
 import io.mockk.spyk
 import kotlinx.coroutines.runBlocking
-import me.uport.sdk.core.Networks
 import me.uport.sdk.ethrdid.EthrDIDDocument
 import me.uport.sdk.ethrdid.EthrDIDNetwork
 import me.uport.sdk.ethrdid.EthrDIDResolver
@@ -160,7 +159,7 @@ class JWTToolsJVMTest {
     @Test
     fun `returns correct payload after successful verification`() = runBlocking {
 
-        val resolver = UportDIDResolver(JsonRPC(Networks.rinkeby.rpcUrl))
+        val resolver = spyk(UportDIDResolver(JsonRPC("")))
 
         coEvery {
             resolver.resolve("2oeXufHGDpU51bfKBsZDdu7Je9weJ3r7sVG")
