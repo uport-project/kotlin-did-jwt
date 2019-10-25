@@ -414,9 +414,10 @@ class JWTToolsJVMTest {
         }
     }
 
-
+    @Deprecated("This test references the deprecated variant of JWTTools().verify()" +
+            "This will be removed in the next major release.")
     @Test
-    fun `finds public key`() = runBlocking {
+    fun `finds public key (deprecated)`() = runBlocking {
 
         val alg = "ES256K"
         val issuer = "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4"
@@ -446,8 +447,46 @@ class JWTToolsJVMTest {
         assertThat(authenticators).isEqualTo(doc.publicKey)
     }
 
+
     @Test
-    fun `only list authenticators able to authenticate a user`() = runBlocking {
+    fun `finds public key`() = runBlocking {
+
+        val alg = "ES256K"
+        val issuer = "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4"
+        val auth = false
+        val doc = EthrDIDDocument.fromJson(
+            """
+                    {
+                        "id": "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4",
+                        "publicKey": [{
+                            "id": "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4#keys-1",
+                            "type": "Secp256k1VerificationKey2018",
+                            "owner": "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4",
+                            "publicKeyHex": "04613bb3a4874d27032618f020614c21cbe4c4e4781687525f6674089f9bd3d6c7f6eb13569053d31715a3ba32e0b791b97922af6387f087d6b5548c06944ab061"
+                        }],
+                        "authentication": [],
+                        "service": [],
+                        "@context": "https://w3id.org/did/v1"
+                    }
+                    """
+        )
+
+        val resolver = spyk(
+            EthrDIDResolver.Builder()
+                .addNetwork(EthrDIDNetwork("", "", JsonRPC("")))
+                .build()
+        )
+
+        coEvery { resolver.resolve(issuer) }.returns(doc)
+
+        val authenticators = JWTTools().resolveAuthenticator(alg, issuer, auth, resolver)
+        assertThat(authenticators).isEqualTo(doc.publicKey)
+    }
+
+    @Deprecated("This test references the deprecated variant of JWTTools().resolveAuthenticator()" +
+            "This will be removed in the next major release.")
+    @Test
+    fun `only list authenticators able to authenticate a user (deprecated)`() = runBlocking {
 
         val alg = "ES256K"
         val issuer = "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4"
@@ -499,6 +538,100 @@ class JWTToolsJVMTest {
         assertThat(authenticators).isEqualTo(listOf(doc.publicKey[0], doc.publicKey[1]))
     }
 
+
+    @Test
+    fun `only list authenticators able to authenticate a user`() = runBlocking {
+
+        val alg = "ES256K"
+        val issuer = "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4"
+        val auth = true
+        val doc = EthrDIDDocument.fromJson(
+            """
+            {
+                "id": "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4",
+                "publicKey": [{
+                    "id": "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4#keys-1",
+                    "type": "Secp256k1VerificationKey2018",
+                    "owner": "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4",
+                    "publicKeyHex": "04613bb3a4874d27032618f020614c21cbe4c4e4781687525f6674089f9bd3d6c7f6eb13569053d31715a3ba32e0b791b97922af6387f087d6b5548c06944ab061"
+                }, {
+                    "id": "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4#keys-2",
+                    "type": "Secp256k1SignatureVerificationKey2018",
+                    "owner": "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4",
+                    "publicKeyHex": "04613bb3a4874d27032618f020614c21cbe4c4e4781687525f6674089f9bd3d6c7f6eb13569053d31715a3ba32e0b791b97922af6387f087d6b5548c06944ab061"
+                }, {
+                    "id": "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4#keys-3",
+                    "type": "Secp256k1SignatureAuthentication2018",
+                    "owner": "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4",
+                    "publicKeyHex": "04613bb3a4874d27032618f020614c21cbe4c4e4781687525f6674089f9bd3d6c7f6eb13569053d31715a3ba32e0b791b97922af6387f087d6b5548c06944ab061"
+                }, {
+                    "id": "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4#keys-3",
+                    "type": "Curve25519EncryptionPublicKey",
+                    "owner": "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4",
+                    "publicKeyHex": "04613bb3a4874d27032618f020614c21cbe4c4e4781687525f6674089f9bd3d6c7f6eb13569053d31715a3ba32e0b791b97922af6387f087d6b5548c06944ab061"
+                }],
+                "authentication": [{
+                    "type": "Secp256k1VerificationKey2018",
+                    "publicKey": "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4#keys-1"
+                }, {
+                    "type": "Secp256k1SignatureVerificationKey2018",
+                    "publicKey": "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4#keys-2"
+                }],
+                "service": [],
+                "@context": "https://w3id.org/did/v1"
+            }
+            """
+        )
+
+        val resolver = spyk(
+            EthrDIDResolver.Builder()
+                .addNetwork(EthrDIDNetwork("", "", JsonRPC("")))
+                .build()
+        )
+
+        coEvery { resolver.resolve(issuer) }.returns(doc)
+
+        val authenticators = JWTTools().resolveAuthenticator(alg, issuer, auth, resolver)
+
+        assertThat(authenticators).isEqualTo(listOf(doc.publicKey[0], doc.publicKey[1]))
+    }
+
+    @Deprecated("This test references the deprecated variant of JWTTools().resolveAuthenticator()" +
+            "This will be removed in the next major release.")
+    @Test
+    fun `errors if no suitable public keys exist for authentication (deprecated)`() = runBlocking {
+
+        val alg = "ES256K"
+        val issuer = "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4"
+        val auth = true
+        val doc = EthrDIDDocument.fromJson(
+            """
+                    {
+                        "id": "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4",
+                        "publicKey": [{
+                            "id": "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4#keys-1",
+                            "type": "Secp256k1VerificationKey2018",
+                            "owner": "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4",
+                            "publicKeyHex": "04613bb3a4874d27032618f020614c21cbe4c4e4781687525f6674089f9bd3d6c7f6eb13569053d31715a3ba32e0b791b97922af6387f087d6b5548c06944ab061"
+                        }],
+                        "authentication": [],
+                        "service": [],
+                        "@context": "https://w3id.org/did/v1"
+                    }
+                    """
+        )
+
+        mockkObject(UniversalDID)
+
+        coEvery { UniversalDID.resolve(issuer) }.returns(doc)
+
+        coAssert {
+            JWTTools().resolveAuthenticator(alg, issuer, auth)
+        }.thrownError {
+            isInstanceOf(InvalidJWTException::class)
+        }
+    }
+
     @Test
     fun `errors if no suitable public keys exist for authentication`() = runBlocking {
 
@@ -515,6 +648,47 @@ class JWTToolsJVMTest {
                             "owner": "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4",
                             "publicKeyHex": "04613bb3a4874d27032618f020614c21cbe4c4e4781687525f6674089f9bd3d6c7f6eb13569053d31715a3ba32e0b791b97922af6387f087d6b5548c06944ab061"
                         }],
+                        "authentication": [],
+                        "service": [],
+                        "@context": "https://w3id.org/did/v1"
+                    }
+                    """
+        )
+
+        val resolver = spyk(
+            EthrDIDResolver.Builder()
+                .addNetwork(
+                    EthrDIDNetwork(
+                        "",
+                        "",
+                        JsonRPC("")
+                    )
+                )
+                .build()
+        )
+
+        coEvery { resolver.resolve(issuer) }.returns(doc)
+
+        coAssert {
+            JWTTools().resolveAuthenticator(alg, issuer, auth, resolver)
+        }.thrownError {
+            isInstanceOf(InvalidJWTException::class)
+        }
+    }
+
+    @Deprecated("This test references the deprecated variant of JWTTools().resolveAuthenticator()" +
+            "This will be removed in the next major release.")
+    @Test
+    fun `errors if no public keys exist (deprecated)`() = runBlocking {
+
+        val alg = "ES256K"
+        val issuer = "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4"
+        val auth = false
+        val doc = EthrDIDDocument.fromJson(
+            """
+                    {
+                        "id": "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4",
+                        "publicKey": [],
                         "authentication": [],
                         "service": [],
                         "@context": "https://w3id.org/did/v1"
@@ -551,19 +725,31 @@ class JWTToolsJVMTest {
                     """
         )
 
-        mockkObject(UniversalDID)
+        val resolver = spyk(
+            EthrDIDResolver.Builder()
+                .addNetwork(
+                    EthrDIDNetwork(
+                        "",
+                        "",
+                        JsonRPC("")
+                    )
+                )
+                .build()
+        )
 
-        coEvery { UniversalDID.resolve(issuer) }.returns(doc)
+        coEvery { resolver.resolve(issuer) }.returns(doc)
 
         coAssert {
-            JWTTools().resolveAuthenticator(alg, issuer, auth)
+            JWTTools().resolveAuthenticator(alg, issuer, auth, resolver)
         }.thrownError {
             isInstanceOf(InvalidJWTException::class)
         }
     }
 
+    @Deprecated("This test references the deprecated variant of JWTTools().verify()" +
+            "This will be removed in the next major release.")
     @Test
-    fun `errors if no supported signature types exist`() = runBlocking {
+    fun `errors if no supported signature types exist (deprecated)`() = runBlocking {
 
         val alg = "ESBAD"
         val issuer = "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4"
@@ -586,6 +772,40 @@ class JWTToolsJVMTest {
 
         coAssert {
             JWTTools().resolveAuthenticator(alg, issuer, auth)
+        }.thrownError {
+            isInstanceOf(JWTEncodingException::class)
+        }
+    }
+
+
+    @Test
+    fun `errors if no supported signature types exist`() = runBlocking {
+
+        val alg = "ESBAD"
+        val issuer = "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4"
+        val auth = false
+        val doc = EthrDIDDocument.fromJson(
+            """
+                    {
+                        "id": "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4",
+                        "publicKey": [],
+                        "authentication": [],
+                        "service": [],
+                        "@context": "https://w3id.org/did/v1"
+                    }
+                    """
+        )
+
+        val resolver = spyk(
+            EthrDIDResolver.Builder()
+                .addNetwork(EthrDIDNetwork("", "0xregistry", JsonRPC("")))
+                .build()
+        )
+
+        coEvery { UniversalDID.resolve(issuer) }.returns(doc)
+
+        coAssert {
+            JWTTools().resolveAuthenticator(alg, issuer, auth, resolver)
         }.thrownError {
             isInstanceOf(JWTEncodingException::class)
         }
