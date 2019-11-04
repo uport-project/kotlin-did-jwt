@@ -12,6 +12,7 @@ import me.uport.sdk.ethrdid.EthrDIDDocument
 import me.uport.sdk.ethrdid.EthrDIDNetwork
 import me.uport.sdk.ethrdid.EthrDIDResolver
 import me.uport.sdk.jsonrpc.JsonRPC
+import me.uport.sdk.jwt.test.EthrDIDTestHelpers
 import me.uport.sdk.jwt.test.EthrDIDTestHelpers.Companion.mockDocForAddress
 import me.uport.sdk.testhelpers.TestTimeProvider
 import me.uport.sdk.testhelpers.coAssert
@@ -86,27 +87,7 @@ class TimestampTests {
         )
 
         coEvery { resolver.resolve("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed") }.returns(
-            EthrDIDDocument.fromJson(
-                """{
-                            "id": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed",
-                            "publicKey": [{
-                                "id": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed#owner",
-                                "type": "Secp256k1VerificationKey2018",
-                                "owner": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed",
-                                "ethereumAddress": "0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed",
-                                "publicKeyHex": null,
-                                "publicKeyBase64": null,
-                                "publicKeyBase58": null,
-                                "value": null
-                            }],
-                            "authentication": [{
-                                "type": "Secp256k1SignatureAuthentication2018",
-                                "publicKey": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed#owner"
-                            }],
-                            "service": [],
-                            "@context": "https://w3id.org/did/v1"
-                        }"""
-            )
+            EthrDIDTestHelpers.mockDocForAddress("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed")
         )
 
         coAssert {
@@ -156,27 +137,7 @@ class TimestampTests {
         )
 
         coEvery { resolver.resolve("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed") }.returns(
-            EthrDIDDocument.fromJson(
-                """{
-                            "id": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed",
-                            "publicKey": [{
-                                "id": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed#owner",
-                                "type": "Secp256k1VerificationKey2018",
-                                "owner": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed",
-                                "ethereumAddress": "0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed",
-                                "publicKeyHex": null,
-                                "publicKeyBase64": null,
-                                "publicKeyBase58": null,
-                                "value": null
-                            }],
-                            "authentication": [{
-                                "type": "Secp256k1SignatureAuthentication2018",
-                                "publicKey": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed#owner"
-                            }],
-                            "service": [],
-                            "@context": "https://w3id.org/did/v1"
-                        }"""
-            )
+            EthrDIDTestHelpers.mockDocForAddress("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed")
         )
 
         coAssert {
@@ -318,27 +279,7 @@ class TimestampTests {
         )
 
         coEvery { resolver.resolve("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed") }.returns(
-            EthrDIDDocument.fromJson(
-                """{
-                            "id": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed",
-                            "publicKey": [{
-                                "id": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed#owner",
-                                "type": "Secp256k1VerificationKey2018",
-                                "owner": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed",
-                                "ethereumAddress": "0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed",
-                                "publicKeyHex": null,
-                                "publicKeyBase64": null,
-                                "publicKeyBase58": null,
-                                "value": null
-                            }],
-                            "authentication": [{
-                                "type": "Secp256k1SignatureAuthentication2018",
-                                "publicKey": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed#owner"
-                            }],
-                            "service": [],
-                            "@context": "https://w3id.org/did/v1"
-                        }"""
-            )
+            EthrDIDTestHelpers.mockDocForAddress("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed")
         )
 
         coAssert {
@@ -422,27 +363,7 @@ class TimestampTests {
         )
 
         coEvery { resolver.resolve("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed") }.returns(
-            EthrDIDDocument.fromJson(
-                """{
-                            "id": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed",
-                            "publicKey": [{
-                                "id": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed#owner",
-                                "type": "Secp256k1VerificationKey2018",
-                                "owner": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed",
-                                "ethereumAddress": "0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed",
-                                "publicKeyHex": null,
-                                "publicKeyBase64": null,
-                                "publicKeyBase58": null,
-                                "value": null
-                            }],
-                            "authentication": [{
-                                "type": "Secp256k1SignatureAuthentication2018",
-                                "publicKey": "did:ethr:0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed#owner"
-                            }],
-                            "service": [],
-                            "@context": "https://w3id.org/did/v1"
-                        }"""
-            )
+            EthrDIDTestHelpers.mockDocForAddress("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed")
         )
 
         val jwt =
