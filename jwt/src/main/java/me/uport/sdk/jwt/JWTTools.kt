@@ -256,61 +256,7 @@ class JWTTools(
         auth: Boolean = false,
         audience: String? = null
     ): JwtPayload {
-        val (header, payload, signatureBytes) = decode(token)
-
-        val nowSkewed = (timeProvider.nowMs() / 1000 + TIME_SKEW)
-
-        if (payload.nbf != null) {
-            if (payload.nbf > nowSkewed) {
-                throw InvalidJWTException("Jwt not valid before nbf: ${payload.nbf}")
-            }
-        } else {
-            if (payload.iat != null && payload.iat > nowSkewed) {
-                throw InvalidJWTException("Jwt not valid yet (issued in the future) iat: ${payload.iat}")
-            }
-        }
-
-        if (payload.exp != null && payload.exp <= (timeProvider.nowMs() / 1000 - TIME_SKEW)) {
-            throw InvalidJWTException("JWT has expired: exp: ${payload.exp}")
-        }
-
-        if (payload.aud != null) {
-
-            val payloadAudience = normalizeKnownDID(payload.aud)
-            if (UniversalDID.canResolve(payloadAudience)) {
-
-                if (audience == null) {
-                    throw InvalidJWTException(
-                        "JWT audience is required but your app address has not been configured. " +
-                                "You can provide the proper app address using the `audience` parameter when verifying."
-                    )
-                }
-
-                if (audience != payloadAudience) {
-                    throw InvalidJWTException(
-                        "JWT audience does not match your DID. " +
-                                "aud: $payloadAudience != yours: $audience"
-                    )
-                }
-            }
-        }
-
-        val publicKeys = resolveAuthenticator(header.alg, payload.iss, auth)
-
-        val signingInputBytes = token.substringBeforeLast('.').toByteArray(utf8)
-
-        val signatureIsValid = verificationMethod[header.alg]
-            ?.invoke(publicKeys, signatureBytes, signingInputBytes)
-            ?: throw JWTEncodingException("JWT algorithm ${header.alg} not supported")
-
-        if (signatureIsValid) {
-            return payload
-        } else {
-            throw InvalidJWTException(
-                "Signature invalid for JWT. DID document for ${payload.iss} does not have any " +
-                        "matching public keys"
-            )
-        }
+        return verify(token, UniversalDID, auth, audience)
     }
 
     /**
