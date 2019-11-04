@@ -242,8 +242,41 @@ class JWTTools(
      *          , when the `audience` does not match the intended audience (`aud` field)
      * @return a [JwtPayload] if the verification is successful and `null` if it fails
      */
+    @Suppress("DEPRECATION")
+    @Deprecated(
+        "Verifying a jwt token using the Universal Resolver is deprecated " +
+                "in favor of using a local resolver passed in as a method parameter." +
+                "This will be removed in the next major release.",
+        ReplaceWith(
+            """verify(token: String, auth: Boolean = false, audience: String? = null, resolver: DIDResolver)"""
+        )
+    )
     suspend fun verify(
         token: String,
+        auth: Boolean = false,
+        audience: String? = null
+    ): JwtPayload {
+        return verify(token, UniversalDID, auth, audience)
+    }
+
+    /**
+     * Verifies a jwt [token]
+     * @param token the jwt token to be verified
+     *
+     * @param auth if this param is `true` the public key list that this token is checked against is filtered to the
+     *          entries in the `authentication` entries in the DID document of the issuer of the token.
+     * @param audience the audience that should be able to verify this token. This is usually a DID but can also be a
+     *          callback URL for situations where the token represents a response or a bearer token.
+     * @param resolver the resolver that should be used locally in the verify method to resolve the DIDs.
+     *
+     * @throws InvalidJWTException when the current time is not within the time range of payload `iat` and `exp`
+     *          , when no public key matches are found in the DID document
+     *          , when the `audience` does not match the intended audience (`aud` field)
+     * @return a [JwtPayload] if the verification is successful and `null` if it fails
+     */
+    suspend fun verify(
+        token: String,
+        resolver: DIDResolver,
         auth: Boolean = false,
         audience: String? = null
     ): JwtPayload {
@@ -268,7 +301,7 @@ class JWTTools(
         if (payload.aud != null) {
 
             val payloadAudience = normalizeKnownDID(payload.aud)
-            if (UniversalDID.canResolve(payloadAudience)) {
+            if (resolver.canResolve(payloadAudience)) {
 
                 if (audience == null) {
                     throw InvalidJWTException(
@@ -286,7 +319,7 @@ class JWTTools(
             }
         }
 
-        val publicKeys = resolveAuthenticator(header.alg, payload.iss, auth)
+        val publicKeys = resolveAuthenticator(header.alg, payload.iss, auth, resolver)
 
         val signingInputBytes = token.substringBeforeLast('.').toByteArray(utf8)
 
@@ -400,14 +433,16 @@ class JWTTools(
      * @param [auth] decide if the returned list should also be filtered against the `authentication`
      * entries in the DIDDocument
      *
+     * @param [resolver] the resolver that should be used locally in the verify method to resolve the DIDs.
+     *
      */
-    internal suspend fun resolveAuthenticator(alg: String, issuer: String, auth: Boolean): List<PublicKeyEntry> {
+    internal suspend fun resolveAuthenticator(alg: String, issuer: String, auth: Boolean, resolver: DIDResolver): List<PublicKeyEntry> {
 
         if (alg !in verificationMethod.keys) {
             throw JWTEncodingException("JWT algorithm '$alg' not supported")
         }
 
-        val doc: DIDDocument = UniversalDID.resolve(issuer)
+        val doc: DIDDocument = resolver.resolve(issuer)
 
         val authenticationKeys: List<String> = if (auth) {
             doc.authentication.map { it.publicKey }
@@ -445,6 +480,5 @@ class JWTTools(
             EcdsaPublicKeySecp256k1
         )
     }
-
 }
 
