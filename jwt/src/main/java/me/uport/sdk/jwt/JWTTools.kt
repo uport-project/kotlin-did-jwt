@@ -433,49 +433,6 @@ class JWTTools(
      * @param [auth] decide if the returned list should also be filtered against the `authentication`
      * entries in the DIDDocument
      *
-     */
-    @Suppress("DEPRECATION")
-    @Deprecated(
-        "Verifying a jwt token using the Universal Resolver is deprecated " +
-                "in favor of using a local resolver passed in as a method parameter." +
-                "This will be removed in the next major release.",
-        ReplaceWith(
-            """resolveAuthenticator(alg: String, issuer: String, auth: Boolean, resolver: DIDResolver)"""
-        )
-    )
-    internal suspend fun resolveAuthenticator(alg: String, issuer: String, auth: Boolean): List<PublicKeyEntry> {
-
-        if (alg !in verificationMethod.keys) {
-            throw JWTEncodingException("JWT algorithm '$alg' not supported")
-        }
-
-        val doc: DIDDocument = UniversalDID.resolve(issuer)
-
-        val authenticationKeys: List<String> = if (auth) {
-            doc.authentication.map { it.publicKey }
-        } else {
-            emptyList() // return an empty list
-        }
-
-        val authenticators = doc.publicKey.filter {
-
-            // filter public keys which belong to the list of supported key types
-            supportedKeyTypes.contains(it.type) && (!auth || (authenticationKeys.contains(it.id)))
-        }
-
-        if (auth && (authenticators.isEmpty())) throw InvalidJWTException("DID document for $issuer does not have public keys suitable for authenticating user")
-        if (authenticators.isEmpty()) throw InvalidJWTException("DID document for $issuer does not have public keys for $alg")
-
-        return authenticators
-    }
-
-    /**
-     * This method obtains a [DIDDocument] corresponding to the [issuer] and returns a list of [PublicKeyEntry]
-     * that can be used to check JWT signatures
-     *
-     * @param [auth] decide if the returned list should also be filtered against the `authentication`
-     * entries in the DIDDocument
-     *
      * @param [resolver] the resolver that should be used locally in the verify method to resolve the DIDs.
      *
      */
