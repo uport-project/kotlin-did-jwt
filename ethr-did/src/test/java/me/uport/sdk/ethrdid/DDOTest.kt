@@ -23,7 +23,7 @@ class DDOTest {
                 "publicKey": [{
                     "id": "did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a#owner",
                     "type" : "Secp256k1VerificationKey2018",
-                    "owner" : "did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a",
+                    "controller" : "did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a",
                     "ethereumAddress" : "0xb9c5714089478a327f09197987f16f9e5d936e8a"
                 }],
                 "authentication": [{

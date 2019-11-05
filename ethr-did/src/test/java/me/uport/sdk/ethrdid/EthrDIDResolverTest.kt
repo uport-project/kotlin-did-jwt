@@ -259,13 +259,13 @@ class EthrDIDResolverTest {
                 {
                   "id": "did:ethr:0x62d283fe6939c01fc88f02c6d2c9a547cc3e2656#owner",
                   "type": "Secp256k1VerificationKey2018",
-                  "owner": "did:ethr:0x62d283fe6939c01fc88f02c6d2c9a547cc3e2656",
+                  "controller": "did:ethr:0x62d283fe6939c01fc88f02c6d2c9a547cc3e2656",
                   "ethereumAddress": "0x62d283fe6939c01fc88f02c6d2c9a547cc3e2656"
                 },
                 {
                   "id": "did:ethr:0x62d283fe6939c01fc88f02c6d2c9a547cc3e2656#delegate-1",
                   "type": "Secp256k1VerificationKey2018",
-                  "owner": "did:ethr:0x62d283fe6939c01fc88f02c6d2c9a547cc3e2656",
+                  "controller": "did:ethr:0x62d283fe6939c01fc88f02c6d2c9a547cc3e2656",
                   "ethereumAddress": "0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed"
                 }
               ],
