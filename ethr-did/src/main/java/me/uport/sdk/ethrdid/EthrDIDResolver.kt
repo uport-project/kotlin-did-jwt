@@ -203,7 +203,7 @@ open class EthrDIDResolver : DIDResolver {
                 "owner", PublicKeyEntry(
                     id = "$ownerDID#owner",
                     type = Secp256k1VerificationKey2018,
-                    owner = ownerDID,
+                    controller = ownerDID,
                     ethereumAddress = ownerAddress
                 )
             )
@@ -278,7 +278,7 @@ open class EthrDIDResolver : DIDResolver {
                 val pk = PublicKeyEntry(
                     id = "$normalizedDid#delegate-$delegateIndex",
                     type = type,
-                    owner = normalizedDid
+                    controller = normalizedDid
                 )
 
                 pkEntries[key] = when (encoding) {
@@ -335,7 +335,7 @@ open class EthrDIDResolver : DIDResolver {
                 veriKey.name -> pkEntries[key] = PublicKeyEntry(
                     id = "$ownerDID#delegate-$delegateIndex",
                     type = Secp256k1VerificationKey2018,
-                    owner = ownerDID,
+                    controller = ownerDID,
                     ethereumAddress = delegate
                 )
             }

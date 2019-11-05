@@ -76,7 +76,7 @@ class UportDIDResolverTest {
 
         val verificationPkMatch = convertedDDO.publicKey.find { it ->
             it.id.startsWith(expectedOwner) &&
-                    it.owner == expectedOwner &&
+                    it.controller == expectedOwner &&
                     it.type == Secp256k1VerificationKey2018 &&
                     it.publicKeyHex == publicKeyHex.clean0xPrefix()
         }
@@ -84,7 +84,7 @@ class UportDIDResolverTest {
 
         val encPkMatch = convertedDDO.publicKey.find { it ->
             it.id.startsWith(expectedOwner) &&
-                    it.owner == expectedOwner &&
+                    it.controller == expectedOwner &&
                     it.type == Curve25519EncryptionPublicKey &&
                     it.publicKeyBase64 == publicEncKey
         }
