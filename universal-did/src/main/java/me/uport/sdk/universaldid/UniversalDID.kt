@@ -11,6 +11,18 @@ import me.uport.sdk.universaldid.UniversalDID.registerResolver
  *
  * Known implementations of [DIDResolver] are [ethr-did] and [uport-did]
  */
+@Suppress("DEPRECATION")
+@Deprecated(
+    "Resolving DIDs using the UniversalDID singleton is deprecated " +
+            "in favor of using the DIDResolver Builder." +
+            "This will be removed in the next major release.",
+    ReplaceWith(
+        """val resolver : DIDResolver = DIDResolver.Builder
+                                .addResolver(ethrDidResolver)
+                                .addResolver(/*...*/)
+                                .build()"""
+    )
+)
 object UniversalDID : DIDResolver {
 
     private val resolvers = mapOf<String, DIDResolver>().toMutableMap()
