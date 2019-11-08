@@ -24,19 +24,28 @@ interface DIDResolver {
 
     /**
      *
-     *
-     *
+     * Builds a [DIDResolverImpl]
+     * This class creates an[DIDResolverImpl] object and enables the registration of [DIDResolver] using the Builder pattern
      *
      */
     class Builder {
 
         private val didResolver = DIDResolverImpl()
 
+        /**
+         *
+         * Register's a [DIDResolver] to the [DIDResolverImpl]
+         * @return this [Builder] instance
+         *
+         */
         fun addResolver(resolver: DIDResolver): Builder {
             didResolver.registerResolver(resolver)
             return this
         }
 
+        /**
+         * @return returns the configured [DIDResolver] object
+         */
         fun build(): DIDResolver {
             return didResolver
         }
