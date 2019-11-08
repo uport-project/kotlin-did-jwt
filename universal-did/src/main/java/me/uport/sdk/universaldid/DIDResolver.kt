@@ -21,4 +21,25 @@ interface DIDResolver {
      * Check if the [potentialDID] can be resolved by this resolver.
      */
     fun canResolve(potentialDID: String): Boolean
+
+    /**
+     *
+     *
+     *
+     *
+     */
+    class Builder {
+
+        private val didResolver = DIDResolverImpl()
+
+        fun addResolver(resolver: DIDResolver): Builder {
+            didResolver.registerResolver(resolver)
+            return this
+        }
+
+        fun build(): DIDResolver {
+            return didResolver
+        }
+    }
 }
+
