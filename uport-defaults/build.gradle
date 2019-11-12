@@ -1,0 +1,16 @@
+apply plugin: 'java-library'
+apply plugin: "kotlin"
+
+project.ext.description = "Default values and configuration for DIDResolver"
+
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    api "com.github.uport-project.kotlin-common:jsonrpc:$uport_kotlin_common_version"
+    api "com.github.uport-project.kotlin-common:signer-common:$uport_kotlin_common_version"
+
+    api project(":universal-did")
+    api project(":uport-did")
+    api project(":ethr-did")
+    api project(":web-did")
+}

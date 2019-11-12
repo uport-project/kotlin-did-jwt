@@ -344,7 +344,6 @@ class JWTTools(
         } else {
             return matches.isNotEmpty()
         }
-
     }
 
     private fun verifyRecoverableES256K(
