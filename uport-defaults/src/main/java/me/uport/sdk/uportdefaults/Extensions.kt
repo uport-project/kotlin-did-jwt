@@ -1,48 +1,81 @@
 package me.uport.sdk.uportdefaults
 
-import me.uport.sdk.core.Networks
-import me.uport.sdk.ethrdid.EthrDIDNetwork
+import me.uport.sdk.core.EthNetwork
 import me.uport.sdk.ethrdid.EthrDIDResolver
+import me.uport.sdk.httpsdid.WebDIDResolver
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.universaldid.DIDResolver
+import me.uport.sdk.uportdid.UportDIDResolver
 
+/**
+ *
+ * An extension function used to configure default [DIDResolver] for
+ * all known networks and add using the DIDResolver Builder
+ *
+ */
+fun DIDResolver.configureDefaultsWithInfura(infuraProjectId: String): DIDResolver {
 
-fun DIDResolver.configureDefaultsWithInfura(infuraProjectId : String) : DIDResolver {
+    val mainnet = EthNetwork(
+        name = "mainnet",
+        networkId = "0x1",
+        rpcUrl = "https://mainnet.infura.io/v3/${infuraProjectId}",
+        ethrDidRegistry = "0xdca7ef03e98e0dc2b855be647c39abe984fcf21b",
+        uPortRegistry = "2ngV6QowStW3ebKXYUhy43wCqeLXcuTfHj2"
+    )
 
-    // blank did declarations
-    /*val blankUportDID = "did:uport:2nQs23uc3UN6BBPqGHpbudDxBkeDRn553BB"
-    val blankEthrDID = "did:ethr:0x0000000000000000000000000000000000000000"
-    val blankHttpsDID = "did:https:example.com"
+    val rinkeby = EthNetwork(
+        name = "rinkeby",
+        networkId = "0x4",
+        rpcUrl = "https://rinkeby.infura.io/v3/${infuraProjectId}",
+        ethrDidRegistry = "0xdca7ef03e98e0dc2b855be647c39abe984fcf21b",
+        uPortRegistry = "2ogxWTKKfy6kwfqdgdEE6GCdoFD4vm4YRZe"
+    )
 
-    // register default Ethr DID resolver if Universal DID is unable to resolve blank Ethr DID
-    if (!.canResolve(blankEthrDID)) {
+    val ropsten = EthNetwork(
+        name = "ropsten",
+        networkId = "0x3",
+        rpcUrl = "https://ropsten.infura.io/v3/${infuraProjectId}",
+        ethrDidRegistry = "0xdca7ef03e98e0dc2b855be647c39abe984fcf21b",
+        uPortRegistry = "2oKVhUttUcwaFAopRBGA21NDJoYcBb3a6iz"
+    )
 
-    }
+    val kovan = EthNetwork(
+        name = "kovan",
+        networkId = "0x2a",
+        rpcUrl = "https://kovan.infura.io/v3/${infuraProjectId}",
+        ethrDidRegistry = "0xdca7ef03e98e0dc2b855be647c39abe984fcf21b",
+        uPortRegistry = "354S1QuCzkmKoQ3ADSLp1KtqAe8gZ74F9am"
+    )
 
-    // register default Uport DID resolver if Universal DID is unable to resolve blank Uport DID
-    if (!UniversalDID.canResolve(blankUportDID)) {
-        val defaultRPC = JsonRPC(preferredNetwork?.rpcUrl ?: Networks.rinkeby.rpcUrl)
-        UniversalDID.registerResolver(UportDIDResolver(defaultRPC))
-    }
-
-    // register default https DID resolver if Universal DID is unable to resolve blank https DID
-    if (!UniversalDID.canResolve(blankHttpsDID)) {
-        UniversalDID.registerResolver(WebDIDResolver())
-    }
-    */
-
-
-
-    val defaultRPC = JsonRPC(preferredNetwork?.rpcUrl ?: Networks.mainnet.rpcUrl)
-    val defaultRegistry = preferredNetwork?.ethrDidRegistry
-        ?: Networks.mainnet.ethrDidRegistry
-        EthrDIDResolver.Builder()
-            .addNetwork(EthrDIDNetwork("", defaultRegistry, defaultRPC, "0x1"))
-            .build()
-
-
-    val resolver : DIDResolver = DIDResolver.Builder()
+    return DIDResolver.Builder()
+        .addResolver(
+            // register default Ethr DID resolver for all known networks
+            EthrDIDResolver.Builder()
+                .addNetwork(mainnet)
+                .addNetwork(rinkeby)
+                .addNetwork(ropsten)
+                .addNetwork(kovan)
+                .build()
+        )
+        .addResolver(
+            // register default Uport DID resolver for mainnet
+            UportDIDResolver(JsonRPC(mainnet.rpcUrl))
+        )
+        .addResolver(
+            // register default Uport DID resolver for rinkeby
+            UportDIDResolver(JsonRPC(rinkeby.rpcUrl))
+        )
+        .addResolver(
+            // register default Uport DID resolver for kovan
+            UportDIDResolver(JsonRPC(kovan.rpcUrl))
+        )
+        .addResolver(
+            // register default Uport DID resolver for ropsten
+            UportDIDResolver(JsonRPC(ropsten.rpcUrl))
+        )
+        .addResolver(
+            // register default Web DID resolver
+            WebDIDResolver()
+        )
         .build()
-
-    return resolver
 }
