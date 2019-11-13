@@ -13,4 +13,6 @@ dependencies {
     api project(":uport-did")
     api project(":ethr-did")
     api project(":web-did")
+
+    testImplementation "junit:junit:$junit_version"
 }

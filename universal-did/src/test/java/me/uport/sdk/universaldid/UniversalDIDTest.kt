@@ -26,7 +26,6 @@ class UniversalDIDTest {
         override suspend fun resolve(did: String): DIDDocument {
             return if (did.contains("test")) testDDO else throw IllegalArgumentException("can't use test resolver")
         }
-
     }
 
     @Test
