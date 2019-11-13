@@ -3,5 +3,6 @@ include ':uport-did'
 include ':ethr-did'
 include ':universal-did'
 include ':jwt'
+include ':ethr-status-registry'
 
 include ':jwt-test'
