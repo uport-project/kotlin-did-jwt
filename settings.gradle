@@ -1,7 +1,8 @@
-include ':web-did', ':uport-defaults'
+include ':web-did'
 include ':uport-did'
 include ':ethr-did'
 include ':universal-did'
 include ':jwt'
+include ':uport-defaults'
 
 include ':jwt-test'

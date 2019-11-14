@@ -19,7 +19,8 @@ import me.uport.sdk.universaldid.UniversalDID.registerResolver
     ReplaceWith(
         """val resolver : DIDResolver = DIDResolver.Builder
                                 .addResolver(ethrDidResolver)
-                                .addResolver(/*...*/)
+                                .addResolver(uportDidResolver)
+                                .addResolver(webDidResolver)
                                 .build()"""
     )
 )

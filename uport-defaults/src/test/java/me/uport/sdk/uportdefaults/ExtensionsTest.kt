@@ -12,7 +12,7 @@ class ExtensionsTest {
 
             /*
             val infuraProjectId = "e72b472993ff46d3b5b88faa47214d7f"
-            val resolver = DIDResolver.configureDefaultsWithInfura()
+            val resolver = DIDResolver.configureDefaultsWithInfura(infuraProjectId)
 
             val dids = listOf(
                 "did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a",
