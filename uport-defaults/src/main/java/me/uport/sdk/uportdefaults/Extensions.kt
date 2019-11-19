@@ -3,9 +3,7 @@ package me.uport.sdk.uportdefaults
 import me.uport.sdk.core.EthNetwork
 import me.uport.sdk.ethrdid.EthrDIDResolver
 import me.uport.sdk.httpsdid.WebDIDResolver
-import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.universaldid.DIDResolver
-import me.uport.sdk.uportdid.UportDIDResolver
 
 /**
  *
@@ -56,22 +54,6 @@ import me.uport.sdk.uportdid.UportDIDResolver
                 .addNetwork(ropsten)
                 .addNetwork(kovan)
                 .build()
-        )
-        .addResolver(
-            // register default Uport DID resolver for mainnet
-            UportDIDResolver(JsonRPC(mainnet.rpcUrl))
-        )
-        .addResolver(
-            // register default Uport DID resolver for rinkeby
-            UportDIDResolver(JsonRPC(rinkeby.rpcUrl))
-        )
-        .addResolver(
-            // register default Uport DID resolver for kovan
-            UportDIDResolver(JsonRPC(kovan.rpcUrl))
-        )
-        .addResolver(
-            // register default Uport DID resolver for ropsten
-            UportDIDResolver(JsonRPC(ropsten.rpcUrl))
         )
         .addResolver(
             // register default Web DID resolver

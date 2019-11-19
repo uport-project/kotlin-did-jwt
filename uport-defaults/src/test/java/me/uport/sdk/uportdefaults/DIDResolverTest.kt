@@ -1,7 +1,15 @@
-package me.uport.sdk.universaldid
+package me.uport.sdk.uportdefaults
 
 import assertk.assertThat
 import assertk.assertions.isFalse
+import assertk.assertions.isTrue
+import me.uport.sdk.core.Networks
+import me.uport.sdk.ethrdid.EthrDIDNetwork
+import me.uport.sdk.ethrdid.EthrDIDResolver
+import me.uport.sdk.httpsdid.WebDIDResolver
+import me.uport.sdk.jsonrpc.JsonRPC
+import me.uport.sdk.universaldid.DIDResolver
+import me.uport.sdk.uportdid.UportDIDResolver
 import org.junit.Test
 
 
@@ -10,7 +18,6 @@ class DIDResolverTest {
 
     @Test
     fun `can resolve valid dids after adding resolvers`() {
-        /*
         val resolver = DIDResolver.Builder()
             .addResolver(
                 EthrDIDResolver.Builder()
@@ -40,7 +47,6 @@ class DIDResolverTest {
         dids.forEach {
             assertThat(resolver.canResolve(it)).isTrue()
         }
-        */
     }
 
 
