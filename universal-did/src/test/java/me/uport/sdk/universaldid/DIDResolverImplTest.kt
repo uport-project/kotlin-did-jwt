@@ -8,7 +8,7 @@ import kotlinx.coroutines.runBlocking
 import me.uport.sdk.testhelpers.coAssert
 import org.junit.Test
 
-class UniversalDIDTest {
+class DIDResolverImplTest {
 
     private val testDDO = object : DIDDocument {
         override val context: String = "test context"
@@ -30,10 +30,12 @@ class UniversalDIDTest {
 
     @Test
     fun `blank resolves to error`() {
-        UniversalDID.clearResolvers()
+
+        val resolver = DIDResolverImpl()
+        resolver.clearResolvers()
 
         coAssert {
-            UniversalDID.resolve("")
+            resolver.resolve("")
         }.thrownError {
             isInstanceOf(IllegalArgumentException::class)
         }
@@ -41,11 +43,13 @@ class UniversalDIDTest {
 
     @Test
     fun `testResolver resolves to error with blank`() {
-        UniversalDID.clearResolvers()
-        UniversalDID.registerResolver(testResolver)
+
+        val resolver = DIDResolverImpl()
+        resolver.clearResolvers()
+        resolver.registerResolver(testResolver)
 
         coAssert {
-            UniversalDID.resolve("")
+            resolver.resolve("")
         }.thrownError {
             isInstanceOf(IllegalArgumentException::class)
         }
@@ -53,10 +57,12 @@ class UniversalDIDTest {
 
     @Test
     fun `can register and find resolver`() = runBlocking {
-        UniversalDID.clearResolvers()
-        UniversalDID.registerResolver(testResolver)
 
-        val ddo = UniversalDID.resolve("did:test:this is a test did")
+        val resolver = DIDResolverImpl()
+        resolver.clearResolvers()
+        resolver.registerResolver(testResolver)
+
+        val ddo = resolver.resolve("did:test:this is a test did")
         assertThat(ddo).isEqualTo(testDDO)
     }
 
@@ -81,13 +87,16 @@ class UniversalDIDTest {
 
     @Test
     fun `parses dids correctly`() {
+
+        val resolver = DIDResolverImpl()
+
         validDIDs.forEach {
-            val (method, _) = UniversalDID.parse(it)
+            val (method, _) = resolver.parse(it)
             assertThat(method).isEqualTo("generic")
         }
 
         invalidDIDs.forEach {
-            val (method, _) = UniversalDID.parse(it)
+            val (method, _) = resolver.parse(it)
             assertThat(method).isEmpty()
         }
     }

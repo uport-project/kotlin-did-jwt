@@ -6,10 +6,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.json.JsonException
 import me.uport.sdk.core.*
-import me.uport.sdk.ethrdid.EthrDIDNetwork
-import me.uport.sdk.ethrdid.EthrDIDResolver
-import me.uport.sdk.httpsdid.WebDIDResolver
-import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jwt.JWTUtils.Companion.normalizeKnownDID
 import me.uport.sdk.jwt.JWTUtils.Companion.splitToken
 import me.uport.sdk.jwt.model.ArbitraryMapSerializer
@@ -25,7 +21,6 @@ import me.uport.sdk.universaldid.PublicKeyType.Companion.EcdsaPublicKeySecp256k1
 import me.uport.sdk.universaldid.PublicKeyType.Companion.Secp256k1SignatureVerificationKey2018
 import me.uport.sdk.universaldid.PublicKeyType.Companion.Secp256k1VerificationKey2018
 import me.uport.sdk.universaldid.UniversalDID
-import me.uport.sdk.uportdid.UportDIDResolver
 import org.kethereum.crypto.toAddress
 import org.kethereum.encodings.decodeBase58
 import org.kethereum.extensions.toBigInteger
@@ -67,39 +62,8 @@ typealias VerificationMethod = (
  * It defaults to `null`
  */
 class JWTTools(
-    private val timeProvider: ITimeProvider = SystemTimeProvider,
-    preferredNetwork: EthNetwork? = null
+    private val timeProvider: ITimeProvider = SystemTimeProvider
 ) {
-    init {
-
-        // blank did declarations
-        val blankUportDID = "did:uport:2nQs23uc3UN6BBPqGHpbudDxBkeDRn553BB"
-        val blankEthrDID = "did:ethr:0x0000000000000000000000000000000000000000"
-        val blankHttpsDID = "did:https:example.com"
-
-        // register default Ethr DID resolver if Universal DID is unable to resolve blank Ethr DID
-        if (!UniversalDID.canResolve(blankEthrDID)) {
-            val defaultRPC = JsonRPC(preferredNetwork?.rpcUrl ?: Networks.mainnet.rpcUrl)
-            val defaultRegistry = preferredNetwork?.ethrDidRegistry
-                ?: Networks.mainnet.ethrDidRegistry
-            UniversalDID.registerResolver(
-                EthrDIDResolver.Builder()
-                    .addNetwork(EthrDIDNetwork("", defaultRegistry, defaultRPC, "0x1"))
-                    .build()
-            )
-        }
-
-        // register default Uport DID resolver if Universal DID is unable to resolve blank Uport DID
-        if (!UniversalDID.canResolve(blankUportDID)) {
-            val defaultRPC = JsonRPC(preferredNetwork?.rpcUrl ?: Networks.rinkeby.rpcUrl)
-            UniversalDID.registerResolver(UportDIDResolver(defaultRPC))
-        }
-
-        // register default https DID resolver if Universal DID is unable to resolve blank https DID
-        if (!UniversalDID.canResolve(blankHttpsDID)) {
-            UniversalDID.registerResolver(WebDIDResolver())
-        }
-    }
 
     /**
      * This coroutine method creates a signed JWT from a [payload] Map and an abstracted [Signer]
@@ -380,7 +344,6 @@ class JWTTools(
         } else {
             return matches.isNotEmpty()
         }
-
     }
 
     private fun verifyRecoverableES256K(

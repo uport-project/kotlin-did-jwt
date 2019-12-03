@@ -1,30 +1,6 @@
 package me.uport.sdk.universaldid
 
-import me.uport.sdk.universaldid.UniversalDID.method
-import me.uport.sdk.universaldid.UniversalDID.registerResolver
-
-/**
- * A class to abstract resolving Decentralized Identity (DID) documents
- * from specific implementations based on the [method] component of a DID [String]
- *
- * [DIDResolver] implementations need to be registered using [registerResolver]
- *
- * Known implementations of [DIDResolver] are [ethr-did] and [uport-did]
- */
-@Suppress("DEPRECATION")
-@Deprecated(
-    "Resolving DIDs using the UniversalDID singleton is deprecated " +
-            "in favor of using the DIDResolver Builder." +
-            "This will be removed in the next major release.",
-    ReplaceWith(
-        """val resolver : DIDResolver = DIDResolver.Builder
-                                .addResolver(ethrDidResolver)
-                                .addResolver(uportDidResolver)
-                                .addResolver(webDidResolver)
-                                .build()"""
-    )
-)
-object UniversalDID : DIDResolver {
+internal class DIDResolverImpl: DIDResolver {
 
     private val resolvers = mapOf<String, DIDResolver>().toMutableMap()
 
