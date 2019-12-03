@@ -1,4 +1,4 @@
-include ':web-did'
+include ':web-did', ':credential-status'
 include ':uport-did'
 include ':ethr-did'
 include ':universal-did'
