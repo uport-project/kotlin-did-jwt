@@ -1,22 +1,18 @@
 package me.uport.sdk.revocation
 
-import javafx.scene.input.Mnemonic
 import kotlinx.coroutines.runBlocking
 import me.uport.sdk.core.Networks
 import me.uport.sdk.jsonrpc.JsonRPC
-import me.uport.sdk.jwt.JWTTools
 import me.uport.sdk.signer.KPSigner
 import me.uport.sdk.signer.Signer
 import me.uport.sdk.signer.signETH
 import me.uport.sdk.signer.utf8
 import org.junit.Test
 import org.kethereum.DEFAULT_GAS_PRICE
-import org.kethereum.crypto.signMessage
 import org.kethereum.extensions.hexToBigInteger
 import org.kethereum.functions.encodeRLP
 import org.kethereum.keccakshortcut.keccak
 import org.kethereum.model.Address
-import org.kethereum.model.ECKeyPair
 import org.kethereum.model.Transaction
 import org.kethereum.model.createTransactionWithDefaults
 import org.komputing.khex.extensions.hexToByteArray
@@ -64,10 +60,10 @@ class RevocationTests {
     fun `can revoke message`() = runBlocking {
         //TODO: add your private key here with a 0x prefix
         val signer =
-            KPSigner("0x your private key here")
+            KPSigner("0x278a5de700e29faae8e40e366ec5012b5ec63d36ec77e8a2417154cc1d25383f")
 
         val address = signer.getAddress().prepend0xPrefix()
-        //0x1FCf8ff78aC5117d9c99B830c74b6668D6AC3229
+        //0xf3beac30c498d9e26865f34fcaa57dbb935b0d74
 
         val txHash = revokeCredential(
             //TODO: paste the credential to be revoked here:
@@ -75,15 +71,6 @@ class RevocationTests {
             signer = signer
         )
     }
-
-
-
-
-
-
-
-
-
 
 
     private suspend fun Transaction.sign(signer: Signer): String =
@@ -108,11 +95,11 @@ class RevocationTests {
 
             val encodedMethodCall = EthrStatusRegistry.Revoked.encode(
                 Solidity.Address(address.hexToBigInteger()),
-                Solidity.Bytes32(msgHash))
+                Solidity.Bytes32(msgHash)
+            )
 
             val result = rpc.ethCall(registryAddress, encodedMethodCall)
             println(result)
-
 
 
         }
