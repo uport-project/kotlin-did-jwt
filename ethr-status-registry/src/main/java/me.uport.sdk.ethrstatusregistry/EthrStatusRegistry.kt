@@ -4,6 +4,7 @@ import me.uport.credential_status.CredentialStatus
 import me.uport.credential_status.StatusEntry
 import me.uport.credential_status.StatusMethod
 import me.uport.credential_status.StatusResolver
+import me.uport.sdk.core.Networks
 import me.uport.sdk.jwt.JWTTools
 import me.uport.sdk.jwt.model.JwtPayload
 
@@ -47,6 +48,8 @@ class EthrStatusRegistry : StatusResolver {
         status: EthrStatusEntry
     ): CredentialStatus {
         val (address, network) = parseRegistryId(status.id)
+
+        val ethNetwork = Networks.get(network)
     }
 
     private fun parseRegistryId(id: String): Pair<String, String> {

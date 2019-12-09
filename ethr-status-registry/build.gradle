@@ -8,6 +8,8 @@ project.ext.description = "Ethr implementation of credential-status"
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    api "com.github.uport-project.kotlin-common:jsonrpc:$uport_kotlin_common_version"
+    api "com.github.uport-project.kotlin-common:signer-common:$uport_kotlin_common_version"
 
     api project(":credential-status")
     api project(":jwt")
