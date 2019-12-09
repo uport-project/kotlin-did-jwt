@@ -32,7 +32,14 @@ Support for other DID methods should be simple.
 Write a DID resolver supporting the 
 [`DIDResolver`](https://github.com/uport-project/kotlin-did-jwt/blob/master/universal-did/src/main/java/me/uport/sdk/universaldid/DIDResolver.kt)
 interface.
-Install it using `UniversalDID.registerResolver(<your own resolver implementation>)`
+Install it using 
+```kotlin
+val resolver : DIDResolver = DIDResolver.Builder
+.addResolver(ethrDidResolver)
+.addResolver(/*...*/)
+.build()
+```
+
 Once you've verified that it works, please add a PR adding it to the above list so people can find it.
 
 If your DID method requires a different signing algorithm than what is already supported, 
