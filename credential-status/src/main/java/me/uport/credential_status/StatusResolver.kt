@@ -4,9 +4,7 @@ package me.uport.credential_status
 /**
  * Represents the result of a status check
  */
-interface CredentialStatus {
-
-}
+data class CredentialStatus (val status: Boolean)
 
 
 /**
@@ -19,17 +17,7 @@ interface CredentialStatus {
  * ```
  *
  */
-interface StatusEntry {
-
-}
-
-
-/**
- * The method signature expected to be implemented by credential status resolvers
- */
-interface StatusMethod {
-
-}
+data class StatusEntry (val type: String, val id: String)
 
 
 /**
@@ -42,14 +30,11 @@ interface StatusMethod {
  */
 interface StatusResolver {
 
-}
+    /*
+     *
+     */
+    val method: String
 
 
-interface JWTPayloadWithStatus {
-
-}
-
-
-interface StatusMethodRegistry {
-
+    fun checkStatus(credential: String): CredentialStatus
 }
