@@ -118,11 +118,17 @@ but that is a more rigid structure and will be phased away in future releases.
 
 
 ```kotlin
-val payload : JwtPayload = JwtTools().verify("<token>")
+val resolver = EthrDIDResolver.Builder()
+                               .addNetwork(EthrDIDNetwork("<name>", "<registryAddress>", "<JsonRPC>"))
+                               .build()
+                               
+val payload : JwtPayload = JWTTools().verify("<token>", resolver)
 ```
 
 If the token is valid, the method returns the decoded payload,
 otherwise throws a `InvalidJWTException` or `JWTEncodingException`
+
+The function requires a DIDResolver which will be used to resolve DIDs during the verification
 
 Verifying a token means checking that the signature was produced by a
 key associated with the issuer DID (`iss` field).
