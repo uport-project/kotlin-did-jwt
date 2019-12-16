@@ -1,10 +1,15 @@
 package me.uport.sdk.ethrstatusregistry
 
+import kotlinx.coroutines.runBlocking
 import me.uport.credential_status.CredentialStatus
 import me.uport.credential_status.StatusEntry
 import me.uport.credential_status.StatusResolver
 import me.uport.sdk.core.Networks
+import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jwt.JWTTools
+import org.kethereum.keccakshortcut.keccak
+import pm.gnosis.model.Solidity
+import java.math.BigInteger
 
 class EthrStatusRegistry : StatusResolver {
 
@@ -13,12 +18,10 @@ class EthrStatusRegistry : StatusResolver {
     override fun checkStatus(credential: String): CredentialStatus {
         val (_, payloadRaw) = JWTTools().decodeRaw(credential)
         val statusEntry = payloadRaw["status"] as StatusEntry?
-        val issuer: String = payloadRaw["iss"] as String? ?: throw IllegalStateException("The method '$method' is not a supported credential status method.")
 
         if (statusEntry?.type == method) {
             return runCredentialCheck(
                 credential,
-                issuer,
                 statusEntry
             )
         } else {
@@ -28,12 +31,29 @@ class EthrStatusRegistry : StatusResolver {
 
     private fun runCredentialCheck(
         credential: String,
-        issuer: String,
         status: StatusEntry
     ): CredentialStatus {
         val (address, network) = parseRegistryId(status.id)
 
         val ethNetwork = Networks.get(network)
+        val registryAddress = "0x1E4651dca5Ef38636e2E4D7A6Ff4d2413fC56450"
+        val rpc = JsonRPC(ethNetwork.rpcUrl)
+        val credentialHash = credential.keccak()
+
+        val encodedMethodCall = Revocation.Revoked.encode(
+            Solidity.Address(address.toBigInteger()),
+            Solidity.Bytes32(credentialHash)
+        )
+
+        val result = runBlocking {
+            rpc.ethCall(registryAddress, encodedMethodCall)
+        }
+
+        if (result.toBigInteger() > BigInteger.ZERO) {
+            return CredentialStatus(true)
+        } else {
+            return CredentialStatus(false)
+        }
     }
 
     private fun parseRegistryId(id: String): Pair<String, String> {
