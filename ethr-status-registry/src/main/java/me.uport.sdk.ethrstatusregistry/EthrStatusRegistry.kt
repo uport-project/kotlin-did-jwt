@@ -36,7 +36,6 @@ class EthrStatusRegistry : StatusResolver {
         val (address, network) = parseRegistryId(status.id)
 
         val ethNetwork = Networks.get(network)
-        val registryAddress = "0x1E4651dca5Ef38636e2E4D7A6Ff4d2413fC56450"
         val rpc = JsonRPC(ethNetwork.rpcUrl)
         val credentialHash = credential.keccak()
 
@@ -46,7 +45,7 @@ class EthrStatusRegistry : StatusResolver {
         )
 
         val result = runBlocking {
-            rpc.ethCall(registryAddress, encodedMethodCall)
+            rpc.ethCall(address, encodedMethodCall)
         }
 
         if (result.toBigInteger() > BigInteger.ZERO) {
