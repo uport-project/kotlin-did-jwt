@@ -1,7 +1,6 @@
 package me.uport.sdk.ethrstatusregistry
 
 import kotlinx.coroutines.runBlocking
-import me.uport.credential_status.CredentialStatus
 import me.uport.credential_status.StatusEntry
 import me.uport.credential_status.StatusResolver
 import me.uport.sdk.core.Networks
@@ -15,7 +14,7 @@ class EthrStatusRegistry : StatusResolver {
 
     override val method = "EthrStatusRegistry2019"
 
-    override fun checkStatus(credential: String): CredentialStatus {
+    override fun checkStatus(credential: String): Boolean {
         val (_, payloadRaw) = JWTTools().decodeRaw(credential)
         val status = payloadRaw["status"] as Map<String, String>
         val type = status["type"] ?: ""
@@ -35,7 +34,7 @@ class EthrStatusRegistry : StatusResolver {
     private fun runCredentialCheck(
         credential: String,
         status: StatusEntry
-    ): CredentialStatus {
+    ): Boolean {
         val (address, network) = parseRegistryId(status.id)
 
         val ethNetwork = Networks.get(network)
@@ -51,11 +50,7 @@ class EthrStatusRegistry : StatusResolver {
             rpc.ethCall(address, encodedMethodCall)
         }
 
-        if (result.toBigIntegerOrNull() != null) {
-            return CredentialStatus(true)
-        } else {
-            return CredentialStatus(false)
-        }
+        return result.toBigIntegerOrNull() != null
     }
 
     private fun parseRegistryId(did: String): Pair<String, String> {
@@ -72,12 +67,7 @@ class EthrStatusRegistry : StatusResolver {
 
         val (_, _, _, _, network, registryAddress, _, _) = matchResult.destructured
 
-        val nameOrId = if (network.isBlank() || network in
-            listOf(
-                "0x1",
-                "0x01"
-            )
-        ) {
+        val nameOrId = if (network.isBlank()) {
             "mainnet"
         } else {
             network
