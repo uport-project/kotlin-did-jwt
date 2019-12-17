@@ -7,9 +7,9 @@ import me.uport.credential_status.StatusResolver
 import me.uport.sdk.core.Networks
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jwt.JWTTools
+import org.kethereum.extensions.hexToBigInteger
 import org.kethereum.keccakshortcut.keccak
 import pm.gnosis.model.Solidity
-import java.math.BigInteger
 
 class EthrStatusRegistry : StatusResolver {
 
@@ -17,9 +17,12 @@ class EthrStatusRegistry : StatusResolver {
 
     override fun checkStatus(credential: String): CredentialStatus {
         val (_, payloadRaw) = JWTTools().decodeRaw(credential)
-        val statusEntry = payloadRaw["status"] as StatusEntry?
+        val status = payloadRaw["status"] as Map<String, String>
+        val type = status["type"] ?: ""
+        val id = status["id"] ?: ""
+        val statusEntry = StatusEntry(type, id)
 
-        if (statusEntry?.type == method) {
+        if (statusEntry.type == method) {
             return runCredentialCheck(
                 credential,
                 statusEntry
@@ -37,10 +40,10 @@ class EthrStatusRegistry : StatusResolver {
 
         val ethNetwork = Networks.get(network)
         val rpc = JsonRPC(ethNetwork.rpcUrl)
-        val credentialHash = credential.keccak()
+        val credentialHash = credential.toByteArray().keccak()
 
         val encodedMethodCall = Revocation.Revoked.encode(
-            Solidity.Address(address.toBigInteger()),
+            Solidity.Address(address.hexToBigInteger()),
             Solidity.Bytes32(credentialHash)
         )
 
@@ -48,25 +51,38 @@ class EthrStatusRegistry : StatusResolver {
             rpc.ethCall(address, encodedMethodCall)
         }
 
-        if (result.toBigInteger() > BigInteger.ZERO) {
+        if (result.toBigIntegerOrNull() != null) {
             return CredentialStatus(true)
         } else {
             return CredentialStatus(false)
         }
     }
 
-    private fun parseRegistryId(id: String): Pair<String, String> {
+    private fun parseRegistryId(did: String): Pair<String, String> {
 
         //language=RegExp
-        val didParsePattern =
-            "^((.*):)?(0x[0-9a-fA-F]{40}$)".toRegex()
+        val didParsePattern = "^(did:)?((\\w+):)?((\\w+):)?((0x)([0-9a-fA-F]{40}))".toRegex()
 
-        if (!didParsePattern.matches(id)) {
-            throw IllegalStateException("The id '$id' is not a valid status registry ID.")
+        if (!didParsePattern.matches(did)) {
+            throw IllegalStateException("The id '$did' is not a valid status registry ID.")
         }
 
-        val result = didParsePattern.find(id)?.destructured
+        val matchResult = didParsePattern.find(did)
+            ?: throw IllegalStateException("The format for '$did' is not a supported")
 
-        return Pair(result?.component2() ?: "", result?.component1() ?: "")
+        val (_, _, _, _, network, registryAddress, _, _) = matchResult.destructured
+
+        val nameOrId = if (network.isBlank() || network in
+            listOf(
+                "0x1",
+                "0x01"
+            )
+        ) {
+            "mainnet"
+        } else {
+            network
+        }
+
+        return Pair(registryAddress, nameOrId)
     }
 }

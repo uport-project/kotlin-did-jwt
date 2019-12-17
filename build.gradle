@@ -20,7 +20,7 @@ buildscript {
         kethereum_version = "0.76.2"
         khex_version = "1.0.0-RC3"
         spongycastle_version = "1.58.0.0"
-        uport_kotlin_common_version = "0.3.2"
+        uport_kotlin_common_version = "797bcd57"
 
         current_release_version = "0.3.3"
     }
