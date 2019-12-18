@@ -65,7 +65,7 @@ class EthrStatus : StatusResolver {
     }
 
     /*
-     * Parses a given [EthrDID]
+     * Parses a given registry ID
      * @returns the network and the registry Address
      *
      */
