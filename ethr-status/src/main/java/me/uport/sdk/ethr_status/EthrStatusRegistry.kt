@@ -1,6 +1,5 @@
-package me.uport.sdk.ethrstatusregistry
+package me.uport.sdk.ethr_status
 
-import kotlinx.coroutines.runBlocking
 import me.uport.credential_status.StatusEntry
 import me.uport.credential_status.StatusResolver
 import me.uport.sdk.core.Networks
@@ -20,7 +19,7 @@ class EthrStatusRegistry : StatusResolver {
 
     override val method = "EthrStatusRegistry2019"
 
-    override fun checkStatus(credential: String): Boolean {
+    override suspend fun checkStatus(credential: String): Boolean {
         val (_, payloadRaw) = JWTTools().decodeRaw(credential)
         val status = payloadRaw["status"] as Map<String, String>
 
@@ -44,7 +43,7 @@ class EthrStatusRegistry : StatusResolver {
      * making a call to the smart contract
      *
      */
-    private fun runCredentialCheck(
+    private suspend fun runCredentialCheck(
         credential: String,
         status: StatusEntry
     ): Boolean {
@@ -59,9 +58,7 @@ class EthrStatusRegistry : StatusResolver {
             Solidity.Bytes32(credentialHash)
         )
 
-        val result = runBlocking {
-            rpc.ethCall(address, encodedMethodCall)
-        }
+        val result = rpc.ethCall(address, encodedMethodCall)
 
         return result.toBigIntegerOrNull() != null
     }
@@ -71,19 +68,19 @@ class EthrStatusRegistry : StatusResolver {
      * @returns the network and the registry Address
      *
      */
-    private fun parseRegistryId(did: String): Pair<String, String> {
+    internal fun parseRegistryId(id: String): Pair<String, String> {
 
         //language=RegExp
-        val didParsePattern = "^(did:)?((\\w+):)?((\\w+):)?((0x)([0-9a-fA-F]{40}))".toRegex()
+        val didParsePattern = "^(\\w+):(0x[0-9a-fA-F]{40})".toRegex()
 
-        if (!didParsePattern.matches(did)) {
-            throw IllegalStateException("The id '$did' is not a valid status registry ID.")
+        if (!didParsePattern.matches(id)) {
+            throw IllegalStateException("The id '$id' is not a valid status registry ID.")
         }
 
-        val matchResult = didParsePattern.find(did)
-            ?: throw IllegalStateException("The format for '$did' is not a supported")
+        val matchResult = didParsePattern.find(id)
+            ?: throw IllegalStateException("The format for '$id' is not a supported")
 
-        val (_, _, _, _, network, registryAddress, _, _) = matchResult.destructured
+        val (network, registryAddress) = matchResult.destructured
 
         val nameOrId = if (network.isBlank()) {
             "mainnet"

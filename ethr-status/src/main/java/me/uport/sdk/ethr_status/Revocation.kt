@@ -1,4 +1,4 @@
-package me.uport.sdk.ethrstatusregistry
+package me.uport.sdk.ethr_status
 
 import pm.gnosis.model.Solidity
 import pm.gnosis.model.SolidityBase

@@ -30,5 +30,5 @@ interface StatusResolver {
     val method: String
 
 
-    fun checkStatus(credential: String): Boolean
+    suspend fun checkStatus(credential: String): Boolean
 }

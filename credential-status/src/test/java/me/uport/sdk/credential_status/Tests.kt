@@ -1,4 +1,4 @@
-package me.uport.sdk.credentialstatus
+package me.uport.sdk.credential_status
 
 import org.junit.Test
 
