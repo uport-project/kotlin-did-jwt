@@ -23,6 +23,7 @@ class EthrStatus : StatusResolver {
     override suspend fun checkStatus(credential: String): Boolean {
         val (_, payloadRaw) = JWTTools().decodeRaw(credential)
         val status = payloadRaw["status"] as Map<String, String>
+        val issuer = payloadRaw["iss"] as String
 
         val statusEntry = StatusEntry(
             status["type"] ?: "",
@@ -32,7 +33,8 @@ class EthrStatus : StatusResolver {
         if (statusEntry.type == method) {
             return runCredentialCheck(
                 credential,
-                statusEntry
+                statusEntry,
+                issuer
             )
         } else {
             throw IllegalStateException("The method '$method' is not a supported credential status method.")
@@ -46,20 +48,21 @@ class EthrStatus : StatusResolver {
      */
     private suspend fun runCredentialCheck(
         credential: String,
-        status: StatusEntry
+        status: StatusEntry,
+        issuer: String
     ): Boolean {
-        val (address, network) = parseRegistryId(status.id)
+        val (registryAddress, network) = parseRegistryId(status.id)
 
         val ethNetwork = Networks.get(network)
         val rpc = JsonRPC(ethNetwork.rpcUrl)
         val credentialHash = credential.toByteArray().keccak()
 
         val encodedMethodCall = Revocation.Revoked.encode(
-            Solidity.Address(address.hexToBigInteger()),
+            Solidity.Address(extractAddress(issuer).hexToBigInteger()),
             Solidity.Bytes32(credentialHash)
         )
 
-        val result = rpc.ethCall(address, encodedMethodCall)
+        val result = rpc.ethCall(registryAddress, encodedMethodCall)
 
         return (result.hexToBigInteger() > BigInteger.ZERO)
     }
@@ -90,5 +93,15 @@ class EthrStatus : StatusResolver {
         }
 
         return Pair(registryAddress, nameOrId)
+    }
+
+    private fun extractAddress(normalizedDid: String): String {
+
+        //language=RegExp
+        val identityExtractPattern = "^did:ethr:((\\w+):)?(0x[0-9a-fA-F]{40})".toRegex()
+
+        return identityExtractPattern
+            .find(normalizedDid)
+            ?.destructured?.component3() ?: ""
     }
 }
