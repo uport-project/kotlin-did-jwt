@@ -71,7 +71,7 @@ class EthrStatusRegistry : StatusResolver {
     internal fun parseRegistryId(id: String): Pair<String, String> {
 
         //language=RegExp
-        val didParsePattern = "^(\\w+):(0x[0-9a-fA-F]{40})".toRegex()
+        val didParsePattern = "^(\\w+)?(?::)?(0x[0-9a-fA-F]{40})".toRegex()
 
         if (!didParsePattern.matches(id)) {
             throw IllegalStateException("The id '$id' is not a valid status registry ID.")

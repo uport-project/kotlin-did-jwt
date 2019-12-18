@@ -16,13 +16,4 @@ class EthrStatusRegistryTests {
         val result = statusRegistry.checkStatus(validShareReqToken)
         assertThat(result).isFalse()
     }
-
-    /*@Test
-    fun `can parse valid id`(){
-
-        val statusRegistry = EthrStatusRegistry()
-        val (address, network) = statusRegistry.parseRegistryId("mainnet:0x63142bebe28e663ec4d007cd12ce5e77c37deafc")
-        assertThat(network).isEqualTo("mainnet")
-        assertThat(address).isEqualTo("0x63142bebe28e663ec4d007cd12ce5e77c37deafc")
-    }*/
 }
