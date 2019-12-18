@@ -10,6 +10,12 @@ import org.kethereum.extensions.hexToBigInteger
 import org.kethereum.keccakshortcut.keccak
 import pm.gnosis.model.Solidity
 
+
+/**
+ *
+ * Ethr Implementation of the [StatusResolver]
+ * This class enables users check the revocation status of a credential
+ */
 class EthrStatusRegistry : StatusResolver {
 
     override val method = "EthrStatusRegistry2019"
@@ -17,9 +23,11 @@ class EthrStatusRegistry : StatusResolver {
     override fun checkStatus(credential: String): Boolean {
         val (_, payloadRaw) = JWTTools().decodeRaw(credential)
         val status = payloadRaw["status"] as Map<String, String>
-        val type = status["type"] ?: ""
-        val id = status["id"] ?: ""
-        val statusEntry = StatusEntry(type, id)
+
+        val statusEntry = StatusEntry(
+            status["type"] ?: "",
+            status["id"] ?: ""
+        )
 
         if (statusEntry.type == method) {
             return runCredentialCheck(
@@ -31,6 +39,11 @@ class EthrStatusRegistry : StatusResolver {
         }
     }
 
+    /*
+     * Checks the revocation status of a given credential by
+     * making a call to the smart contract
+     *
+     */
     private fun runCredentialCheck(
         credential: String,
         status: StatusEntry
@@ -53,6 +66,11 @@ class EthrStatusRegistry : StatusResolver {
         return result.toBigIntegerOrNull() != null
     }
 
+    /*
+     * Parses a given [EthrDID]
+     * @returns the network and the registry Address
+     *
+     */
     private fun parseRegistryId(did: String): Pair<String, String> {
 
         //language=RegExp

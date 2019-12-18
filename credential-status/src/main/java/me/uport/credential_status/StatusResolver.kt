@@ -17,7 +17,7 @@ data class StatusEntry (val type: String, val id: String)
 /**
  *
  *  The interface expected for status resolvers.
- * `checkStatus` should be called with a raw credential and it should return a [CredentialStatus] result.
+ * `checkStatus` should be called with a raw credential and it should return a [Boolean] result.
  * It is advisable that classes that implement this interface also provide a way to easily register the correct
  * Status method type.
  *
@@ -25,7 +25,7 @@ data class StatusEntry (val type: String, val id: String)
 interface StatusResolver {
 
     /*
-     * Holds the revocation method name
+     * Holds the name of the method signature expected to be implemented by credential status resolvers
      */
     val method: String
 
