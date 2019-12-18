@@ -8,6 +8,7 @@ import me.uport.sdk.jwt.JWTTools
 import org.kethereum.extensions.hexToBigInteger
 import org.kethereum.keccakshortcut.keccak
 import pm.gnosis.model.Solidity
+import java.math.BigInteger
 
 
 /**
@@ -15,7 +16,7 @@ import pm.gnosis.model.Solidity
  * Ethr Implementation of the [StatusResolver]
  * This class enables users check the revocation status of a credential
  */
-class EthrStatusRegistry : StatusResolver {
+class EthrStatus : StatusResolver {
 
     override val method = "EthrStatusRegistry2019"
 
@@ -60,7 +61,7 @@ class EthrStatusRegistry : StatusResolver {
 
         val result = rpc.ethCall(address, encodedMethodCall)
 
-        return result.toBigIntegerOrNull() != null
+        return (result.hexToBigInteger() > BigInteger.ZERO)
     }
 
     /*
