@@ -19,7 +19,6 @@ dependencies {
     api "com.github.uport-project.kotlin-common:test-helpers:$uport_kotlin_common_version"
 
     api project(":credential-status")
-    api project(":jwt")
 
     testImplementation "junit:junit:$junit_version"
     testImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"

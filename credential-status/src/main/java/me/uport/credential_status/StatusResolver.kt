@@ -1,5 +1,10 @@
 package me.uport.credential_status
 
+/**
+ * Generic interface representing a credential-status result
+ **/
+interface CredentialStatus
+
 
 /**
  * Represents a status method entry that could be embedded in a W3C Verifiable Credential.
@@ -17,7 +22,7 @@ data class StatusEntry (val type: String, val id: String)
 /**
  *
  *  The interface expected for status resolvers.
- * `checkStatus` should be called with a raw credential and it should return a [Boolean] result.
+ * `checkStatus` should be called with a raw credential and it should return a [CredentialStatus] result.
  * It is advisable that classes that implement this interface also provide a way to easily register the correct
  * Status method type.
  *
@@ -25,10 +30,10 @@ data class StatusEntry (val type: String, val id: String)
 interface StatusResolver {
 
     /*
-     * Holds the name of the method signature expected to be implemented by credential status resolvers
+     * Holds the name of the method expected to be used in checking the credential-status
      */
     val method: String
 
 
-    suspend fun checkStatus(credential: String): Boolean
+    suspend fun checkStatus(credential: String): CredentialStatus
 }

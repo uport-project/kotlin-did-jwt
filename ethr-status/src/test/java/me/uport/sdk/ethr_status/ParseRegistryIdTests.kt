@@ -7,7 +7,7 @@ import org.junit.Test
 
 class ParseRegistryIdTests {
 
-    private val ethrStatus = EthrStatus()
+    private val ethrStatus = EthrStatusResolver()
 
     @Test
     fun `can parse simple address`() {

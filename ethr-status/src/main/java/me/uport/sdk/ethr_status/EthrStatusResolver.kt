@@ -1,7 +1,9 @@
 package me.uport.sdk.ethr_status
 
+import me.uport.credential_status.CredentialStatus
 import me.uport.credential_status.StatusEntry
 import me.uport.credential_status.StatusResolver
+import me.uport.credential_status.getStatusEntry
 import me.uport.sdk.core.Networks
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jwt.JWTTools
@@ -16,19 +18,15 @@ import java.math.BigInteger
  * Ethr Implementation of the [StatusResolver]
  * This class enables users check the revocation status of a credential
  */
-class EthrStatus : StatusResolver {
+class EthrStatusResolver : StatusResolver {
 
     override val method = "EthrStatusRegistry2019"
 
-    override suspend fun checkStatus(credential: String): Boolean {
+    override suspend fun checkStatus(credential: String): EthrStatus {
         val (_, payloadRaw) = JWTTools().decodeRaw(credential)
-        val status = payloadRaw["status"] as Map<String, String>
         val issuer = payloadRaw["iss"] as String
 
-        val statusEntry = StatusEntry(
-            status["type"] ?: "",
-            status["id"] ?: ""
-        )
+        val statusEntry = getStatusEntry(credential)
 
         if (statusEntry.type == method) {
             return runCredentialCheck(
@@ -50,7 +48,7 @@ class EthrStatus : StatusResolver {
         credential: String,
         status: StatusEntry,
         issuer: String
-    ): Boolean {
+    ): EthrStatus {
         val (registryAddress, network) = parseRegistryId(status.id)
 
         val ethNetwork = Networks.get(network)
@@ -64,7 +62,7 @@ class EthrStatus : StatusResolver {
 
         val result = rpc.ethCall(registryAddress, encodedMethodCall)
 
-        return (result.hexToBigInteger() > BigInteger.ZERO)
+        return EthrStatus(result.hexToBigInteger())
     }
 
     /*
@@ -105,3 +103,13 @@ class EthrStatus : StatusResolver {
             ?.destructured?.component3() ?: ""
     }
 }
+
+/**
+ * Represents the status of a credential that should be checked using `EthrStatusRegistry2019`
+ **/
+data class EthrStatus(
+    /**
+     * The block number when it was first revoked by the issuer, or [BigInteger.ZERO] if it was never revoked
+     **/
+    val blockNumber: BigInteger
+) : CredentialStatus
