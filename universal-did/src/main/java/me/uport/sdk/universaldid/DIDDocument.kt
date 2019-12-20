@@ -70,8 +70,8 @@ data class PublicKeyEntry(
     @SerialName("type")
     val type: PublicKeyType,
 
-    @SerialName("owner")
-    val owner: String,
+    @SerialName("controller")
+    val controller: String,
 
     @SerialName("ethereumAddress")
     val ethereumAddress: String? = null,

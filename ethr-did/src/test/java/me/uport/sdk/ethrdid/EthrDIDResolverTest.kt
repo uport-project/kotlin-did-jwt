@@ -259,13 +259,13 @@ class EthrDIDResolverTest {
                 {
                   "id": "did:ethr:0x62d283fe6939c01fc88f02c6d2c9a547cc3e2656#owner",
                   "type": "Secp256k1VerificationKey2018",
-                  "owner": "did:ethr:0x62d283fe6939c01fc88f02c6d2c9a547cc3e2656",
+                  "controller": "did:ethr:0x62d283fe6939c01fc88f02c6d2c9a547cc3e2656",
                   "ethereumAddress": "0x62d283fe6939c01fc88f02c6d2c9a547cc3e2656"
                 },
                 {
                   "id": "did:ethr:0x62d283fe6939c01fc88f02c6d2c9a547cc3e2656#delegate-1",
                   "type": "Secp256k1VerificationKey2018",
-                  "owner": "did:ethr:0x62d283fe6939c01fc88f02c6d2c9a547cc3e2656",
+                  "controller": "did:ethr:0x62d283fe6939c01fc88f02c6d2c9a547cc3e2656",
                   "ethereumAddress": "0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed"
                 }
               ],
@@ -831,7 +831,7 @@ class EthrDIDResolverTest {
                 "DIDAttributeChanged-did/pub/secp256k1/veriKey/hex-0x0295dda1dca7f80e308ef60155ddeac00e46b797fd40ef407f422e88d2467a27eb" to PublicKeyEntry(
                     id = "did:ethr:0xE6Fe788d8ca214A080b0f6aC7F48480b2AEfa9a6#delegate-1",
                     type = PublicKeyType("secp256k1VerificationKey2018"),
-                    owner = "did:ethr:0xE6Fe788d8ca214A080b0f6aC7F48480b2AEfa9a6",
+                    controller = "did:ethr:0xE6Fe788d8ca214A080b0f6aC7F48480b2AEfa9a6",
                     publicKeyHex = "0x0295dda1dca7f80e308ef60155ddeac00e46b797fd40ef407f422e88d2467a27eb"
                 )
             ) to emptyMap<String, ServiceEntry>()

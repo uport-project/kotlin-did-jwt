@@ -26,7 +26,7 @@ open class EthrDIDTestHelpers {
                     PublicKeyEntry(
                         id = "$did#owner",
                         type = PublicKeyType.Secp256k1VerificationKey2018,
-                        owner = did,
+                        controller = did,
                         ethereumAddress = address
                     )
                 ),

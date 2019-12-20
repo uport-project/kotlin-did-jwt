@@ -52,7 +52,7 @@ data class UportIdentityDocument(
         val publicVerificationKey = PublicKeyEntry(
             id = "$normalizedDid#keys-1",
             type = Secp256k1VerificationKey2018,
-            owner = normalizedDid,
+            controller = normalizedDid,
             publicKeyHex = this.publicKey?.clean0xPrefix()
         )
         val authEntries = listOf(
@@ -69,7 +69,7 @@ data class UportIdentityDocument(
                 PublicKeyEntry(
                     id = "$normalizedDid#keys-2",
                     type = Curve25519EncryptionPublicKey,
-                    owner = normalizedDid,
+                    controller = normalizedDid,
                     publicKeyBase64 = publicEncKey
                 )
             )
