@@ -16,7 +16,6 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
 
     api "com.github.komputing.kethereum:keccak_shortcut:$kethereum_version"
-    api "com.github.uport-project.kotlin-common:test-helpers:$uport_kotlin_common_version"
 
     api project(":credential-status")
 

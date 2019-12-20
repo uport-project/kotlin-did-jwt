@@ -49,13 +49,14 @@ class ParseRegistryIdTests {
             "0x",
             "mainnet:0x",
             "helloworld",
-            "0xhelloworld"
+            "0xhelloworld",
+            "mainnet:0x63142bebe28e663ec4d007cd12ce5e77c37deafc78253"
         )
         invalidRegistryIDs.forEach {
             assertThat {
                 ethrStatus.parseRegistryId(it)
             }.thrownError {
-                isInstanceOf(IllegalStateException::class)
+                isInstanceOf(IllegalArgumentException::class)
             }
         }
     }

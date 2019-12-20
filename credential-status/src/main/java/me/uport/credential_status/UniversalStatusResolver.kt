@@ -37,8 +37,8 @@ class UniversalStatusResolver : StatusResolver {
         if (statusEntry.type.isBlank() || !resolvers.containsKey(statusEntry.type)) {
             throw IllegalStateException("There is no StatusResolver registered to check status using '${statusEntry.type}' method.")
         } else {
-            return resolvers[method]?.checkStatus(credential)
-                ?: throw IllegalStateException("There StatusResolver for '$method' failed to resolve for an unknown reason.")
+            return resolvers[statusEntry.type]?.checkStatus(credential)
+                ?: throw IllegalStateException("There StatusResolver for '$statusEntry.type' failed to resolve for an unknown reason.")
         }
     }
 

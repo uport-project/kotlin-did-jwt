@@ -8,6 +8,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     api project(":jwt")
+    api project(":ethr-status")
+    api "com.github.uport-project.kotlin-common:test-helpers:$uport_kotlin_common_version"
 
     testImplementation "junit:junit:$junit_version"
 }
