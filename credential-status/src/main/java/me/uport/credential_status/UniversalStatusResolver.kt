@@ -32,6 +32,7 @@ class UniversalStatusResolver : StatusResolver {
      * @throws IllegalStateException if the proper resolver is not registered or produces `null`
      */
     override suspend fun checkStatus(credential: String): CredentialStatus {
+
         val statusEntry = getStatusEntry(credential)
 
         if (statusEntry.type.isBlank() || !resolvers.containsKey(statusEntry.type)) {

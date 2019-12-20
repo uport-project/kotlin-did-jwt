@@ -8,7 +8,8 @@ import me.uport.sdk.jwt.JWTTools
  */
 fun getStatusEntry(credential: String): StatusEntry {
     val (_, payloadRaw) = JWTTools().decodeRaw(credential)
-    val status = payloadRaw["status"] as Map<String, String>
+    val status = payloadRaw["status"] as Map<String, String>?
+        ?: throw IllegalArgumentException("No entry for status found in jwt")
 
     return StatusEntry(
         status["type"] ?: "",
