@@ -34,6 +34,9 @@ interface StatusResolver {
      */
     val method: String
 
-
+    /**
+     *
+     * Checks the status of a given credential and returns a [CredentialStatus] or throws an error
+     */
     suspend fun checkStatus(credential: String): CredentialStatus
 }
