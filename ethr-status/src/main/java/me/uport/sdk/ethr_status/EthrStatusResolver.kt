@@ -97,7 +97,7 @@ class EthrStatusResolver : StatusResolver {
             revokers.add(extractAddress(issuer))
         }
 
-        return revokers
+        return revokers.distinct()
     }
 
     /*
