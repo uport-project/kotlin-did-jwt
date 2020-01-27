@@ -77,4 +77,27 @@ class EthrStatusResolverTests {
             isInstanceOf(IllegalStateException::class)
         }
     }
+
+    @Test
+    fun `throws error when issuer and diddoc controller are not the same`() = runBlocking {
+
+        val didDoc = EthrDIDDocument.fromJson(
+            """{
+                "id": "did:ethr:0xf3beac30c498d9e26865f34fcaa57dbb935s0d74",
+                "publicKey": [],
+                "authentication": [{
+                    "type": "Secp256k1SignatureAuthentication2018",
+                    "publicKey": "did:ethr:0xf3beac30c498d9e26865f34fcaa57dbb935b0d74#owner"
+                }],
+                "service": [],
+                "@context": "https://w3id.org/did/v1"
+            }"""
+        )
+        val token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NzI5NjY3ODAsInN0YXR1cyI6eyJ0eXBlIjoidW5rbm93biIsImlkIjoic29tZXRoaW5nIHNvbWV0aGluZyJ9LCJpc3MiOiJkaWQ6ZXRocjoweGYzYmVhYzMwYzQ5OGQ5ZTI2ODY1ZjM0ZmNhYTU3ZGJiOTM1YjBkNzQifQ.WO4kUEYy3xzZR1VlofOm3e39e1XM227uIr-Z7Yb9YQcJJ-2PRcnQmecW5fDjIfF3EInS3rRd4TZmuVQOnhaKQAE\n"
+        coAssert {
+            ethrStatus.checkStatus(token, didDoc)
+        }.thrownError {
+            isInstanceOf(IllegalArgumentException::class)
+        }
+    }
 }
