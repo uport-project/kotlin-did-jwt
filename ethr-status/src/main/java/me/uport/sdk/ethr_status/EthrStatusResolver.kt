@@ -7,6 +7,7 @@ import me.uport.credential_status.getStatusEntry
 import me.uport.sdk.core.Networks
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jwt.JWTTools
+import me.uport.sdk.universaldid.DIDDocument
 import org.kethereum.extensions.hexToBigInteger
 import org.kethereum.keccakshortcut.keccak
 import pm.gnosis.model.Solidity
@@ -22,9 +23,13 @@ class EthrStatusResolver : StatusResolver {
 
     override val method = "EthrStatusRegistry2019"
 
-    override suspend fun checkStatus(credential: String): EthrStatus {
+    override suspend fun checkStatus(credential: String, didDoc: DIDDocument): CredentialStatus {
         val (_, payloadRaw) = JWTTools().decodeRaw(credential)
         val issuer = payloadRaw["iss"] as String
+
+        if (issuer != didDoc.id) {
+            throw IllegalArgumentException("The issuer of the credential does not match the controller of the DIDDocument provided.")
+        }
 
         val statusEntry = getStatusEntry(credential)
 
@@ -32,7 +37,7 @@ class EthrStatusResolver : StatusResolver {
             return runCredentialCheck(
                 credential,
                 statusEntry,
-                issuer
+                didDoc
             )
         } else {
             throw IllegalStateException("The method '$method' is not a supported credential status method.")
@@ -47,7 +52,7 @@ class EthrStatusResolver : StatusResolver {
     private suspend fun runCredentialCheck(
         credential: String,
         status: StatusEntry,
-        issuer: String
+        didDoc: DIDDocument
     ): EthrStatus {
         val (registryAddress, network) = parseRegistryId(status.id)
 
@@ -55,14 +60,37 @@ class EthrStatusResolver : StatusResolver {
         val rpc = JsonRPC(ethNetwork.rpcUrl)
         val credentialHash = credential.toByteArray().keccak()
 
-        val encodedMethodCall = Revocation.Revoked.encode(
-            Solidity.Address(extractAddress(issuer).hexToBigInteger()),
-            Solidity.Bytes32(credentialHash)
-        )
+        val revokers = getValidRevokers(didDoc)
 
-        val result = rpc.ethCall(registryAddress, encodedMethodCall)
+        revokers.forEach { revoker ->
+            val encodedMethodCall = Revocation.Revoked.encode(
+                Solidity.Address(revoker.hexToBigInteger()),
+                Solidity.Bytes32(credentialHash)
+            )
 
-        return EthrStatus(result.hexToBigInteger())
+            val result = rpc.ethCall(registryAddress, encodedMethodCall)
+            if (result.hexToBigInteger() > BigInteger.ZERO) {
+                return EthrStatus(BigInteger.ONE)
+            }
+        }
+
+        return EthrStatus(BigInteger.ZERO)
+    }
+
+    internal fun getValidRevokers(didDoc: DIDDocument): List<String> {
+
+        val revokers = didDoc.publicKey.filter { pubKey ->
+            pubKey.ethereumAddress != null
+        }.map { pubKey ->
+            pubKey.ethereumAddress as String
+        }
+
+        val issuer = didDoc.id as String
+        if (issuer.startsWith("did:ethr")) {
+            revokers.toMutableList().add(extractAddress(issuer))
+        }
+
+        return revokers
     }
 
     /*
