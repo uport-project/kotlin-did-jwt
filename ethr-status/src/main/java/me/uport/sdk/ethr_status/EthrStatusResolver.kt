@@ -77,17 +77,24 @@ class EthrStatusResolver : StatusResolver {
         return EthrStatus(BigInteger.ZERO)
     }
 
+    /*
+     * Generates a list of valid revoker addresses using the
+     * list of public key entries in the [DIDDocument]
+     * @returns a list of ethereum addresses for valid revokers
+     *
+     */
     internal fun getValidRevokers(didDoc: DIDDocument): List<String> {
 
-        val revokers = didDoc.publicKey.filter { pubKey ->
-            pubKey.ethereumAddress != null
-        }.map { pubKey ->
-            pubKey.ethereumAddress as String
+        val revokers = mutableListOf<String>()
+        didDoc.publicKey.forEach { pubKey ->
+            if (pubKey.ethereumAddress != null) {
+                revokers.add(pubKey.ethereumAddress as String)
+            }
         }
 
         val issuer = didDoc.id as String
         if (issuer.startsWith("did:ethr")) {
-            revokers.toMutableList().add(extractAddress(issuer))
+            revokers.add(extractAddress(issuer))
         }
 
         return revokers
