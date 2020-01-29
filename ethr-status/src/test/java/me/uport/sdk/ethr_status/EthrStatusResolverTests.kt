@@ -40,7 +40,17 @@ class EthrStatusResolverTests {
         val didDoc = EthrDIDDocument.fromJson(
             """{
                 "id": "did:ethr:0x1fcf8ff78ac5117d9c99b830c74b6668d6ac3229",
-                "publicKey": [],
+                "publicKey": [{
+                            "id": "did:ethr:0xf3beac30c498d9e26865f34fcaa57dbb935b0d74#owner",
+                            "type": "Secp256k1VerificationKey2018",
+                            "owner": "did:ethr:0xf3beac30c498d9e26865f34fcaa57dbb935b0d74",
+                            "ethereumAddress": "0xf3beac30c498d9e26865f34fcaa57dbb935b0d74"
+                        },{
+                            "id": "did:ethr:0xf3beac30c498d9e26865f34fcaa57dbb935b0d74#owner",
+                            "type": "Secp256k1VerificationKey2018",
+                            "owner": "did:ethr:0xf3beac30c498d9e26865f34fcaa57dbb935b0d74",
+                            "ethereumAddress": "0xf3beac30c498d9e26865f34fcaa57dbb935b0d74"
+                        }],
                 "authentication": [{
                     "type": "Secp256k1SignatureAuthentication2018",
                     "publicKey": "did:ethr:0x1fcf8ff78ac5117d9c99b830c74b6668d6ac3229#owner"
