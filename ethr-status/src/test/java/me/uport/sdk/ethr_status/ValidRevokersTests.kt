@@ -61,7 +61,7 @@ class ValidRevokersTests {
     }
 
     @Test
-    fun `can generate list of revokers with publickey entries and non ethr-did issuer`() {
+    fun `can generate list of revokers with public key entries and non ethr-did issuer`() {
 
         val didDoc = EthrDIDDocument.fromJson(
             """{
