@@ -1,5 +1,7 @@
 package me.uport.credential_status
 
+import me.uport.sdk.universaldid.DIDDocument
+
 /**
  * Generic interface representing a credential-status result
  **/
@@ -38,5 +40,5 @@ interface StatusResolver {
      *
      * Checks the status of a given credential and returns a [CredentialStatus] or throws an error
      */
-    suspend fun checkStatus(credential: String): CredentialStatus
+    suspend fun checkStatus(credential: String, didDoc: DIDDocument): CredentialStatus
 }

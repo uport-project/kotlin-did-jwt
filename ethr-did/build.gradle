@@ -32,4 +32,5 @@ dependencies {
     testImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"
     testImplementation project(":jwt-test")
     testImplementation "com.github.uport-project.kotlin-common:test-helpers:$uport_kotlin_common_version"
+    testImplementation "com.squareup.okhttp3:okhttp:$okhttp_version"
 }

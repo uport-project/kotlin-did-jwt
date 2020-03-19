@@ -1,10 +1,16 @@
-@file:Suppress("UndocumentedPublicFunction", "UndocumentedPublicClass")
+@file:Suppress("UndocumentedPublicFunction", "UndocumentedPublicClass", "unused")
+
 package me.uport.sdk.ethr_status
 
 import pm.gnosis.model.Solidity
 import pm.gnosis.model.SolidityBase
 
-class Revocation {
+/**
+ * Encodes and decodes calls to the ethr-status-registry contract.
+ *
+ * This class was generated using the bivrost tools
+ */
+class RevocationContract {
     object Revoked {
         private const val METHOD_ID: String = "e46e3846"
 
