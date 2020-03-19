@@ -4,5 +4,6 @@ include ':ethr-did'
 include ':universal-did'
 include ':jwt'
 include ':uport-defaults'
-
+include ':credential-status'
+include ':ethr-status'
 include ':jwt-test'
