@@ -1,4 +1,5 @@
 @file:Suppress("UndocumentedPublicFunction", "UndocumentedPublicClass", "StringLiteralDuplication")
+
 package me.uport.sdk.ethr_status
 
 import assertk.assertThat
@@ -27,7 +28,7 @@ class ValidRevokersTests {
         )
 
         val revokers = ethrStatus.getValidRevokers(didDoc)
-        assertThat(revokers).isEqualTo(listOf("0x1fcf8ff78ac5117d9c99b830c74b6668d6ac3229"))
+        assertThat(revokers).isEqualTo(emptyList<String>())
     }
 
     @Test
@@ -37,14 +38,14 @@ class ValidRevokersTests {
             """{
                         "id": "did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154",
                         "publicKey": [{
-                            "id": "did:ethr:0xf3beac30c498d9e26865f34fcaa57dbb935b0d74#owner",
+                            "id": "did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154#owner",
                             "type": "Secp256k1VerificationKey2018",
-                            "owner": "did:ethr:0xf3beac30c498d9e26865f34fcaa57dbb935b0d74",
-                            "ethereumAddress": "0xf3beac30c498d9e26865f34fcaa57dbb935b0d74"
+                            "owner": "did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154",
+                            "ethereumAddress": "0x108209f4247b7fe6605b0f58f9145ec3269d0154"
                         },{
-                            "id": "did:ethr:0xf3beac30c498d9e26865f34fcaa57dbb935b0d74#owner",
+                            "id": "did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154#key-1",
                             "type": "Secp256k1VerificationKey2018",
-                            "owner": "did:ethr:0xf3beac30c498d9e26865f34fcaa57dbb935b0d74",
+                            "owner": "did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154",
                             "ethereumAddress": "0xf3beac30c498d9e26865f34fcaa57dbb935b0d74"
                         }],
                         "authentication": [{
@@ -57,7 +58,12 @@ class ValidRevokersTests {
         )
 
         val revokers = ethrStatus.getValidRevokers(didDoc)
-        assertThat(revokers).isEqualTo(listOf("0xf3beac30c498d9e26865f34fcaa57dbb935b0d74", "0x108209f4247b7fe6605b0f58f9145ec3269d0154"))
+        assertThat(revokers).isEqualTo(
+            listOf(
+                "0x108209f4247b7fe6605b0f58f9145ec3269d0154",
+                "0xf3beac30c498d9e26865f34fcaa57dbb935b0d74"
+            )
+        )
     }
 
     @Test

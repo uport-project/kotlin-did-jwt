@@ -6,7 +6,6 @@ import me.uport.credential_status.StatusResolver
 import me.uport.credential_status.getStatusEntry
 import me.uport.sdk.core.Networks
 import me.uport.sdk.jsonrpc.JsonRPC
-import me.uport.sdk.jwt.JWTTools
 import me.uport.sdk.universaldid.DIDDocument
 import org.kethereum.extensions.hexToBigInteger
 import org.kethereum.keccakshortcut.keccak
@@ -15,7 +14,6 @@ import java.math.BigInteger
 
 
 /**
- *
  * Ethr Implementation of the [StatusResolver]
  * This class enables users check the revocation status of a credential
  */
@@ -24,13 +22,6 @@ class EthrStatusResolver : StatusResolver {
     override val method = "EthrStatusRegistry2019"
 
     override suspend fun checkStatus(credential: String, didDoc: DIDDocument): CredentialStatus {
-        val (_, payloadRaw) = JWTTools().decodeRaw(credential)
-        val issuer = payloadRaw["iss"] as String
-
-        if (issuer != didDoc.id) {
-            throw IllegalArgumentException("The issuer of the credential does not match the controller of the DIDDocument provided.")
-        }
-
         val statusEntry = getStatusEntry(credential)
 
         if (statusEntry.type == method) {
@@ -44,10 +35,8 @@ class EthrStatusResolver : StatusResolver {
         }
     }
 
-    /*
-     * Checks the revocation status of a given credential by
-     * making a call to the smart contract
-     *
+    /**
+     * Checks the revocation status of a given credential by making a call to the smart contract
      */
     private suspend fun runCredentialCheck(
         credential: String,
@@ -62,48 +51,33 @@ class EthrStatusResolver : StatusResolver {
 
         val revokers = getValidRevokers(didDoc)
 
-        revokers.forEach { revoker ->
-            val encodedMethodCall = Revocation.Revoked.encode(
-                Solidity.Address(revoker.hexToBigInteger()),
-                Solidity.Bytes32(credentialHash)
-            )
+        val minRevocationBlock: BigInteger = revokers.map { revoker ->
+                val encodedMethodCall = RevocationContract.Revoked.encode(
+                    Solidity.Address(revoker.hexToBigInteger()),
+                    Solidity.Bytes32(credentialHash)
+                )
 
-            val result = rpc.ethCall(registryAddress, encodedMethodCall)
-            if (result.hexToBigInteger() > BigInteger.ZERO) {
-                return EthrStatus(BigInteger.ONE)
+                val result = rpc.ethCall(registryAddress, encodedMethodCall)
+                result.hexToBigInteger()
             }
-        }
+            .filter { it != BigInteger.ZERO }
+            .min()
+            ?: BigInteger.ZERO
 
-        return EthrStatus(BigInteger.ZERO)
+        return EthrStatus(minRevocationBlock)
     }
 
-    /*
+    /**
      * Generates a list of valid revoker addresses using the
      * list of public key entries in the [DIDDocument]
-     * @returns a list of ethereum addresses for valid revokers
-     *
+     * @returns a list of ethereum addresses considered to be valid revokers
      */
-    internal fun getValidRevokers(didDoc: DIDDocument): List<String> {
+    internal fun getValidRevokers(didDoc: DIDDocument): List<String> =
+        didDoc.publicKey.mapNotNull { it.ethereumAddress }.distinct()
 
-        val revokers = mutableListOf<String>()
-        didDoc.publicKey.forEach { pubKey ->
-            if (pubKey.ethereumAddress != null) {
-                revokers.add(pubKey.ethereumAddress as String)
-            }
-        }
-
-        val issuer = didDoc.id as String
-        if (issuer.startsWith("did:ethr")) {
-            revokers.add(extractAddress(issuer))
-        }
-
-        return revokers.distinct()
-    }
-
-    /*
+    /**
      * Parses a given registry ID
      * @returns the network and the registry Address
-     *
      */
     internal fun parseRegistryId(id: String): Pair<String, String> {
 
@@ -126,16 +100,6 @@ class EthrStatusResolver : StatusResolver {
         }
 
         return Pair(registryAddress, nameOrId)
-    }
-
-    private fun extractAddress(normalizedDid: String): String {
-
-        //language=RegExp
-        val identityExtractPattern = "^did:ethr:((\\w+):)?(0x[0-9a-fA-F]{40})".toRegex()
-
-        return identityExtractPattern
-            .find(normalizedDid)
-            ?.destructured?.component3() ?: ""
     }
 }
 
