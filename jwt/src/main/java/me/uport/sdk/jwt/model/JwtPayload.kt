@@ -66,6 +66,6 @@ data class JwtPayload(
         fun fromJson(payloadString: String): JwtPayload =
             jsonAdapter.parse(serializer(), payloadString)
 
-        private val jsonAdapter = Json(JsonConfiguration(strictMode = false))
+        private val jsonAdapter = Json(JsonConfiguration(isLenient = true, ignoreUnknownKeys = true))
     }
 }

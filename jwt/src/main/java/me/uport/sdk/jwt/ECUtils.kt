@@ -3,9 +3,9 @@
 package me.uport.sdk.jwt
 
 import me.uport.sdk.signer.getUncompressedPublicKeyWithPrefix
-import org.kethereum.hashes.sha256
 import org.kethereum.model.PublicKey
 import org.kethereum.model.SignatureData
+import org.komputing.khash.sha256.extensions.sha256
 import org.spongycastle.asn1.x9.X9IntegerConverter
 import org.spongycastle.crypto.digests.SHA256Digest
 import org.spongycastle.crypto.ec.CustomNamedCurves

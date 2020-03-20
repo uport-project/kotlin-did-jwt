@@ -48,11 +48,13 @@ data class DIDDocumentImpl(
 
     companion object {
 
-        private val JSON = Json(JsonConfiguration(
-            encodeDefaults = true,
-            strictMode = false,
-            useArrayPolymorphism = false
-        ))
+        private val JSON = Json(
+            JsonConfiguration.Stable.copy(
+                encodeDefaults = true,
+                isLenient = true,
+                useArrayPolymorphism = false
+            )
+        )
 
         /**
          * Attempts to deserialize a given [json] string into a [DIDDocument]
@@ -115,8 +117,8 @@ data class PublicKeyType(val name: String) {
     @Serializer(forClass = PublicKeyType::class)
     companion object : KSerializer<PublicKeyType> {
 
-        override fun serialize(encoder: Encoder, obj: PublicKeyType) =
-            encoder.encodeString(obj.name)
+        override fun serialize(encoder: Encoder, value: PublicKeyType) =
+            encoder.encodeString(value.name)
 
         override fun deserialize(decoder: Decoder): PublicKeyType =
             PublicKeyType(decoder.decodeString())
@@ -136,12 +138,14 @@ data class PublicKeyType(val name: String) {
         /**
          * references a [Secp256k1VerificationKey2018] in a DID document [AuthenticationEntry]
          */
-        val Secp256k1SignatureAuthentication2018 = PublicKeyType("Secp256k1SignatureAuthentication2018")
+        val Secp256k1SignatureAuthentication2018 =
+            PublicKeyType("Secp256k1SignatureAuthentication2018")
 
         /**
          * While not directly generated here, it is treated as [Secp256k1VerificationKey2018]
          */
-        val Secp256k1SignatureVerificationKey2018 = PublicKeyType("Secp256k1SignatureVerificationKey2018")
+        val Secp256k1SignatureVerificationKey2018 =
+            PublicKeyType("Secp256k1SignatureVerificationKey2018")
 
         /**
          * While not directly generated here, it is treated as [Secp256k1VerificationKey2018]

@@ -1,7 +1,7 @@
 package me.uport.sdk.ethrdid
 
-import org.komputing.khex.extensions.clean0xPrefix
-import org.komputing.khex.extensions.prepend0xPrefix
+import me.uport.sdk.core.clean0xPrefix
+import me.uport.sdk.core.prepend0xPrefix
 
 /**
  * This encapsulates a mapping of names and chainIDs to [EthrDIDNetwork] configuration instances
@@ -34,7 +34,8 @@ internal class RegistryMap {
 
     companion object {
 
-        private fun normalizeQuantity(id: String) = id.clean0xPrefix().trimStart('0').prepend0xPrefix()
+        private fun normalizeQuantity(id: String) =
+            id.clean0xPrefix().trimStart('0').prepend0xPrefix()
 
         /**
          * build a usable registry map from a list of network configurations.

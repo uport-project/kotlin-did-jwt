@@ -8,15 +8,13 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.spyk
 import kotlinx.coroutines.runBlocking
-import me.uport.sdk.ethrdid.EthrDIDDocument
 import me.uport.sdk.ethrdid.EthrDIDNetwork
 import me.uport.sdk.ethrdid.EthrDIDResolver
 import me.uport.sdk.jsonrpc.JsonRPC
-import me.uport.sdk.jwt.test.EthrDIDTestHelpers
 import me.uport.sdk.jwt.test.EthrDIDTestHelpers.Companion.mockDocForAddress
 import me.uport.sdk.testhelpers.TestTimeProvider
 import me.uport.sdk.testhelpers.coAssert
-import me.uport.sdk.universaldid.UniversalDID
+import me.uport.sdk.universaldid.DIDResolver
 import org.junit.Before
 import org.junit.Test
 
@@ -31,18 +29,17 @@ class TimestampTests {
         private const val FUTURE: Long = 1_900L //seconds
     }
 
+    lateinit var resolver: DIDResolver
+
     @Before
     fun `mock DID documents before every test`() {
         val jrpc = mockk<JsonRPC>()
         //intentionally suppress deprecation here to test that the old constructor still works
         @Suppress("DEPRECATION")
-        val resolver = spyk(EthrDIDResolver(jrpc))
+        resolver = spyk(EthrDIDResolver(jrpc))
         coEvery {
             resolver.resolve(any())
         } returns mockDocForAddress("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed")
-
-        UniversalDID.clearResolvers()
-        UniversalDID.registerResolver(resolver)
     }
 
     @Deprecated(
@@ -60,7 +57,7 @@ class TimestampTests {
         assertThat(decoded.containsKey("iat")).isEqualTo(false)
 
         coAssert {
-            tested.verify(jwt)
+            tested.verify(jwt, resolver)
         }.doesNotThrowAnyException()
     }
 
@@ -87,7 +84,7 @@ class TimestampTests {
         )
 
         coEvery { resolver.resolve("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed") }.returns(
-            EthrDIDTestHelpers.mockDocForAddress("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed")
+            mockDocForAddress("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed")
         )
 
         coAssert {
@@ -110,7 +107,7 @@ class TimestampTests {
         assertThat(decoded["iat"]).isEqualTo(FUTURE)
 
         coAssert {
-            tested.verify(jwt)
+            tested.verify(jwt, resolver)
         }.doesNotThrowAnyException()
     }
 
@@ -137,7 +134,7 @@ class TimestampTests {
         )
 
         coEvery { resolver.resolve("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed") }.returns(
-            EthrDIDTestHelpers.mockDocForAddress("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed")
+            mockDocForAddress("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed")
         )
 
         coAssert {
@@ -160,7 +157,7 @@ class TimestampTests {
         assertThat(decoded.containsKey("iat")).isEqualTo(false)
 
         coAssert {
-            tested.verify(jwt)
+            tested.verify(jwt, resolver)
         }.thrownError {
             isInstanceOf(InvalidJWTException::class)
             hasMessage("Jwt not valid before nbf: $FUTURE")
@@ -206,7 +203,7 @@ class TimestampTests {
         assertThat(decoded["iat"]).isEqualTo(PAST)
 
         coAssert {
-            tested.verify(jwt)
+            tested.verify(jwt, resolver)
         }.thrownError {
             isInstanceOf(InvalidJWTException::class)
             hasMessage("Jwt not valid before nbf: $FUTURE")
@@ -252,7 +249,7 @@ class TimestampTests {
         assertThat(decoded["iat"]).isEqualTo(PAST)
 
         coAssert {
-            tested.verify(jwt)
+            tested.verify(jwt, resolver)
         }.doesNotThrowAnyException()
     }
 
@@ -279,7 +276,7 @@ class TimestampTests {
         )
 
         coEvery { resolver.resolve("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed") }.returns(
-            EthrDIDTestHelpers.mockDocForAddress("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed")
+            mockDocForAddress("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed")
         )
 
         coAssert {
@@ -287,10 +284,7 @@ class TimestampTests {
         }.doesNotThrowAnyException()
     }
 
-    @Deprecated(
-        "This test references the deprecated variant of JWTTools().verify()" +
-                "This will be removed in the next major release."
-    )
+    @Suppress("DEPRECATION")
     @Test
     fun `fail when nbf missing and iat in the future (deprecated)`() = runBlocking {
         val tested = JWTTools(TestTimeProvider(NOW))
@@ -343,7 +337,7 @@ class TimestampTests {
             "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJpc3MiOiIweGNmMDNkZDBhODk0ZWY3OWNiNWI2MDFhNDNjNGIyNWUzYWU0YzY3ZWQifQ.0z278XpJdjQIgvaqSiJMoqBPBjp5Fy-QqjyT8Sgcbe0KGpCyd7001vLXr09X5aJ5kdcQYnnJ6QFYZeStQWId4w"
         val tested = JWTTools(TestTimeProvider(NOW))
         coAssert {
-            tested.verify(jwt)
+            tested.verify(jwt, resolver)
         }.doesNotThrowAnyException()
     }
 
@@ -363,7 +357,7 @@ class TimestampTests {
         )
 
         coEvery { resolver.resolve("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed") }.returns(
-            EthrDIDTestHelpers.mockDocForAddress("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed")
+            mockDocForAddress("0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed")
         )
 
         val jwt =

@@ -2,16 +2,16 @@
 
 package me.uport.sdk.ethrdid
 
+import me.uport.sdk.core.hexToBigInteger
+import me.uport.sdk.core.hexToByteArray
+import me.uport.sdk.core.prepend0xPrefix
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.signer.Signer
 import me.uport.sdk.signer.signRawTx
 import me.uport.sdk.signer.utf8
 import me.uport.sdk.universaldid.PublicKeyType
-import org.kethereum.extensions.hexToBigInteger
 import org.kethereum.model.Address
 import org.kethereum.model.createTransactionWithDefaults
-import org.komputing.khex.extensions.hexToByteArray
-import org.komputing.khex.extensions.prepend0xPrefix
 import org.komputing.khex.extensions.toHexString
 import pm.gnosis.model.Solidity
 import java.math.BigInteger
@@ -57,7 +57,8 @@ class EthrDID(
 
     suspend fun lookupOwner(cache: Boolean = true): String {
         if (cache && this.owner != null) return this.owner
-        val encodedCall = EthereumDIDRegistry.IdentityOwner.encode(Solidity.Address(address.hexToBigInteger()))
+        val encodedCall =
+            EthereumDIDRegistry.IdentityOwner.encode(Solidity.Address(address.hexToBigInteger()))
         val rawResult = rpc.ethCall(registry, encodedCall)
         return rawResult.substring(rawResult.length - 40).prepend0xPrefix()
     }
@@ -74,7 +75,11 @@ class EthrDID(
     }
 
 
-    suspend fun addDelegate(delegate: String, options: DelegateOptions = DelegateOptions(), txOptions: TransactionOptions? = null): String {
+    suspend fun addDelegate(
+        delegate: String,
+        options: DelegateOptions = DelegateOptions(),
+        txOptions: TransactionOptions? = null
+    ): String {
         val owner = lookupOwner()
 
         val encodedCall = EthereumDIDRegistry.AddDelegate.encode(
@@ -102,7 +107,12 @@ class EthrDID(
         return signAndSendContractCall(owner, encodedCall, txOptions)
     }
 
-    suspend fun setAttribute(key: String, value: String, expiresIn: Long = 86400L, txOptions: TransactionOptions? = null): String {
+    suspend fun setAttribute(
+        key: String,
+        value: String,
+        expiresIn: Long = 86400L,
+        txOptions: TransactionOptions? = null
+    ): String {
         val owner = this.lookupOwner()
         val encodedCall = EthereumDIDRegistry.SetAttribute.encode(
             Solidity.Address(this.address.hexToBigInteger()),

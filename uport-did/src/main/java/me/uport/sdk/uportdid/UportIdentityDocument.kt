@@ -6,6 +6,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
+import me.uport.sdk.core.clean0xPrefix
 import me.uport.sdk.universaldid.AuthenticationEntry
 import me.uport.sdk.universaldid.DIDDocument
 import me.uport.sdk.universaldid.PublicKeyEntry
@@ -13,7 +14,6 @@ import me.uport.sdk.universaldid.PublicKeyType.Companion.Curve25519EncryptionPub
 import me.uport.sdk.universaldid.PublicKeyType.Companion.Secp256k1SignatureAuthentication2018
 import me.uport.sdk.universaldid.PublicKeyType.Companion.Secp256k1VerificationKey2018
 import me.uport.sdk.uportdid.UportDIDResolver.Companion.parseDIDString
-import org.komputing.khex.extensions.clean0xPrefix
 
 /**
  * A class that encapsulates the legacy uport-did profile document
@@ -100,7 +100,8 @@ data class UportIdentityDocument(
         /**
          * Attempts to deserialize a json string into a profile document
          */
-        private val jsonParser = Json(JsonConfiguration(encodeDefaults = false, strictMode = false))
+        private val jsonParser =
+            Json(JsonConfiguration(encodeDefaults = false, isLenient = true, ignoreUnknownKeys = true))
     }
 }
 

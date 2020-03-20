@@ -5,9 +5,9 @@ import me.uport.credential_status.StatusEntry
 import me.uport.credential_status.StatusResolver
 import me.uport.credential_status.getStatusEntry
 import me.uport.sdk.core.Networks
+import me.uport.sdk.core.hexToBigInteger
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.universaldid.DIDDocument
-import org.kethereum.extensions.hexToBigInteger
 import org.kethereum.keccakshortcut.keccak
 import pm.gnosis.model.Solidity
 import java.math.BigInteger
