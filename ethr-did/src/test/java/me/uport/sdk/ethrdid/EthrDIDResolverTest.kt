@@ -4,7 +4,18 @@ package me.uport.sdk.ethrdid
 
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.*
+import assertk.assertions.doesNotContain
+import assertk.assertions.hasMessage
+import assertk.assertions.hasSize
+import assertk.assertions.isEmpty
+import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
+import assertk.assertions.isGreaterThan
+import assertk.assertions.isInstanceOf
+import assertk.assertions.isNotEmpty
+import assertk.assertions.isNotEqualTo
+import assertk.assertions.isNotNull
+import assertk.assertions.isTrue
 import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.slot

@@ -101,7 +101,13 @@ data class UportIdentityDocument(
          * Attempts to deserialize a json string into a profile document
          */
         private val jsonParser =
-            Json(JsonConfiguration(encodeDefaults = false, isLenient = true, ignoreUnknownKeys = true))
+            Json(
+                JsonConfiguration(
+                    encodeDefaults = false,
+                    isLenient = true,
+                    ignoreUnknownKeys = true
+                )
+            )
     }
 }
 

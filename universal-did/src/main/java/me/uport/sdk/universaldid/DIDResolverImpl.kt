@@ -1,6 +1,6 @@
 package me.uport.sdk.universaldid
 
-internal class DIDResolverImpl: DIDResolver {
+internal class DIDResolverImpl : DIDResolver {
 
     private val resolvers = mapOf<String, DIDResolver>().toMutableMap()
 

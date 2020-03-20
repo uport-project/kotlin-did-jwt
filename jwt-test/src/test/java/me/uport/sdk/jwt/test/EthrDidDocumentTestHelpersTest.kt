@@ -17,17 +17,21 @@ class EthrDIDTestHelpersTest {
         val did = "did:ethr:$address"
 
         val referenceDDO = EthrDIDDocument(
-                did,
-                listOf(PublicKeyEntry(
-                        "$did#owner",
-                        PublicKeyType.Secp256k1VerificationKey2018,
-                        did,
-                        address
-                )),
-                listOf(AuthenticationEntry(
-                        PublicKeyType.Secp256k1SignatureAuthentication2018,
-                        "$did#owner"
-                ))
+            did,
+            listOf(
+                PublicKeyEntry(
+                    "$did#owner",
+                    PublicKeyType.Secp256k1VerificationKey2018,
+                    did,
+                    address
+                )
+            ),
+            listOf(
+                AuthenticationEntry(
+                    PublicKeyType.Secp256k1SignatureAuthentication2018,
+                    "$did#owner"
+                )
+            )
         )
 
         val ddo = EthrDIDTestHelpers.mockDocForAddress(address)
@@ -41,17 +45,21 @@ class EthrDIDTestHelpersTest {
         val did = "did:ethr:$address"
 
         val referenceDDO = EthrDIDDocument(
-                did,
-                listOf(PublicKeyEntry(
-                        "$did#owner",
-                        PublicKeyType.Secp256k1VerificationKey2018,
-                        did,
-                        address
-                )),
-                listOf(AuthenticationEntry(
-                        PublicKeyType.Secp256k1SignatureAuthentication2018,
-                        "$did#owner"
-                ))
+            did,
+            listOf(
+                PublicKeyEntry(
+                    "$did#owner",
+                    PublicKeyType.Secp256k1VerificationKey2018,
+                    did,
+                    address
+                )
+            ),
+            listOf(
+                AuthenticationEntry(
+                    PublicKeyType.Secp256k1SignatureAuthentication2018,
+                    "$did#owner"
+                )
+            )
         )
 
         val ddo = EthrDIDTestHelpers.mockDocForAddress(did)
@@ -66,16 +74,20 @@ class EthrDIDTestHelpersTest {
 
         val referenceDDO = EthrDIDDocument(
             did,
-            listOf(PublicKeyEntry(
-                "$did#owner",
-                PublicKeyType.Secp256k1VerificationKey2018,
-                did,
-                address
-            )),
-            listOf(AuthenticationEntry(
-                PublicKeyType.Secp256k1SignatureAuthentication2018,
-                "$did#owner"
-            ))
+            listOf(
+                PublicKeyEntry(
+                    "$did#owner",
+                    PublicKeyType.Secp256k1VerificationKey2018,
+                    did,
+                    address
+                )
+            ),
+            listOf(
+                AuthenticationEntry(
+                    PublicKeyType.Secp256k1SignatureAuthentication2018,
+                    "$did#owner"
+                )
+            )
         )
 
         val ddo = EthrDIDTestHelpers.mockDocForAddress(did)
@@ -90,16 +102,20 @@ class EthrDIDTestHelpersTest {
 
         val referenceDDO = EthrDIDDocument(
             expectedDID,
-            listOf(PublicKeyEntry(
-                "$expectedDID#owner",
-                PublicKeyType.Secp256k1VerificationKey2018,
-                expectedDID,
-                address
-            )),
-            listOf(AuthenticationEntry(
-                PublicKeyType.Secp256k1SignatureAuthentication2018,
-                "$expectedDID#owner"
-            ))
+            listOf(
+                PublicKeyEntry(
+                    "$expectedDID#owner",
+                    PublicKeyType.Secp256k1VerificationKey2018,
+                    expectedDID,
+                    address
+                )
+            ),
+            listOf(
+                AuthenticationEntry(
+                    PublicKeyType.Secp256k1SignatureAuthentication2018,
+                    "$expectedDID#owner"
+                )
+            )
         )
 
         val ddo = EthrDIDTestHelpers.mockDocForAddress("did:ethr:mainnet:$address")

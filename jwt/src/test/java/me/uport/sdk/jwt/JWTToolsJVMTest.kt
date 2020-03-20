@@ -1,7 +1,11 @@
 package me.uport.sdk.jwt
 
 import assertk.assertThat
-import assertk.assertions.*
+import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
+import assertk.assertions.isInstanceOf
+import assertk.assertions.isNotNull
+import assertk.assertions.isTrue
 import io.mockk.coEvery
 import io.mockk.mockkObject
 import io.mockk.spyk
@@ -28,8 +32,10 @@ class JWTToolsJVMTest {
         "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1MzUwMTY1OTcsImV4cCI6MTUzNTEwMjk5NywiYXVkIjoiZGlkOmV0aHI6MHhhOWUzMjMyYjYxYmRiNjcyNzEyYjlhZTMzMTk1MDY5ZDhkNjUxYzFhIiwidHlwZSI6InNoYXJlUmVzcCIsIm5hZCI6IjJvd2hGdGRtc0VVNVVWMVNCbld0RnZZcHlUcjNqNHd5TmR2Iiwib3duIjp7Im5hbWUiOiJ1UG9ydCBVc2VyIn0sInJlcSI6ImV5SjBlWEFpT2lKS1YxUWlMQ0poYkdjaU9pSkZVekkxTmtzdFVpSjkuZXlKcFlYUWlPakUxTXpVd01UWTFPRGdzSW1WNGNDSTZNVFV6TlRBeE56RTRPQ3dpY21WeGRXVnpkR1ZrSWpwYkltNWhiV1VpTENKd2FHOXVaU0lzSW1OdmRXNTBjbmtpWFN3aWNHVnliV2x6YzJsdmJuTWlPbHNpYm05MGFXWnBZMkYwYVc5dWN5SmRMQ0pqWVd4c1ltRmpheUk2SW1oMGRIQnpPaTh2WTJoaGMzRjFhUzUxY0c5eWRDNXRaUzloY0drdmRqRXZkRzl3YVdNdldtMXNOa2xuUWsxYU9XUXhWbGgwV0ZsYVJUTlBkeUlzSW1GamRDSTZJbXRsZVhCaGFYSWlMQ0owZVhCbElqb2ljMmhoY21WU1pYRWlMQ0pwYzNNaU9pSmthV1E2WlhSb2Nqb3dlR0U1WlRNeU16SmlOakZpWkdJMk56STNNVEppT1dGbE16TXhPVFV3Tmpsa09HUTJOVEZqTVdFaWZRLnRNbWh6cjFkbER0YUhUeWUtVDAxOGp2N0NUYlRhVWY4ZzlhbHNxVWJ6VGpGUkFsbV9qZ2RaR3pVVEVzeGtBY0ZmVy1ZSmpIVGtwSmtjNFNWREc3REJBQSIsImlzcyI6ImRpZDpldGhyOjB4ZThjOTFiZGU3NjI1YWIyYzBlZDlmMjE0ZGViMzk0NDBkYTdlMDNjNCJ9.-04Z_m2kgFBwF1Elh3jmv1_44jdGjEczf4x3c5Z4TxwiMP8nXZsIDVgsp3PS34DPGfpR4OkZ6LBozBBER3TABAA"
     )
 
-    @Deprecated("This test references the deprecated variant of JWTTools().verify()" +
-            "This will be removed in the next major release.")
+    @Deprecated(
+        "This test references the deprecated variant of JWTTools().verify()" +
+                "This will be removed in the next major release."
+    )
     @Test
     fun `verifies simple tokens (deprecated)`() = runBlocking {
         mockkObject(UniversalDID)
@@ -140,14 +146,20 @@ class JWTToolsJVMTest {
         acc = null
     )
 
-    @Deprecated("This test references the deprecated variant of JWTTools().verify()" +
-            "This will be removed in the next major release.")
+    @Deprecated(
+        "This test references the deprecated variant of JWTTools().verify()" +
+                "This will be removed in the next major release."
+    )
     @Test
     fun `returns correct payload after successful verification (deprecated)`() = runBlocking {
         mockkObject(UniversalDID)
 
-        coEvery { UniversalDID.resolve("2oeXufHGDpU51bfKBsZDdu7Je9weJ3r7sVG") }.returns(UportDIDDocument.fromJson("""{"id":"did:uport:2oeXufHGDpU51bfKBsZDdu7Je9weJ3r7sVG","publicKey":[{"id":"did:uport:2oeXufHGDpU51bfKBsZDdu7Je9weJ3r7sVG#keys-1","type":"Secp256k1VerificationKey2018","owner":"did:uport:2oeXufHGDpU51bfKBsZDdu7Je9weJ3r7sVG","publicKeyHex":"04171fcc7654cad14745b9835bc534d8e59038ae6929c793d7f8dd2c934580ca39ff1e2de3d7ef69a8daba5e5590d3ec80486a273cbe2bd1b76ebd01f949b41463"}],"authentication":[{"type":"Secp256k1SignatureAuthentication2018","publicKey":"did:uport:2oeXufHGDpU51bfKBsZDdu7Je9weJ3r7sVG#keys-1"}],"service":[],"@context":"https://w3id.org/did/v1","uportProfile":{"@type":"App","image":{"@type":"ImageObject","name":"avatar","contentUrl":"/ipfs/Qmez4bdFmxPknbAoGzHmpjpLjQFChq39h5UMPGiwUHgt8f"},"name":"uPort Demo","description":"Demo App"}}"""))
-        coEvery { UniversalDID.resolve("2omRJZL23ZCYgc1rZrFVpFXJpWoaEEuJUcf") }.returns(UportDIDDocument.fromJson("""{"id":"did:uport:2omRJZL23ZCYgc1rZrFVpFXJpWoaEEuJUcf","publicKey":[{"id":"did:uport:2omRJZL23ZCYgc1rZrFVpFXJpWoaEEuJUcf#keys-1","type":"Secp256k1VerificationKey2018","owner":"did:uport:2omRJZL23ZCYgc1rZrFVpFXJpWoaEEuJUcf","publicKeyHex":"0422d2edad30d8588c0661e032f37af8177cfa0a056ee9b8ca953b07c6600a637c002ed22fe6612e28e558aee130d399ba97f89e25c16661a99c8af8c832b88568"}],"authentication":[{"type":"Secp256k1SignatureAuthentication2018","publicKey":"did:uport:2omRJZL23ZCYgc1rZrFVpFXJpWoaEEuJUcf#keys-1"}],"service":[],"@context":"https://w3id.org/did/v1","uportProfile":{"@type":"App","image":{"@type":"ImageObject","name":"avatar","contentUrl":"/ipfs/QmdznPoNSnc6RawSzzvNFX5HerF62Vu7sbP3vSur9gDFGb"},"name":"Olorun","description":"Private network configuration service"}}"""))
+        coEvery { UniversalDID.resolve("2oeXufHGDpU51bfKBsZDdu7Je9weJ3r7sVG") }.returns(
+            UportDIDDocument.fromJson("""{"id":"did:uport:2oeXufHGDpU51bfKBsZDdu7Je9weJ3r7sVG","publicKey":[{"id":"did:uport:2oeXufHGDpU51bfKBsZDdu7Je9weJ3r7sVG#keys-1","type":"Secp256k1VerificationKey2018","owner":"did:uport:2oeXufHGDpU51bfKBsZDdu7Je9weJ3r7sVG","publicKeyHex":"04171fcc7654cad14745b9835bc534d8e59038ae6929c793d7f8dd2c934580ca39ff1e2de3d7ef69a8daba5e5590d3ec80486a273cbe2bd1b76ebd01f949b41463"}],"authentication":[{"type":"Secp256k1SignatureAuthentication2018","publicKey":"did:uport:2oeXufHGDpU51bfKBsZDdu7Je9weJ3r7sVG#keys-1"}],"service":[],"@context":"https://w3id.org/did/v1","uportProfile":{"@type":"App","image":{"@type":"ImageObject","name":"avatar","contentUrl":"/ipfs/Qmez4bdFmxPknbAoGzHmpjpLjQFChq39h5UMPGiwUHgt8f"},"name":"uPort Demo","description":"Demo App"}}""")
+        )
+        coEvery { UniversalDID.resolve("2omRJZL23ZCYgc1rZrFVpFXJpWoaEEuJUcf") }.returns(
+            UportDIDDocument.fromJson("""{"id":"did:uport:2omRJZL23ZCYgc1rZrFVpFXJpWoaEEuJUcf","publicKey":[{"id":"did:uport:2omRJZL23ZCYgc1rZrFVpFXJpWoaEEuJUcf#keys-1","type":"Secp256k1VerificationKey2018","owner":"did:uport:2omRJZL23ZCYgc1rZrFVpFXJpWoaEEuJUcf","publicKeyHex":"0422d2edad30d8588c0661e032f37af8177cfa0a056ee9b8ca953b07c6600a637c002ed22fe6612e28e558aee130d399ba97f89e25c16661a99c8af8c832b88568"}],"authentication":[{"type":"Secp256k1SignatureAuthentication2018","publicKey":"did:uport:2omRJZL23ZCYgc1rZrFVpFXJpWoaEEuJUcf#keys-1"}],"service":[],"@context":"https://w3id.org/did/v1","uportProfile":{"@type":"App","image":{"@type":"ImageObject","name":"avatar","contentUrl":"/ipfs/QmdznPoNSnc6RawSzzvNFX5HerF62Vu7sbP3vSur9gDFGb"},"name":"Olorun","description":"Private network configuration service"}}""")
+        )
 
         val shareReqPayload = JWTTools(TestTimeProvider(1520366666000L)).verify(validShareReqToken1)
         assertThat(shareReqPayload).isEqualTo(expectedShareReqPayload1)
@@ -173,10 +185,12 @@ class JWTToolsJVMTest {
             UportDIDDocument.fromJson("""{"id":"did:uport:2omRJZL23ZCYgc1rZrFVpFXJpWoaEEuJUcf","publicKey":[{"id":"did:uport:2omRJZL23ZCYgc1rZrFVpFXJpWoaEEuJUcf#keys-1","type":"Secp256k1VerificationKey2018","owner":"did:uport:2omRJZL23ZCYgc1rZrFVpFXJpWoaEEuJUcf","publicKeyHex":"0422d2edad30d8588c0661e032f37af8177cfa0a056ee9b8ca953b07c6600a637c002ed22fe6612e28e558aee130d399ba97f89e25c16661a99c8af8c832b88568"}],"authentication":[{"type":"Secp256k1SignatureAuthentication2018","publicKey":"did:uport:2omRJZL23ZCYgc1rZrFVpFXJpWoaEEuJUcf#keys-1"}],"service":[],"@context":"https://w3id.org/did/v1","uportProfile":{"@type":"App","image":{"@type":"ImageObject","name":"avatar","contentUrl":"/ipfs/QmdznPoNSnc6RawSzzvNFX5HerF62Vu7sbP3vSur9gDFGb"},"name":"Olorun","description":"Private network configuration service"}}""")
         )
 
-        val shareReqPayload = JWTTools(TestTimeProvider(1520366666000L)).verify(validShareReqToken1, resolver)
+        val shareReqPayload =
+            JWTTools(TestTimeProvider(1520366666000L)).verify(validShareReqToken1, resolver)
         assertThat(shareReqPayload).isEqualTo(expectedShareReqPayload1)
 
-        val incomingJwtPayload = JWTTools(TestTimeProvider(1522540300000L)).verify(incomingJwt, resolver)
+        val incomingJwtPayload =
+            JWTTools(TestTimeProvider(1522540300000L)).verify(incomingJwt, resolver)
         assertThat(incomingJwtPayload).isEqualTo(expectedJwtPayload)
     }
 
@@ -189,14 +203,21 @@ class JWTToolsJVMTest {
         val issuerDID = "did:ethr:${signer.getAddress()}"
 
         coAssert {
-            tested.createJWT(payload, issuerDID, signer, algorithm = "some fancy but unknown algorithm")
+            tested.createJWT(
+                payload,
+                issuerDID,
+                signer,
+                algorithm = "some fancy but unknown algorithm"
+            )
         }.thrownError {
             isInstanceOf(JWTEncodingException::class)
         }
     }
 
-    @Deprecated("This test references the deprecated variant of JWTTools().verify()" +
-            "This will be removed in the next major release.")
+    @Deprecated(
+        "This test references the deprecated variant of JWTTools().verify()" +
+                "This will be removed in the next major release."
+    )
     @Test
     fun `throws error when aud is not available (deprecated)`() = runBlocking {
         mockkObject(UniversalDID)
@@ -247,8 +268,10 @@ class JWTToolsJVMTest {
         }
     }
 
-    @Deprecated("This test references the deprecated variant of JWTTools().verify()" +
-            "This will be removed in the next major release.")
+    @Deprecated(
+        "This test references the deprecated variant of JWTTools().verify()" +
+                "This will be removed in the next major release."
+    )
     @Test
     fun `throws error when aud and payload aud do not match (deprecated)`() = runBlocking {
         mockkObject(UniversalDID)
@@ -301,8 +324,10 @@ class JWTToolsJVMTest {
         }
     }
 
-    @Deprecated("This test references the deprecated variant of JWTTools().verify()" +
-            "This will be removed in the next major release.")
+    @Deprecated(
+        "This test references the deprecated variant of JWTTools().verify()" +
+                "This will be removed in the next major release."
+    )
     @Test
     fun `throws when a token is issued in the future (deprecated)`() {
         val token =
@@ -333,8 +358,10 @@ class JWTToolsJVMTest {
         }
     }
 
-    @Deprecated("This test references the deprecated variant of JWTTools().verify()" +
-            "This will be removed in the next major release.")
+    @Deprecated(
+        "This test references the deprecated variant of JWTTools().verify()" +
+                "This will be removed in the next major release."
+    )
     @Test
     fun `throws when a token is expired (deprecated)`() {
         val token =
@@ -365,8 +392,10 @@ class JWTToolsJVMTest {
         }
     }
 
-    @Deprecated("This test references the deprecated variant of JWTTools().verify()" +
-            "This will be removed in the next major release.")
+    @Deprecated(
+        "This test references the deprecated variant of JWTTools().verify()" +
+                "This will be removed in the next major release."
+    )
     @Test
     fun `throws when the signature does not match any public keys belonging to the issuer (deprecated)`() {
 
@@ -627,8 +656,10 @@ class JWTToolsJVMTest {
         }
     }
 
-    @Deprecated("This test references the deprecated variant of JWTTools().verify()" +
-            "This will be removed in the next major release.")
+    @Deprecated(
+        "This test references the deprecated variant of JWTTools().verify()" +
+                "This will be removed in the next major release."
+    )
     @Test
     fun `can verify a freshly minted token (deprecated)`() = runBlocking {
         val signer = KPSigner("0x1234")
@@ -671,28 +702,31 @@ class JWTToolsJVMTest {
         Unit
     }
 
-    @Deprecated("This test references the deprecated variant of JWTTools().verify()" +
-                            "This will be removed in the next major release.")
+    @Deprecated(
+        "This test references the deprecated variant of JWTTools().verify()" +
+                "This will be removed in the next major release."
+    )
     @Test
-    fun `can verify a ES256K signature with only ethereumAddress in the DID doc (deprecated)`() = runBlocking {
-        val address = "0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed"
+    fun `can verify a ES256K signature with only ethereumAddress in the DID doc (deprecated)`() =
+        runBlocking {
+            val address = "0xcf03dd0a894ef79cb5b601a43c4b25e3ae4c67ed"
 
-        val resolver = spyk(
-            EthrDIDResolver.Builder()
-                .addNetwork(EthrDIDNetwork("", "0xregistry", JsonRPC("")))
-                .build()
-        )
+            val resolver = spyk(
+                EthrDIDResolver.Builder()
+                    .addNetwork(EthrDIDNetwork("", "0xregistry", JsonRPC("")))
+                    .build()
+            )
 
-        coEvery { resolver.resolve(eq("did:ethr:$address")) } returns
-                EthrDIDTestHelpers.mockDocForAddress(address)
+            coEvery { resolver.resolve(eq("did:ethr:$address")) } returns
+                    EthrDIDTestHelpers.mockDocForAddress(address)
 
-        UniversalDID.registerResolver(resolver)
+            UniversalDID.registerResolver(resolver)
 
-        val token =
-            "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJoZWxsbyI6IndvcmxkIiwiaWF0IjoxNTYxOTcxMTE5LCJpc3MiOiJkaWQ6ZXRocjoweGNmMDNkZDBhODk0ZWY3OWNiNWI2MDFhNDNjNGIyNWUzYWU0YzY3ZWQifQ.t5o1vzZExArlrrTVHmwtti7fnicXqvWrX6SS3F-Lu3budH7p6zQHjG8X7EvUTRUxhvr-eENCbXeteSE4rgF7MA"
-        val payload = JWTTools().verify(token)
-        assertThat(payload.iss).isEqualTo("did:ethr:$address")
-    }
+            val token =
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJoZWxsbyI6IndvcmxkIiwiaWF0IjoxNTYxOTcxMTE5LCJpc3MiOiJkaWQ6ZXRocjoweGNmMDNkZDBhODk0ZWY3OWNiNWI2MDFhNDNjNGIyNWUzYWU0YzY3ZWQifQ.t5o1vzZExArlrrTVHmwtti7fnicXqvWrX6SS3F-Lu3budH7p6zQHjG8X7EvUTRUxhvr-eENCbXeteSE4rgF7MA"
+            val payload = JWTTools().verify(token)
+            assertThat(payload.iss).isEqualTo("did:ethr:$address")
+        }
 
     @Test
     fun `can verify a ES256K signature with only ethereumAddress in the DID doc`() = runBlocking {

@@ -8,8 +8,10 @@ import org.junit.Test
 
 @Suppress("UNUSED_VARIABLE")
 class RegistryMapTest {
-    private val mainnetLocal = EthrDIDNetwork("mainnet", "0x1234", JsonRPC("http://localhost:8545"), chainId = "0x1")
-    private val rinkebyLocal = EthrDIDNetwork("rinkeby", "0x4321", JsonRPC("http://localhost:8545"), chainId = "0x04")
+    private val mainnetLocal =
+        EthrDIDNetwork("mainnet", "0x1234", JsonRPC("http://localhost:8545"), chainId = "0x1")
+    private val rinkebyLocal =
+        EthrDIDNetwork("rinkeby", "0x4321", JsonRPC("http://localhost:8545"), chainId = "0x04")
 
     @Test
     fun `can get network by direct ID`() {
