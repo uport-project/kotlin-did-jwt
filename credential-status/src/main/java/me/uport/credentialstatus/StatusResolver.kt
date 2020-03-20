@@ -1,4 +1,4 @@
-package me.uport.credential_status
+package me.uport.credentialstatus
 
 import me.uport.sdk.universaldid.DIDDocument
 

@@ -1,4 +1,10 @@
-@file:Suppress("KDocUnresolvedReference", "EXPERIMENTAL_API_USAGE", "DEPRECATION")
+@file:Suppress(
+    "KDocUnresolvedReference",
+    "EXPERIMENTAL_API_USAGE",
+    "DEPRECATION",
+    "ThrowsCount",
+    "MagicNumber"
+)
 
 package me.uport.sdk.jwt
 
@@ -12,8 +18,8 @@ import me.uport.sdk.core.clean0xPrefix
 import me.uport.sdk.core.decodeBase64
 import me.uport.sdk.core.hexToByteArray
 import me.uport.sdk.core.toBase64UrlSafe
-import me.uport.sdk.jwt.JWTUtils.Companion.normalizeKnownDID
-import me.uport.sdk.jwt.JWTUtils.Companion.splitToken
+import me.uport.sdk.jwt.JWTUtils.normalizeKnownDID
+import me.uport.sdk.jwt.JWTUtils.splitToken
 import me.uport.sdk.jwt.model.ArbitraryMapSerializer
 import me.uport.sdk.jwt.model.JwtHeader
 import me.uport.sdk.jwt.model.JwtHeader.Companion.ES256K
@@ -435,8 +441,14 @@ class JWTTools(
             supportedKeyTypes.contains(it.type) && (!auth || (authenticationKeys.contains(it.id)))
         }
 
-        if (auth && (authenticators.isEmpty())) throw InvalidJWTException("DID document for $issuer does not have public keys suitable for authenticating user")
-        if (authenticators.isEmpty()) throw InvalidJWTException("DID document for $issuer does not have public keys for $alg")
+        if (auth && (authenticators.isEmpty())) throw InvalidJWTException(
+            "DID document for $issuer" +
+                    " does not have public keys suitable for authenticating user"
+        )
+        if (authenticators.isEmpty()) throw InvalidJWTException(
+            "DID document for $issuer" +
+                    " does not have public keys for $alg"
+        )
 
         return authenticators
     }

@@ -7,7 +7,8 @@ import me.uport.sdk.signer.signJWT
 import me.uport.sdk.signer.utf8
 
 /**
- * Abstracts the signature to a recoverable/non-recoverable JOSE encoding based on the jwt header or algorithm provided during construction
+ * Abstracts the signature to a recoverable/non-recoverable JOSE encoding based on the jwt header
+ * or algorithm provided during construction
  *
  * It supports "ES256K" and "ES256K-R" signing methods
  */

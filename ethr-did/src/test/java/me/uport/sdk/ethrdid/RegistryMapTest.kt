@@ -1,8 +1,11 @@
 package me.uport.sdk.ethrdid
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFailure
 import assertk.assertions.isInstanceOf
+import assertk.assertions.isSuccess
 import me.uport.sdk.jsonrpc.JsonRPC
 import org.junit.Test
 
@@ -49,7 +52,7 @@ class RegistryMapTest {
 
         assertThat {
             val unused = tested[""].registryAddress
-        }.doesNotThrowAnyException()
+        }.isSuccess()
     }
 
     @Test
@@ -60,7 +63,7 @@ class RegistryMapTest {
 
         assertThat {
             val unused = tested["0x6123"]
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(IllegalArgumentException::class)
         }
     }

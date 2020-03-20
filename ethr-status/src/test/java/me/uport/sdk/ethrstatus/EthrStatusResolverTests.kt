@@ -1,9 +1,11 @@
 @file:Suppress("UndocumentedPublicFunction", "UndocumentedPublicClass", "StringLiteralDuplication")
 
-package me.uport.sdk.ethr_status
+package me.uport.sdk.ethrstatus
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFailure
 import assertk.assertions.isInstanceOf
 import kotlinx.coroutines.runBlocking
 import me.uport.sdk.ethrdid.EthrDIDDocument
@@ -86,7 +88,7 @@ class EthrStatusResolverTests {
             "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NzI5NjY3ODAsInN0YXR1cyI6eyJ0eXBlIjoidW5rbm93biIsImlkIjoic29tZXRoaW5nIHNvbWV0aGluZyJ9LCJpc3MiOiJkaWQ6ZXRocjoweGYzYmVhYzMwYzQ5OGQ5ZTI2ODY1ZjM0ZmNhYTU3ZGJiOTM1YjBkNzQifQ.WO4kUEYy3xzZR1VlofOm3e39e1XM227uIr-Z7Yb9YQcJJ-2PRcnQmecW5fDjIfF3EInS3rRd4TZmuVQOnhaKQAE\n"
         coAssert {
             ethrStatus.checkStatus(token, didDoc)
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(IllegalStateException::class)
         }
     }

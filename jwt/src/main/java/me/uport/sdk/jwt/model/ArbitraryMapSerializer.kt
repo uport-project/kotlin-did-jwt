@@ -90,5 +90,4 @@ object ArbitraryMapSerializer : KSerializer<Map<String, Any?>> {
         val asJsonObj: JsonObject = value.toJsonObject()
         encoder.encode(JsonObjectSerializer, asJsonObj)
     }
-
 }

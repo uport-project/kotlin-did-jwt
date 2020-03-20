@@ -1,6 +1,6 @@
 @file:Suppress("UndocumentedPublicFunction", "UndocumentedPublicClass", "unused")
 
-package me.uport.sdk.ethr_status
+package me.uport.sdk.ethrstatus
 
 import pm.gnosis.model.Solidity
 import pm.gnosis.model.SolidityBase

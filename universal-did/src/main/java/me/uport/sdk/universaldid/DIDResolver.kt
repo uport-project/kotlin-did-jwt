@@ -25,7 +25,8 @@ interface DIDResolver {
     /**
      *
      * Builds a [DIDResolverImpl]
-     * This class creates an[DIDResolverImpl] object and enables the registration of [DIDResolver] using the Builder pattern
+     * This class creates an[DIDResolverImpl] object and enables the registration of [DIDResolver]
+     * using the Builder pattern
      *
      */
     class Builder {

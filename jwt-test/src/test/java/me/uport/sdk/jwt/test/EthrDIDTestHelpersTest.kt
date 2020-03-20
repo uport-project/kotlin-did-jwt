@@ -1,7 +1,9 @@
 package me.uport.sdk.jwt.test
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFailure
 import assertk.assertions.isInstanceOf
 import me.uport.sdk.ethrdid.EthrDIDDocument
 import me.uport.sdk.universaldid.AuthenticationEntry
@@ -127,7 +129,7 @@ class EthrDIDTestHelpersTest {
     fun `throws error when given improper input`() {
         assertThat {
             EthrDIDTestHelpers.mockDocForAddress("bla bla")
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(IllegalArgumentException::class)
         }
     }
