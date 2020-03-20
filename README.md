@@ -63,7 +63,7 @@ allprojects {
 In your application `build.gradle` file, add:
 
 ```groovy
-def did_jwt_version = "0.3.5"
+def did_jwt_version = "0.3.6"
 dependencies {
     //...
     implementation "com.github.uport-project.kotlin-did-jwt:jwt:$did_jwt_version"
@@ -149,6 +149,10 @@ so that only tokens intended for your app are considered valid.
 
 ## CHANGELOG
 
+* 0.3.6
+    - fix: okhttp dependency issue (#43)
+    - docs: mark UportDIDResolver as deprecated
+    - refactor: code cleanup, enforcing detekt on PRs  
 * 0.3.5
     - feat: add credential status / revocation support (#35)(#42)
     - support: bump dependencies (#44)
