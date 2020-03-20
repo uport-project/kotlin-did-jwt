@@ -1,7 +1,9 @@
 package me.uport.sdk.httpsdid
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFailure
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import io.mockk.coEvery
@@ -95,7 +97,7 @@ class WebDIDResolverTest {
 
         coAssert {
             tested.resolve("did:web:example.com")
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(
                 listOf(
                     IllegalArgumentException::class,
@@ -116,7 +118,7 @@ class WebDIDResolverTest {
 
             coAssert {
                 tested.resolve("did:https:example.com")
-            }.thrownError {
+            }.isFailure().all {
                 isInstanceOf(
                     listOf(
                         IllegalArgumentException::class,

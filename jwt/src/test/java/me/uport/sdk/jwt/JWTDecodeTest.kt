@@ -1,8 +1,10 @@
 package me.uport.sdk.jwt
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFailure
 import assertk.assertions.isInstanceOf
 import me.uport.sdk.jwt.JWTUtils.Companion.splitToken
 import org.junit.Test
@@ -39,13 +41,13 @@ class JWTDecodeTest {
     @Test
     fun `throws when splitting empty token`() {
         assertThat { splitToken("") }
-            .thrownError { isInstanceOf(IllegalArgumentException::class) }
+            .isFailure().all { isInstanceOf(IllegalArgumentException::class) }
     }
 
     @Test
     fun `throws when splitting incomplete token`() {
         assertThat { splitToken(invalidTokenOnlyHeader) }
-            .thrownError { isInstanceOf(IllegalArgumentException::class) }
+            .isFailure().all { isInstanceOf(IllegalArgumentException::class) }
     }
 
     @Test
@@ -68,13 +70,13 @@ class JWTDecodeTest {
     @Test
     fun `throws when decoding incomplete token`() {
         assertThat { JWTTools().decode((invalidTokenEmptyPayload)) }
-            .thrownError {
+            .isFailure().all {
                 isInstanceOf(InvalidJWTException::class)
                 hasMessage("Payload cannot be empty")
             }
 
         assertThat { JWTTools().decode((invalidTokenEmptyHeader)) }
-            .thrownError {
+            .isFailure().all {
                 isInstanceOf(InvalidJWTException::class)
                 hasMessage("Header cannot be empty")
             }
@@ -83,17 +85,17 @@ class JWTDecodeTest {
     @Test
     fun `throws on random token parts`() {
         assertThat { JWTTools().decode("blahhh.blahhh.blahhh") }
-            .thrownError {
+            .isFailure().all {
                 isInstanceOf(InvalidJWTException::class)
             }
 
         assertThat { JWTTools().decode("$validTokenHeader.blahhh.blahhh") }
-            .thrownError {
+            .isFailure().all {
                 isInstanceOf(InvalidJWTException::class)
             }
 
         assertThat { JWTTools().decode("blahhh.$validShareReqTokenPayload.blahhh") }
-            .thrownError {
+            .isFailure().all {
                 isInstanceOf(InvalidJWTException::class)
             }
 

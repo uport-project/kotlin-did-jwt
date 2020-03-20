@@ -2,8 +2,10 @@
 
 package me.uport.sdk.credential_status
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFailure
 import assertk.assertions.isInstanceOf
 import kotlinx.coroutines.runBlocking
 import me.uport.credential_status.CredentialStatus
@@ -58,9 +60,10 @@ class UniversalStatusResolverTests {
         coAssert {
             UniversalStatusResolver().checkStatus(
                 "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NzMwNDczNTEsInN0YXR1cyI6eyJ0eXBlIjoiRXRoclN0YXR1c1JlZ2lzdHJ5MjAxOSIsImlkIjoicmlua2VieToweDFFNDY1MWRjYTVFZjM4NjM2ZTJFNEQ3QTZGZjRkMjQxM2ZDNTY0NTAifSwiaXNzIjoiZGlkOmV0aHI6MHgxZmNmOGZmNzhhYzUxMTdkOWM5OWI4MzBjNzRiNjY2OGQ2YWMzMjI5In0.MHabafA0UxJuQJ0Z-7Egb57WRlgj4_zf96B0LUhRyXgVDU5RABIczTTTXWjcuKVzhJc_-FuhRI8uQYmQQNxKzgA"
-                , didDoc
+                ,
+                didDoc
             )
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(IllegalStateException::class)
         }
     }
@@ -74,7 +77,7 @@ class UniversalStatusResolverTests {
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
                 didDoc
             )
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(IllegalArgumentException::class)
         }
     }

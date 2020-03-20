@@ -9,12 +9,14 @@ import assertk.assertions.hasMessage
 import assertk.assertions.hasSize
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFailure
 import assertk.assertions.isFalse
 import assertk.assertions.isGreaterThan
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
+import assertk.assertions.isSuccess
 import assertk.assertions.isTrue
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -398,7 +400,7 @@ class EthrDIDResolverTest {
                 .addNetwork(EthrDIDNetwork("", "0xregistry", rpc))
                 .build()
                 .wrapDidDocument("did:ethr:$identity", owner, listOf(event))
-        }.doesNotThrowAnyException()
+        }.isSuccess()
     }
 
     @Test
@@ -606,7 +608,7 @@ class EthrDIDResolverTest {
         coAssert {
             val ddo = resolver.resolve("did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a")
             assertThat(ddo).isEqualTo(referenceDDO)
-        }.doesNotThrowAnyException()
+        }.isSuccess()
     }
 
     @Test
@@ -706,7 +708,7 @@ class EthrDIDResolverTest {
         coAssert {
             val ddo = resolver.resolve("did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a")
             assertThat(ddo).isEqualTo(referenceDDO)
-        }.doesNotThrowAnyException()
+        }.isSuccess()
     }
 
     @Test
@@ -715,7 +717,7 @@ class EthrDIDResolverTest {
 
         coAssert {
             resolver.resolve("did:ethr:unknown:0xb9c5714089478a327f09197987f16f9e5d936e8a")
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(IllegalArgumentException::class)
             hasMessage("Missing registry configuration for `unknown`. To resolve did:ethr:unknown:0x... you need to register an `EthrDIDNetwork` in the EthrDIDResolver.Builder")
         }
@@ -813,7 +815,7 @@ class EthrDIDResolverTest {
                 .build()
         coAssert {
             resolver.resolve("did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a")
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(IllegalArgumentException::class)
         }
     }
@@ -845,7 +847,7 @@ class EthrDIDResolverTest {
                     owner = "did:ethr:0xE6Fe788d8ca214A080b0f6aC7F48480b2AEfa9a6",
                     publicKeyHex = "0x0295dda1dca7f80e308ef60155ddeac00e46b797fd40ef407f422e88d2467a27eb"
                 )
-            ) to emptyMap<String, ServiceEntry>()
+            ) to emptyMap()
         )
     }
 
@@ -861,7 +863,7 @@ class EthrDIDResolverTest {
             .addNetwork(EthrDIDNetwork("", "0xregistry", rpc, "0x1")).build()
         coAssert {
             resolver.lastChanged("0xb9c5714089478a327f09197987f16f9e5d936e8a", rpc, "0xregistry")
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(DidResolverError::class)
         }
     }

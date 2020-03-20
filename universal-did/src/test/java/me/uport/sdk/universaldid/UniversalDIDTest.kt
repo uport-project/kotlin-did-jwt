@@ -1,8 +1,10 @@
 package me.uport.sdk.universaldid
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFailure
 import assertk.assertions.isInstanceOf
 import kotlinx.coroutines.runBlocking
 import me.uport.sdk.testhelpers.coAssert
@@ -34,7 +36,7 @@ class UniversalDIDTest {
 
         coAssert {
             UniversalDID.resolve("")
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(IllegalArgumentException::class)
         }
     }
@@ -46,7 +48,7 @@ class UniversalDIDTest {
 
         coAssert {
             UniversalDID.resolve("")
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(IllegalArgumentException::class)
         }
     }
