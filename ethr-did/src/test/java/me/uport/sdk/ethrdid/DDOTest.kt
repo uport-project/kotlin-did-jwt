@@ -2,6 +2,7 @@ package me.uport.sdk.ethrdid
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isSuccess
 import org.junit.Test
 
 class DDOTest {
@@ -35,8 +36,6 @@ class DDOTest {
 
         assertThat {
             EthrDIDDocument.fromJson(docText)
-        }.doesNotThrowAnyException()
-
+        }.isSuccess()
     }
-
 }

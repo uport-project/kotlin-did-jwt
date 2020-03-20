@@ -1,4 +1,4 @@
-@file:Suppress("UndocumentedPublicFunction", "UndocumentedPublicClass")
+@file:Suppress("UndocumentedPublicFunction", "UndocumentedPublicClass", "MagicNumber")
 
 package me.uport.sdk.ethrdid
 

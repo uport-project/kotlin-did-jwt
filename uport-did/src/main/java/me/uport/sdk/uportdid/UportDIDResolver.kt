@@ -26,6 +26,10 @@ import pm.gnosis.model.Solidity
  * Example uport did: "did:uport:2nQtiQG6Cgm1GYTBaaKAgr76uY7iSexUkqX#owner"
  * Example mnid: "2nQtiQG6Cgm1GYTBaaKAgr76uY7iSexUkqX"
  */
+@Deprecated(
+    "This identity method is no longer supported and will be removed in the next major release." +
+            "Please switch to a more sustainable method such as ethr-did"
+)
 open class UportDIDResolver(
     private val rpc: JsonRPC,
     private val httpClient: HttpClient = HttpClient()

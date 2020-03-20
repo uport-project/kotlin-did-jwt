@@ -21,5 +21,4 @@ dependencies {
 
     testImplementation "junit:junit:$junit_version"
     testImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"
-    testImplementation "com.squareup.okhttp3:okhttp:$okhttp_version"
 }

@@ -1,7 +1,7 @@
 package me.uport.sdk.jwt
 
 import assertk.assertions.isEqualTo
-import me.uport.sdk.jwt.JWTUtils.Companion.normalizeKnownDID
+import me.uport.sdk.jwt.JWTUtils.normalizeKnownDID
 import org.junit.Test
 
 class JwtUtilsKtTest {

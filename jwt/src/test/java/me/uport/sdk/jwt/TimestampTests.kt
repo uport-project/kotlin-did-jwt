@@ -1,9 +1,12 @@
 package me.uport.sdk.jwt
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFailure
 import assertk.assertions.isInstanceOf
+import assertk.assertions.isSuccess
 import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.spyk
@@ -11,7 +14,7 @@ import kotlinx.coroutines.runBlocking
 import me.uport.sdk.ethrdid.EthrDIDNetwork
 import me.uport.sdk.ethrdid.EthrDIDResolver
 import me.uport.sdk.jsonrpc.JsonRPC
-import me.uport.sdk.jwt.test.EthrDIDTestHelpers.Companion.mockDocForAddress
+import me.uport.sdk.jwt.test.EthrDIDTestHelpers.mockDocForAddress
 import me.uport.sdk.testhelpers.TestTimeProvider
 import me.uport.sdk.testhelpers.coAssert
 import me.uport.sdk.universaldid.DIDResolver
@@ -58,7 +61,8 @@ class TimestampTests {
 
         coAssert {
             tested.verify(jwt, resolver)
-        }.doesNotThrowAnyException()
+        }.isSuccess()
+        Unit
     }
 
     @Test
@@ -89,7 +93,8 @@ class TimestampTests {
 
         coAssert {
             tested.verify(jwt, resolver)
-        }.doesNotThrowAnyException()
+        }.isSuccess()
+        Unit
     }
 
     @Deprecated(
@@ -108,7 +113,8 @@ class TimestampTests {
 
         coAssert {
             tested.verify(jwt, resolver)
-        }.doesNotThrowAnyException()
+        }.isSuccess()
+        Unit
     }
 
     @Test
@@ -139,7 +145,8 @@ class TimestampTests {
 
         coAssert {
             tested.verify(jwt, resolver)
-        }.doesNotThrowAnyException()
+        }.isSuccess()
+        Unit
     }
 
     @Deprecated(
@@ -158,7 +165,7 @@ class TimestampTests {
 
         coAssert {
             tested.verify(jwt, resolver)
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(InvalidJWTException::class)
             hasMessage("Jwt not valid before nbf: $FUTURE")
         }
@@ -182,7 +189,7 @@ class TimestampTests {
 
         coAssert {
             tested.verify(jwt, resolver)
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(InvalidJWTException::class)
             hasMessage("Jwt not valid before nbf: $FUTURE")
         }
@@ -204,7 +211,7 @@ class TimestampTests {
 
         coAssert {
             tested.verify(jwt, resolver)
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(InvalidJWTException::class)
             hasMessage("Jwt not valid before nbf: $FUTURE")
         }
@@ -228,7 +235,7 @@ class TimestampTests {
 
         coAssert {
             tested.verify(jwt, resolver)
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(InvalidJWTException::class)
             hasMessage("Jwt not valid before nbf: $FUTURE")
         }
@@ -250,7 +257,9 @@ class TimestampTests {
 
         coAssert {
             tested.verify(jwt, resolver)
-        }.doesNotThrowAnyException()
+        }.isSuccess()
+
+        Unit
     }
 
     @Test
@@ -281,7 +290,8 @@ class TimestampTests {
 
         coAssert {
             tested.verify(jwt, resolver)
-        }.doesNotThrowAnyException()
+        }.isSuccess()
+        Unit
     }
 
     @Suppress("DEPRECATION")
@@ -297,7 +307,7 @@ class TimestampTests {
 
         coAssert {
             tested.verify(jwt)
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(InvalidJWTException::class)
             hasMessage("Jwt not valid yet (issued in the future) iat: $FUTURE")
         }
@@ -321,7 +331,7 @@ class TimestampTests {
 
         coAssert {
             tested.verify(jwt, resolver)
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(InvalidJWTException::class)
             hasMessage("Jwt not valid yet (issued in the future) iat: $FUTURE")
         }
@@ -338,7 +348,8 @@ class TimestampTests {
         val tested = JWTTools(TestTimeProvider(NOW))
         coAssert {
             tested.verify(jwt, resolver)
-        }.doesNotThrowAnyException()
+        }.isSuccess()
+        Unit
     }
 
     @Test
@@ -365,6 +376,7 @@ class TimestampTests {
         val tested = JWTTools(TestTimeProvider(NOW))
         coAssert {
             tested.verify(jwt, resolver)
-        }.doesNotThrowAnyException()
+        }.isSuccess()
+        Unit
     }
 }

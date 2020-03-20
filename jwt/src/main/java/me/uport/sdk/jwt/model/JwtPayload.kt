@@ -32,18 +32,34 @@ data class JwtPayload(
     val verified: List<String>? = null,
     val permissions: List<String>? = null,
 
-    /**
+    /*
      * Specific to selective disclosure RESPONSE
      * Also includes verified
      */
-    val req: String? = null, //original jwt request, REQUIRED for sign selective disclosure responses
-    val nad: String? = null, //The MNID of the Ethereum account requested using act in the Selective Disclosure Request
-    val dad: String? = null, //The devicekey as a regular hex encoded ethereum address as requested using act='devicekey' in the Selective Disclosure Request
+    /**
+     * original jwt request, REQUIRED for sign selective disclosure responses
+     */
+    val req: String? = null,
+
+    /**
+     * The MNID of the Ethereum account requested using act in the Selective Disclosure Request
+     */
+    val nad: String? = null,
+
+    /**
+     * The devicekey as a regular hex encoded ethereum address as requested
+     * using act='devicekey' in the Selective Disclosure Request
+     */
+    val dad: String? = null,
 
     @SerialName("own")
     val own: Map<String, String>? = null,
 
-    val capabilities: List<String>? = null, //An array of JWT tokens giving client app the permissions requested. Currently a token allowing them to send push notifications
+    /**
+     * An array of JWT tokens giving client app the permissions requested.
+     * Currently a token allowing them to send push notifications
+     */
+    val capabilities: List<String>? = null,
 
     /**
      * Specific to Verification

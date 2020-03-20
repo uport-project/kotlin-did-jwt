@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <Blacklist></Blacklist>
+  <Whitelist>
+    <ID>MaxLineLength:UniversalDID.kt$UniversalDID$ override suspend fun resolve(did: String): DIDDocument</ID>
+    <ID>MaxLineLength:UniversalDID.kt$UniversalDID$?:</ID>
+    <ID>MaxLineLength:UniversalDID.kt$UniversalDID$throw IllegalStateException("There is no DIDResolver registered to resolve '$method' DIDs and none of the other ${resolvers.size} registered ones can do it.")</ID>
+    <ID>MaxLineLength:UportIdentityDocument.kt$UportIdentityDocument$val image: ProfilePicture? = null</ID>
+    <ID>MaxLineLength:UportIdentityDocument.kt$UportIdentityDocument$val publicEncKey: String? = null</ID>
+    <ID>MaxLineLength:UportIdentityDocument.kt$UportIdentityDocument$val publicKey: String? = null</ID>
+    <ID>TooGenericExceptionCaught:UniversalDID.kt$UniversalDID$ex: Exception</ID>
+  </Whitelist>
+</SmellBaseline>

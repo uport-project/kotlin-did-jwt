@@ -1,4 +1,4 @@
-@file:Suppress("MoveVariableDeclarationIntoWhen", "MatchingDeclarationName")
+@file:Suppress("MoveVariableDeclarationIntoWhen", "MatchingDeclarationName", "MagicNumber")
 
 package me.uport.sdk.jwt
 
@@ -30,7 +30,8 @@ internal data class ECDSASignature internal constructor(val r: BigInteger, val s
  * on the secp256k1 elliptic curve
  *
  * @param messageHash The hash of the message. For JWT this is `sha256`, for ETH this is `keccak`
- * @param signature the components of the signature. Only `r` and `s` are used for verification, the `v` component is ignored
+ * @param signature the components of the signature. Only `r` and `s` are used for verification,
+ * the `v` component is ignored
  * @param publicKey the public key to check against.
  *
  * @return `true` when there is a match or `false` otherwise
@@ -55,6 +56,7 @@ internal fun ecVerify(
 /***
  * Copied from Kethereum because it is a private method there
  */
+@Suppress("ReturnCount")
 internal fun recoverFromSignature(
     recId: Int,
     sig: ECDSASignature,

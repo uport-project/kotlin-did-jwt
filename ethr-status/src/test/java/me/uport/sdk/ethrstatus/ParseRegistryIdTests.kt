@@ -1,9 +1,11 @@
 @file:Suppress("UndocumentedPublicFunction", "UndocumentedPublicClass", "StringLiteralDuplication")
 
-package me.uport.sdk.ethr_status
+package me.uport.sdk.ethrstatus
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFailure
 import assertk.assertions.isInstanceOf
 import org.junit.Test
 
@@ -57,7 +59,7 @@ class ParseRegistryIdTests {
         invalidRegistryIDs.forEach {
             assertThat {
                 ethrStatus.parseRegistryId(it)
-            }.thrownError {
+            }.isFailure().all {
                 isInstanceOf(IllegalArgumentException::class)
             }
         }

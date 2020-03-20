@@ -1,7 +1,11 @@
+@file:Suppress("LargeClass")
+
 package me.uport.sdk.jwt
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFailure
 import assertk.assertions.isFalse
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
@@ -14,7 +18,7 @@ import me.uport.sdk.ethrdid.EthrDIDDocument
 import me.uport.sdk.ethrdid.EthrDIDNetwork
 import me.uport.sdk.ethrdid.EthrDIDResolver
 import me.uport.sdk.jsonrpc.JsonRPC
-import me.uport.sdk.jwt.JWTUtils.Companion.normalizeKnownDID
+import me.uport.sdk.jwt.JWTUtils.normalizeKnownDID
 import me.uport.sdk.jwt.model.JwtPayload
 import me.uport.sdk.jwt.test.EthrDIDTestHelpers
 import me.uport.sdk.signer.KPSigner
@@ -209,7 +213,7 @@ class JWTToolsJVMTest {
                 signer,
                 algorithm = "some fancy but unknown algorithm"
             )
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(JWTEncodingException::class)
         }
     }
@@ -235,7 +239,7 @@ class JWTToolsJVMTest {
             JWTTools(TestTimeProvider(1535102500000L)).verify(
                 token = token
             )
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(InvalidJWTException::class)
         }
     }
@@ -263,7 +267,7 @@ class JWTToolsJVMTest {
                 token = token,
                 resolver = resolver
             )
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(InvalidJWTException::class)
         }
     }
@@ -290,7 +294,7 @@ class JWTToolsJVMTest {
                 token = token,
                 audience = "did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154"
             )
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(InvalidJWTException::class)
         }
     }
@@ -319,7 +323,7 @@ class JWTToolsJVMTest {
                 resolver = resolver,
                 audience = "did:ethr:0x108209f4247b7fe6605b0f58f9145ec3269d0154"
             )
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(InvalidJWTException::class)
         }
     }
@@ -335,7 +339,7 @@ class JWTToolsJVMTest {
 
         coAssert {
             JWTTools(TestTimeProvider(977317692000L)).verify(token)
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(InvalidJWTException::class)
         }
     }
@@ -353,7 +357,7 @@ class JWTToolsJVMTest {
 
         coAssert {
             JWTTools(TestTimeProvider(977317692000L)).verify(token, resolver)
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(InvalidJWTException::class)
         }
     }
@@ -369,7 +373,7 @@ class JWTToolsJVMTest {
 
         coAssert {
             JWTTools(TestTimeProvider(1576847292000L)).verify(token)
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(InvalidJWTException::class)
         }
     }
@@ -387,7 +391,7 @@ class JWTToolsJVMTest {
 
         coAssert {
             JWTTools(TestTimeProvider(1576847292000L)).verify(token, resolver)
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(InvalidJWTException::class)
         }
     }
@@ -412,7 +416,7 @@ class JWTToolsJVMTest {
 
         coAssert {
             JWTTools(TestTimeProvider(1547818630000L)).verify(token)
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(InvalidJWTException::class)
         }
     }
@@ -438,7 +442,7 @@ class JWTToolsJVMTest {
 
         coAssert {
             JWTTools(TestTimeProvider(1547818630000L)).verify(token, resolver)
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(InvalidJWTException::class)
         }
     }
@@ -577,7 +581,7 @@ class JWTToolsJVMTest {
 
         coAssert {
             JWTTools().resolveAuthenticator(alg, issuer, auth, resolver)
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(InvalidJWTException::class)
         }
     }
@@ -617,7 +621,7 @@ class JWTToolsJVMTest {
 
         coAssert {
             JWTTools().resolveAuthenticator(alg, issuer, auth, resolver)
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(InvalidJWTException::class)
         }
     }
@@ -651,7 +655,7 @@ class JWTToolsJVMTest {
 
         coAssert {
             JWTTools().resolveAuthenticator(alg, issuer, auth, resolver)
-        }.thrownError {
+        }.isFailure().all {
             isInstanceOf(JWTEncodingException::class)
         }
     }
