@@ -25,6 +25,7 @@ class JwtHeader(
         fun fromJson(headerString: String): JwtHeader =
             jsonAdapter.parse(serializer(), headerString)
 
-        private val jsonAdapter = Json(JsonConfiguration(strictMode = false))
+        private val jsonAdapter =
+            Json(JsonConfiguration(isLenient = true, ignoreUnknownKeys = true))
     }
 }

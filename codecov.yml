@@ -1,0 +1,2 @@
+ignore:
+  - "ethr-status/src/main/java/me/uport/sdk/ethr_status/Revocation.kt"

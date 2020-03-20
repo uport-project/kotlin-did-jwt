@@ -6,16 +6,16 @@ import me.uport.mnid.Account
 import me.uport.mnid.MNID
 import me.uport.sdk.core.HttpClient
 import me.uport.sdk.core.Networks
+import me.uport.sdk.core.clean0xPrefix
+import me.uport.sdk.core.hexToBigInteger
+import me.uport.sdk.core.hexToByteArray
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jsonrpc.model.exceptions.JsonRpcException
 import me.uport.sdk.universaldid.BlankDocumentError
 import me.uport.sdk.universaldid.DIDDocument
 import me.uport.sdk.universaldid.DIDResolver
 import me.uport.sdk.universaldid.DidResolverError
-import org.kethereum.encodings.encodeToBase58String
-import org.kethereum.extensions.hexToBigInteger
-import org.komputing.khex.extensions.clean0xPrefix
-import org.komputing.khex.extensions.hexToByteArray
+import org.komputing.kbase58.encodeToBase58String
 import pm.gnosis.model.Solidity
 
 /**
@@ -28,7 +28,7 @@ import pm.gnosis.model.Solidity
  */
 open class UportDIDResolver(
     private val rpc: JsonRPC,
-    private val httpClient : HttpClient = HttpClient()
+    private val httpClient: HttpClient = HttpClient()
 ) : DIDResolver {
     override val method: String = "uport"
 

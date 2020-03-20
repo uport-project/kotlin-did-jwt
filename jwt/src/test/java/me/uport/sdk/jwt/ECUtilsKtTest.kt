@@ -2,12 +2,12 @@ package me.uport.sdk.jwt
 
 import assertk.assertThat
 import assertk.assertions.isTrue
+import me.uport.sdk.core.hexToBigInteger
 import org.junit.Test
 import org.kethereum.crypto.publicKeyFromPrivate
-import org.kethereum.extensions.hexToBigInteger
-import org.kethereum.hashes.sha256
 import org.kethereum.model.PrivateKey
 import org.kethereum.model.SignatureData
+import org.komputing.khash.sha256.extensions.sha256
 
 class ECUtilsKtTest {
 

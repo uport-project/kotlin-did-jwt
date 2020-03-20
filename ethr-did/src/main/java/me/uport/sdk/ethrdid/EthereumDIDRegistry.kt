@@ -57,7 +57,12 @@ class EthereumDIDRegistry {
             delegate: Solidity.Address,
             validity: Solidity.UInt256
         ): String {
-            return "0x$METHOD_ID${SolidityBase.encodeFunctionArguments(identity, delegateType, delegate, validity)}"
+            return "0x$METHOD_ID${SolidityBase.encodeFunctionArguments(
+                identity,
+                delegateType,
+                delegate,
+                validity
+            )}"
         }
 
     }
@@ -70,7 +75,11 @@ class EthereumDIDRegistry {
             delegateType: Solidity.Bytes32,
             delegate: Solidity.Address
         ): String {
-            return "0x$METHOD_ID${SolidityBase.encodeFunctionArguments(identity, delegateType, delegate)}"
+            return "0x$METHOD_ID${SolidityBase.encodeFunctionArguments(
+                identity,
+                delegateType,
+                delegate
+            )}"
         }
 
     }
@@ -84,7 +93,12 @@ class EthereumDIDRegistry {
             value: Solidity.Bytes,
             validity: Solidity.UInt256
         ): String {
-            return "0x$METHOD_ID${SolidityBase.encodeFunctionArguments(identity, name, value, validity)}"
+            return "0x$METHOD_ID${SolidityBase.encodeFunctionArguments(
+                identity,
+                name,
+                value,
+                validity
+            )}"
         }
 
     }

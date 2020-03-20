@@ -8,10 +8,10 @@ import io.mockk.CapturingSlot
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
+import me.uport.sdk.core.prepend0xPrefix
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.signer.KPSigner
 import org.junit.Test
-import org.komputing.khex.extensions.prepend0xPrefix
 import java.math.BigInteger
 
 class EthrDIDTest {
@@ -65,11 +65,13 @@ class EthrDIDTest {
 
             val ethrDid = EthrDID(address, rpc, rinkebyRegistry, signer)
 
-            val txHash = ethrDid.changeOwner(newAddress, EthrDID.TransactionOptions(
-                gasLimit = 70_000L.toBigInteger(),
-                gasPrice = 20_000_000_000L.toBigInteger(),
-                nonce = BigInteger.ZERO
-            ))
+            val txHash = ethrDid.changeOwner(
+                newAddress, EthrDID.TransactionOptions(
+                    gasLimit = 70_000L.toBigInteger(),
+                    gasPrice = 20_000_000_000L.toBigInteger(),
+                    nonce = BigInteger.ZERO
+                )
+            )
 
             assertThat(txHash).isEqualTo("mockedTxHash")
 

@@ -8,6 +8,7 @@ import kotlinx.serialization.ContextualSerialization
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import me.uport.sdk.jwt.model.ArbitraryMapSerializer
 import org.junit.Test
 
@@ -52,7 +53,7 @@ class SerializationTesting {
     fun `can deserialize known object`() {
         val input =
             """{"generic":{"hello":"world","missing":null,"some number":4321,"number as string":"1234","boolean":false,"boolean as string":"true","custom object":{"@context":["asdf"]},"obj":{"a":"b","c":null}}}"""
-        val parsed = Json.nonstrict.parse(CompoundTestObject.serializer(), input)
+        val parsed = Json(JsonConfiguration.Stable).parse(CompoundTestObject.serializer(), input)
         assertThat(parsed.generic).isEqualTo(
             mapOf(
                 "hello" to "world",

@@ -1,0 +1,25 @@
+apply plugin: 'java-library'
+apply plugin: "kotlin"
+apply plugin: "maven"
+apply plugin: "bivrost"
+apply plugin: "com.jfrog.bintray"
+
+project.ext.description = "Ethr implementation of credential-status"
+
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    api "com.github.uport-project.kotlin-common:jsonrpc:$uport_kotlin_common_version"
+    api "com.github.uport-project.kotlin-common:signer-common:$uport_kotlin_common_version"
+
+    implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$bivrost_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
+
+    api "com.github.komputing.kethereum:keccak_shortcut:$kethereum_version"
+
+    api project(":credential-status")
+
+    testImplementation "junit:junit:$junit_version"
+    testImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"
+    testImplementation "com.squareup.okhttp3:okhttp:$okhttp_version"
+}

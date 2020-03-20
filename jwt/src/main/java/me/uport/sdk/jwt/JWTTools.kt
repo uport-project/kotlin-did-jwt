@@ -1,15 +1,17 @@
-@file:Suppress("KDocUnresolvedReference", "EXPERIMENTAL_API_USAGE")
+@file:Suppress("KDocUnresolvedReference", "EXPERIMENTAL_API_USAGE", "DEPRECATION")
 
 package me.uport.sdk.jwt
 
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.json.JsonException
-import me.uport.sdk.core.*
-import me.uport.sdk.ethrdid.EthrDIDNetwork
-import me.uport.sdk.ethrdid.EthrDIDResolver
-import me.uport.sdk.httpsdid.WebDIDResolver
-import me.uport.sdk.jsonrpc.JsonRPC
+import me.uport.sdk.core.EthNetwork
+import me.uport.sdk.core.ITimeProvider
+import me.uport.sdk.core.SystemTimeProvider
+import me.uport.sdk.core.clean0xPrefix
+import me.uport.sdk.core.decodeBase64
+import me.uport.sdk.core.hexToByteArray
+import me.uport.sdk.core.toBase64UrlSafe
 import me.uport.sdk.jwt.JWTUtils.Companion.normalizeKnownDID
 import me.uport.sdk.jwt.JWTUtils.Companion.splitToken
 import me.uport.sdk.jwt.model.ArbitraryMapSerializer
@@ -17,7 +19,11 @@ import me.uport.sdk.jwt.model.JwtHeader
 import me.uport.sdk.jwt.model.JwtHeader.Companion.ES256K
 import me.uport.sdk.jwt.model.JwtHeader.Companion.ES256K_R
 import me.uport.sdk.jwt.model.JwtPayload
-import me.uport.sdk.signer.*
+import me.uport.sdk.signer.SIG_RECOVERABLE_SIZE
+import me.uport.sdk.signer.Signer
+import me.uport.sdk.signer.decodeJose
+import me.uport.sdk.signer.normalize
+import me.uport.sdk.signer.utf8
 import me.uport.sdk.universaldid.DIDDocument
 import me.uport.sdk.universaldid.DIDResolver
 import me.uport.sdk.universaldid.PublicKeyEntry
@@ -25,15 +31,12 @@ import me.uport.sdk.universaldid.PublicKeyType.Companion.EcdsaPublicKeySecp256k1
 import me.uport.sdk.universaldid.PublicKeyType.Companion.Secp256k1SignatureVerificationKey2018
 import me.uport.sdk.universaldid.PublicKeyType.Companion.Secp256k1VerificationKey2018
 import me.uport.sdk.universaldid.UniversalDID
-import me.uport.sdk.uportdid.UportDIDResolver
 import org.kethereum.crypto.toAddress
-import org.kethereum.encodings.decodeBase58
 import org.kethereum.extensions.toBigInteger
-import org.kethereum.hashes.sha256
 import org.kethereum.model.PUBLIC_KEY_SIZE
 import org.kethereum.model.PublicKey
-import org.komputing.khex.extensions.clean0xPrefix
-import org.komputing.khex.extensions.hexToByteArray
+import org.komputing.kbase58.decodeBase58
+import org.komputing.khash.sha256.extensions.sha256
 import java.math.BigInteger
 import java.security.SignatureException
 import kotlin.math.floor
@@ -67,39 +70,8 @@ typealias VerificationMethod = (
  * It defaults to `null`
  */
 class JWTTools(
-    private val timeProvider: ITimeProvider = SystemTimeProvider,
-    preferredNetwork: EthNetwork? = null
+    private val timeProvider: ITimeProvider = SystemTimeProvider
 ) {
-    init {
-
-        // blank did declarations
-        val blankUportDID = "did:uport:2nQs23uc3UN6BBPqGHpbudDxBkeDRn553BB"
-        val blankEthrDID = "did:ethr:0x0000000000000000000000000000000000000000"
-        val blankHttpsDID = "did:https:example.com"
-
-        // register default Ethr DID resolver if Universal DID is unable to resolve blank Ethr DID
-        if (!UniversalDID.canResolve(blankEthrDID)) {
-            val defaultRPC = JsonRPC(preferredNetwork?.rpcUrl ?: Networks.mainnet.rpcUrl)
-            val defaultRegistry = preferredNetwork?.ethrDidRegistry
-                ?: Networks.mainnet.ethrDidRegistry
-            UniversalDID.registerResolver(
-                EthrDIDResolver.Builder()
-                    .addNetwork(EthrDIDNetwork("", defaultRegistry, defaultRPC, "0x1"))
-                    .build()
-            )
-        }
-
-        // register default Uport DID resolver if Universal DID is unable to resolve blank Uport DID
-        if (!UniversalDID.canResolve(blankUportDID)) {
-            val defaultRPC = JsonRPC(preferredNetwork?.rpcUrl ?: Networks.rinkeby.rpcUrl)
-            UniversalDID.registerResolver(UportDIDResolver(defaultRPC))
-        }
-
-        // register default https DID resolver if Universal DID is unable to resolve blank https DID
-        if (!UniversalDID.canResolve(blankHttpsDID)) {
-            UniversalDID.registerResolver(WebDIDResolver())
-        }
-    }
 
     /**
      * This coroutine method creates a signed JWT from a [payload] Map and an abstracted [Signer]
@@ -221,7 +193,7 @@ class JWTTools(
             //Parse Json
             val header = JwtHeader.fromJson(headerString)
 
-            val payload = Json.nonstrict.parse(ArbitraryMapSerializer, payloadString)
+            val payload = jsonParser.parse(ArbitraryMapSerializer, payloadString)
 
             return Triple(header, payload, signatureBytes)
         } catch (ex: JsonException) {
@@ -242,8 +214,41 @@ class JWTTools(
      *          , when the `audience` does not match the intended audience (`aud` field)
      * @return a [JwtPayload] if the verification is successful and `null` if it fails
      */
+    @Suppress("DEPRECATION")
+    @Deprecated(
+        "Verifying a jwt token using the Universal Resolver is deprecated " +
+                "in favor of using a local resolver passed in as a method parameter." +
+                "This will be removed in the next major release.",
+        ReplaceWith(
+            """verify(token: String, auth: Boolean = false, audience: String? = null, resolver: DIDResolver)"""
+        )
+    )
     suspend fun verify(
         token: String,
+        auth: Boolean = false,
+        audience: String? = null
+    ): JwtPayload {
+        return verify(token, UniversalDID, auth, audience)
+    }
+
+    /**
+     * Verifies a jwt [token]
+     * @param token the jwt token to be verified
+     *
+     * @param auth if this param is `true` the public key list that this token is checked against is filtered to the
+     *          entries in the `authentication` entries in the DID document of the issuer of the token.
+     * @param audience the audience that should be able to verify this token. This is usually a DID but can also be a
+     *          callback URL for situations where the token represents a response or a bearer token.
+     * @param resolver the resolver that should be used locally in the verify method to resolve the DIDs.
+     *
+     * @throws InvalidJWTException when the current time is not within the time range of payload `iat` and `exp`
+     *          , when no public key matches are found in the DID document
+     *          , when the `audience` does not match the intended audience (`aud` field)
+     * @return a [JwtPayload] if the verification is successful and `null` if it fails
+     */
+    suspend fun verify(
+        token: String,
+        resolver: DIDResolver,
         auth: Boolean = false,
         audience: String? = null
     ): JwtPayload {
@@ -268,7 +273,7 @@ class JWTTools(
         if (payload.aud != null) {
 
             val payloadAudience = normalizeKnownDID(payload.aud)
-            if (UniversalDID.canResolve(payloadAudience)) {
+            if (resolver.canResolve(payloadAudience)) {
 
                 if (audience == null) {
                     throw InvalidJWTException(
@@ -286,7 +291,7 @@ class JWTTools(
             }
         }
 
-        val publicKeys = resolveAuthenticator(header.alg, payload.iss, auth)
+        val publicKeys = resolveAuthenticator(header.alg, payload.iss, auth, resolver)
 
         val signingInputBytes = token.substringBeforeLast('.').toByteArray(utf8)
 
@@ -303,6 +308,9 @@ class JWTTools(
             )
         }
     }
+
+    private val jsonParser =
+        Json(JsonConfiguration.Stable.copy(isLenient = true, ignoreUnknownKeys = true))
 
     /**
      * maps known algorithms to the corresponding verification method
@@ -347,7 +355,6 @@ class JWTTools(
         } else {
             return matches.isNotEmpty()
         }
-
     }
 
     private fun verifyRecoverableES256K(
@@ -400,14 +407,21 @@ class JWTTools(
      * @param [auth] decide if the returned list should also be filtered against the `authentication`
      * entries in the DIDDocument
      *
+     * @param [resolver] the resolver that should be used locally in the verify method to resolve the DIDs.
+     *
      */
-    internal suspend fun resolveAuthenticator(alg: String, issuer: String, auth: Boolean): List<PublicKeyEntry> {
+    internal suspend fun resolveAuthenticator(
+        alg: String,
+        issuer: String,
+        auth: Boolean,
+        resolver: DIDResolver
+    ): List<PublicKeyEntry> {
 
         if (alg !in verificationMethod.keys) {
             throw JWTEncodingException("JWT algorithm '$alg' not supported")
         }
 
-        val doc: DIDDocument = UniversalDID.resolve(issuer)
+        val doc: DIDDocument = resolver.resolve(issuer)
 
         val authenticationKeys: List<String> = if (auth) {
             doc.authentication.map { it.publicKey }
@@ -445,6 +459,5 @@ class JWTTools(
             EcdsaPublicKeySecp256k1
         )
     }
-
 }
 

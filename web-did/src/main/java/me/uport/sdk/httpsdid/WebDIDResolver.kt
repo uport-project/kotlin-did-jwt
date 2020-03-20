@@ -1,7 +1,11 @@
 package me.uport.sdk.httpsdid
 
 import me.uport.sdk.core.HttpClient
-import me.uport.sdk.universaldid.*
+import me.uport.sdk.universaldid.BlankDocumentError
+import me.uport.sdk.universaldid.DIDDocument
+import me.uport.sdk.universaldid.DIDDocumentImpl
+import me.uport.sdk.universaldid.DIDResolver
+import me.uport.sdk.universaldid.DidResolverError
 
 /**
  * This is a DID resolver implementation that supports the "web" DID method.
@@ -42,7 +46,8 @@ open class WebDIDResolver(private val httpClient: HttpClient = HttpClient()) : D
 
         private const val DEPRECATED_METHOD = "https"
 
-        private val webDIDPattern = "^(did:(web|https):)?([-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])".toRegex()
+        private val webDIDPattern =
+            "^(did:(web|https):)?([-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])".toRegex()
 
         internal fun parseDIDString(did: String): Pair<String, String> {
             val matchResult = webDIDPattern.find(did) ?: return ("" to did)
