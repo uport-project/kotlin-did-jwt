@@ -57,6 +57,7 @@ detekt {
             "$projectDir"
     )
     config = files("${projectDir}/detekt.yml")
+    baseline = file("${projectDir}/detekt_baseline.xml")
     parallel = true
     reports {
         xml {

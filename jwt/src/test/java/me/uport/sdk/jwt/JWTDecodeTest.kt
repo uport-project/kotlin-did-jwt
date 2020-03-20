@@ -6,7 +6,7 @@ import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFailure
 import assertk.assertions.isInstanceOf
-import me.uport.sdk.jwt.JWTUtils.Companion.splitToken
+import me.uport.sdk.jwt.JWTUtils.splitToken
 import org.junit.Test
 
 
@@ -98,7 +98,5 @@ class JWTDecodeTest {
             .isFailure().all {
                 isInstanceOf(InvalidJWTException::class)
             }
-
     }
-
 }

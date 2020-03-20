@@ -109,5 +109,4 @@ class DIDResolverImplTest {
         //language=json
         assertThat(docString).isEqualTo("""{"@context":"test context","id":"example document","publicKey":[],"authentication":[],"service":[]}""")
     }
-
 }

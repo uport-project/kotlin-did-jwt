@@ -100,5 +100,4 @@ class UniversalDIDTest {
         //language=json
         assertThat(docString).isEqualTo("""{"@context":"test context","id":"example document","publicKey":[],"authentication":[],"service":[]}""")
     }
-
 }

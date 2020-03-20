@@ -8,9 +8,9 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFailure
 import assertk.assertions.isInstanceOf
 import kotlinx.coroutines.runBlocking
-import me.uport.credential_status.CredentialStatus
-import me.uport.credential_status.StatusResolver
-import me.uport.credential_status.UniversalStatusResolver
+import me.uport.credentialstatus.CredentialStatus
+import me.uport.credentialstatus.StatusResolver
+import me.uport.credentialstatus.UniversalStatusResolver
 import me.uport.sdk.ethrdid.EthrDIDDocument
 import me.uport.sdk.testhelpers.coAssert
 import me.uport.sdk.universaldid.DIDDocument

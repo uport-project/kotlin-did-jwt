@@ -11,6 +11,7 @@ import me.uport.sdk.universaldid.DIDResolver
  * all known networks and add using the DIDResolver Builder
  *
  */
+@Suppress("unused")
 fun DIDResolver.configureDefaultsWithInfura(infuraProjectId: String): DIDResolver {
 
     val mainnet = EthNetwork(

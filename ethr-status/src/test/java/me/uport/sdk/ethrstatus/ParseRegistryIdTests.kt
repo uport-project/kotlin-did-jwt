@@ -1,6 +1,6 @@
 @file:Suppress("UndocumentedPublicFunction", "UndocumentedPublicClass", "StringLiteralDuplication")
 
-package me.uport.sdk.ethr_status
+package me.uport.sdk.ethrstatus
 
 import assertk.all
 import assertk.assertThat

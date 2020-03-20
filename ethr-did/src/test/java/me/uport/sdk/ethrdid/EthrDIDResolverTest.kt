@@ -1,4 +1,4 @@
-@file:Suppress("UnnecessaryVariable")
+@file:Suppress("UnnecessaryVariable", "LargeClass", "LongMethod")
 
 package me.uport.sdk.ethrdid
 
@@ -18,6 +18,7 @@ import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isSuccess
 import assertk.assertions.isTrue
+import assertk.assertions.message
 import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.slot
@@ -719,6 +720,7 @@ class EthrDIDResolverTest {
             resolver.resolve("did:ethr:unknown:0xb9c5714089478a327f09197987f16f9e5d936e8a")
         }.isFailure().all {
             isInstanceOf(IllegalArgumentException::class)
+            println(this.message())
             hasMessage("Missing registry configuration for `unknown`. To resolve did:ethr:unknown:0x... you need to register an `EthrDIDNetwork` in the EthrDIDResolver.Builder")
         }
     }

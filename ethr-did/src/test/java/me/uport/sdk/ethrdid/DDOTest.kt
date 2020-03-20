@@ -37,7 +37,5 @@ class DDOTest {
         assertThat {
             EthrDIDDocument.fromJson(docText)
         }.isSuccess()
-
     }
-
 }

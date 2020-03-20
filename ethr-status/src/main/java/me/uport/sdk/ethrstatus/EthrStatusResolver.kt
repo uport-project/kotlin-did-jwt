@@ -1,9 +1,9 @@
-package me.uport.sdk.ethr_status
+package me.uport.sdk.ethrstatus
 
-import me.uport.credential_status.CredentialStatus
-import me.uport.credential_status.StatusEntry
-import me.uport.credential_status.StatusResolver
-import me.uport.credential_status.getStatusEntry
+import me.uport.credentialstatus.CredentialStatus
+import me.uport.credentialstatus.StatusEntry
+import me.uport.credentialstatus.StatusResolver
+import me.uport.credentialstatus.getStatusEntry
 import me.uport.sdk.core.Networks
 import me.uport.sdk.core.hexToBigInteger
 import me.uport.sdk.jsonrpc.JsonRPC

@@ -1,8 +1,6 @@
-package me.uport.credential_status
+package me.uport.credentialstatus
 
 import me.uport.sdk.universaldid.DIDDocument
-import me.uport.sdk.universaldid.UniversalDID.method
-import me.uport.sdk.universaldid.UniversalDID.registerResolver
 
 /**
  *
@@ -36,12 +34,13 @@ class UniversalStatusResolver : StatusResolver {
 
         val statusEntry = getStatusEntry(credential)
 
-        if (statusEntry.type.isBlank() || !resolvers.containsKey(statusEntry.type)) {
-            throw IllegalStateException("There is no StatusResolver registered to check status using '${statusEntry.type}' method.")
-        } else {
-            return resolvers[statusEntry.type]?.checkStatus(credential, didDoc)
-                ?: throw IllegalStateException("There StatusResolver for '$statusEntry.type' failed to resolve for an unknown reason.")
+        val resolver = resolvers[statusEntry.type]
+
+        check(statusEntry.type.isNotBlank() && resolver != null) {
+            "There is no StatusResolver registered to check status using '${statusEntry.type}' method."
         }
+
+        return resolver.checkStatus(credential, didDoc)
     }
 
 

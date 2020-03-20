@@ -1,3 +1,5 @@
+@file:Suppress("LargeClass")
+
 package me.uport.sdk.jwt
 
 import assertk.all
@@ -16,7 +18,7 @@ import me.uport.sdk.ethrdid.EthrDIDDocument
 import me.uport.sdk.ethrdid.EthrDIDNetwork
 import me.uport.sdk.ethrdid.EthrDIDResolver
 import me.uport.sdk.jsonrpc.JsonRPC
-import me.uport.sdk.jwt.JWTUtils.Companion.normalizeKnownDID
+import me.uport.sdk.jwt.JWTUtils.normalizeKnownDID
 import me.uport.sdk.jwt.model.JwtPayload
 import me.uport.sdk.jwt.test.EthrDIDTestHelpers
 import me.uport.sdk.signer.KPSigner

@@ -14,7 +14,7 @@ import kotlinx.coroutines.runBlocking
 import me.uport.sdk.ethrdid.EthrDIDNetwork
 import me.uport.sdk.ethrdid.EthrDIDResolver
 import me.uport.sdk.jsonrpc.JsonRPC
-import me.uport.sdk.jwt.test.EthrDIDTestHelpers.Companion.mockDocForAddress
+import me.uport.sdk.jwt.test.EthrDIDTestHelpers.mockDocForAddress
 import me.uport.sdk.testhelpers.TestTimeProvider
 import me.uport.sdk.testhelpers.coAssert
 import me.uport.sdk.universaldid.DIDResolver

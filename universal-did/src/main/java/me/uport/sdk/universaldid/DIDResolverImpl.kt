@@ -36,11 +36,14 @@ internal class DIDResolverImpl : DIDResolver {
     }
 
     /**
-     * Looks for a [DIDResolver] that can resolve the provided [did] either by method if the did contains one or by trial
+     * Looks for a [DIDResolver] that can resolve the provided [did] either by method if the did
+     * contains one or by trial
      *
      * @throws IllegalStateException if the proper resolver is not registered or produces `null`
-     * @throws IllegalArgumentException if the given [did] has no `method` but could be resolved by one of the registered resolvers and that one fails with `null`
+     * @throws IllegalArgumentException if the given [did] has no `method` but could be resolved
+     * by one of the registered resolvers and that one fails with `null`
      */
+    @Suppress("TooGenericExceptionCaught")
     override suspend fun resolve(did: String): DIDDocument {
         val (method, _) = parse(did)
 
@@ -55,14 +58,21 @@ internal class DIDResolverImpl : DIDResolver {
                     null
                 }
             }.firstOrNull()
-                ?: throw IllegalArgumentException("The provided did ($did) could not be resolved by any of the ${resolvers.size} registered resolvers")
+                ?: throw IllegalArgumentException(
+                    "The provided did ($did) could not be resolved by any of the ${resolvers.size} registered resolvers"
+                )
         }  //no else clause, carry on
 
         if (resolvers.containsKey(method)) {
             return resolvers[method]?.resolve(did)
-                ?: throw IllegalStateException("There DIDResolver for '$method' failed to resolve '$did' for an unknown reason.")
+                ?: throw IllegalStateException(
+                    "There DIDResolver for '$method' failed to resolve '$did' for an unknown reason."
+                )
         } else {
-            throw IllegalStateException("There is no DIDResolver registered to resolve '$method' DIDs and none of the other ${resolvers.size} registered ones can do it.")
+            throw IllegalStateException(
+                "There is no DIDResolver registered to resolve '$method' DIDs and none of the other" +
+                        " ${resolvers.size} registered ones can do it."
+            )
         }
     }
 
