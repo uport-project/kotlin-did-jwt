@@ -13,8 +13,6 @@ buildscript {
         detekt_version = "1.6.0"
         jacoco_version = "0.8.4"
 
-        okhttp_version = "4.4.1"
-
         bivrost_version = "v0.7.1"
         kmnid_version = "0.4.4"
         kethereum_version = "0.81.4"
