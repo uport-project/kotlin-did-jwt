@@ -4,7 +4,18 @@ package me.uport.sdk.ethrdid
 
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.*
+import assertk.assertions.doesNotContain
+import assertk.assertions.hasMessage
+import assertk.assertions.hasSize
+import assertk.assertions.isEmpty
+import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
+import assertk.assertions.isGreaterThan
+import assertk.assertions.isInstanceOf
+import assertk.assertions.isNotEmpty
+import assertk.assertions.isNotEqualTo
+import assertk.assertions.isNotNull
+import assertk.assertions.isTrue
 import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.slot
@@ -12,6 +23,7 @@ import io.mockk.spyk
 import kotlinx.coroutines.runBlocking
 import me.uport.sdk.core.HttpClient
 import me.uport.sdk.core.Networks
+import me.uport.sdk.core.hexToBigInteger
 import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDOwnerChanged
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jsonrpc.model.JsonRpcLogItem
@@ -26,7 +38,6 @@ import me.uport.sdk.universaldid.PublicKeyEntry
 import me.uport.sdk.universaldid.PublicKeyType
 import me.uport.sdk.universaldid.ServiceEntry
 import org.junit.Test
-import org.kethereum.extensions.hexToBigInteger
 import pm.gnosis.model.Solidity
 import pm.gnosis.utils.hexToByteArray
 import java.math.BigInteger

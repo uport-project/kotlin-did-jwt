@@ -18,7 +18,7 @@ interface CredentialStatus
  * ```
  *
  */
-data class StatusEntry (val type: String, val id: String)
+data class StatusEntry(val type: String, val id: String)
 
 
 /**

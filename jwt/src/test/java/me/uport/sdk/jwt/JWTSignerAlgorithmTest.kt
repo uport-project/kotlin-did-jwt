@@ -16,7 +16,8 @@ class JWTSignerAlgorithmTest {
 
         val signer = KPSigner("65fc670d9351cb87d1f56702fb56a7832ae2aab3427be944ab8c9f2a0ab87960")
 
-        val expectedSignature = "a82BRGGDrxk8pKFy1cXCY0WQOyR3DZC115D3Sp3sH2jiuFs8ksm0889Y3kbnmX2O-24UsuUy0T36Iu4C86Q9XQ"
+        val expectedSignature =
+            "a82BRGGDrxk8pKFy1cXCY0WQOyR3DZC115D3Sp3sH2jiuFs8ksm0889Y3kbnmX2O-24UsuUy0T36Iu4C86Q9XQ"
         val signature = JWTSignerAlgorithm(ES256K).sign("Hello, world!", signer)
 
         assertThat(signature).isEqualTo(expectedSignature)
@@ -48,7 +49,8 @@ class JWTSignerAlgorithmTest {
         val expectedSignature =
             "jsvdLwqr-O206hkegoq6pbo7LJjCaflEKHCvfohBP9XJ4C7mG2TPL9YjyKEpYSXqqkUrfRoCxQecHR11Uh7POwA"
 
-        val signature = JWTSignerAlgorithm(ES256K_R).sign("thequickbrownfoxjumpedoverthelazyprogrammer", signer)
+        val signature =
+            JWTSignerAlgorithm(ES256K_R).sign("thequickbrownfoxjumpedoverthelazyprogrammer", signer)
 
         assertThat(signature).isEqualTo(expectedSignature)
     }

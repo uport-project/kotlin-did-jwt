@@ -3,9 +3,9 @@
 package me.uport.sdk.jwt
 
 import me.uport.sdk.signer.getUncompressedPublicKeyWithPrefix
-import org.kethereum.hashes.sha256
 import org.kethereum.model.PublicKey
 import org.kethereum.model.SignatureData
+import org.komputing.khash.sha256.extensions.sha256
 import org.spongycastle.asn1.x9.X9IntegerConverter
 import org.spongycastle.crypto.digests.SHA256Digest
 import org.spongycastle.crypto.ec.CustomNamedCurves
@@ -35,7 +35,11 @@ internal data class ECDSASignature internal constructor(val r: BigInteger, val s
  *
  * @return `true` when there is a match or `false` otherwise
  */
-internal fun ecVerify(messageHash: ByteArray, signature: SignatureData, publicKey: PublicKey): Boolean {
+internal fun ecVerify(
+    messageHash: ByteArray,
+    signature: SignatureData,
+    publicKey: PublicKey
+): Boolean {
     val publicKeyBytes = publicKey.getUncompressedPublicKeyWithPrefix()
 
     val ecPoint = CURVE.curve.decodePoint(publicKeyBytes)
@@ -51,7 +55,11 @@ internal fun ecVerify(messageHash: ByteArray, signature: SignatureData, publicKe
 /***
  * Copied from Kethereum because it is a private method there
  */
-internal fun recoverFromSignature(recId: Int, sig: ECDSASignature, messageHash: ByteArray?): BigInteger? {
+internal fun recoverFromSignature(
+    recId: Int,
+    sig: ECDSASignature,
+    messageHash: ByteArray?
+): BigInteger? {
     require(recId >= 0) { "recId must be positive" }
     require(sig.r.signum() >= 0) { "r must be positive" }
     require(sig.s.signum() >= 0) { "s must be positive" }

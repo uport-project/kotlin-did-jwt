@@ -11,7 +11,12 @@ import kotlinx.serialization.SerializationException
 import me.uport.sdk.core.HttpClient
 import me.uport.sdk.testhelpers.coAssert
 import me.uport.sdk.testhelpers.isInstanceOf
-import me.uport.sdk.universaldid.*
+import me.uport.sdk.universaldid.AuthenticationEntry
+import me.uport.sdk.universaldid.DIDDocumentImpl
+import me.uport.sdk.universaldid.DidResolverError
+import me.uport.sdk.universaldid.PublicKeyEntry
+import me.uport.sdk.universaldid.PublicKeyType
+import me.uport.sdk.universaldid.UniversalDID
 import org.junit.Test
 import java.io.IOException
 

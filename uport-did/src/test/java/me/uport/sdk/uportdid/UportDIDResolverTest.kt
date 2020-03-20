@@ -15,11 +15,11 @@ import kotlinx.coroutines.runBlocking
 import me.uport.mnid.Account
 import me.uport.sdk.core.HttpClient
 import me.uport.sdk.core.Networks
+import me.uport.sdk.core.clean0xPrefix
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.universaldid.PublicKeyType.Companion.Curve25519EncryptionPublicKey
 import me.uport.sdk.universaldid.PublicKeyType.Companion.Secp256k1VerificationKey2018
 import org.junit.Test
-import org.komputing.khex.extensions.clean0xPrefix
 
 class UportDIDResolverTest {
 
@@ -27,7 +27,8 @@ class UportDIDResolverTest {
     fun `can encode a uPort registry Get method call`() {
         val expectedEncoding =
             "0x447885f075506f727450726f66696c654950465331323230000000000000000000000000000000000000000000000000f12c30cd32b4a027710c150ae742f50db0749213000000000000000000000000f12c30cd32b4a027710c150ae742f50db0749213"
-        val acc = Account.from(network = "0x04", address = "0xf12c30cd32b4a027710c150ae742f50db0749213")
+        val acc =
+            Account.from(network = "0x04", address = "0xf12c30cd32b4a027710c150ae742f50db0749213")
         val rpc = mockk<JsonRPC>()
         val encoding = UportDIDResolver(rpc).encodeRegistryGetCall("uPortProfileIPFS1220", acc, acc)
 
@@ -116,7 +117,10 @@ class UportDIDResolverTest {
             name = null
         )
 
-        val ddo = UportDIDResolver(rpc, http).getProfileDocumentFor(mnid = "2ozs2ntCXceKkAQKX4c9xp2zPS8pvkJhVqC")
+        val ddo = UportDIDResolver(
+            rpc,
+            http
+        ).getProfileDocumentFor(mnid = "2ozs2ntCXceKkAQKX4c9xp2zPS8pvkJhVqC")
 
         assertThat(ddo).isEqualTo(expectedDDO)
     }

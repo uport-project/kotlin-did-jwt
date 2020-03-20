@@ -1,9 +1,21 @@
 package me.uport.sdk.jwt.model
 
-import kotlinx.serialization.*
-import kotlinx.serialization.internal.LinkedHashMapClassDesc
-import kotlinx.serialization.internal.StringDescriptor
-import kotlinx.serialization.json.*
+import kotlinx.serialization.Decoder
+import kotlinx.serialization.Encoder
+import kotlinx.serialization.ImplicitReflectionSerializer
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.PolymorphicKind
+import kotlinx.serialization.SerialDescriptor
+import kotlinx.serialization.encode
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonConfiguration
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonLiteral
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonObjectSerializer
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.modules.getContextualOrDefault
 
 /**
@@ -71,11 +83,11 @@ object ArbitraryMapSerializer : KSerializer<Map<String, Any?>> {
     }
 
     override val descriptor: SerialDescriptor
-        get() = LinkedHashMapClassDesc(StringDescriptor, PolymorphicClassDescriptor)
+        get() = SerialDescriptor("arbitrary map", PolymorphicKind.OPEN)
 
     @ImplicitReflectionSerializer
-    override fun serialize(encoder: Encoder, obj: Map<String, Any?>) {
-        val asJsonObj: JsonObject = obj.toJsonObject()
+    override fun serialize(encoder: Encoder, value: Map<String, Any?>) {
+        val asJsonObj: JsonObject = value.toJsonObject()
         encoder.encode(JsonObjectSerializer, asJsonObj)
     }
 
