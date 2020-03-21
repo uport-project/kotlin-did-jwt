@@ -49,7 +49,6 @@ class EthrDID(
 
     private val owner: String? = null
 
-
     class DelegateOptions(
         val delegateType: PublicKeyType = PublicKeyType.veriKey,
         val expiresIn: Long = 86400L
@@ -58,7 +57,7 @@ class EthrDID(
     suspend fun lookupOwner(cache: Boolean = true): String {
         if (cache && this.owner != null) return this.owner
         val encodedCall =
-            EthereumDIDRegistry.IdentityOwner.encode(Solidity.Address(address.hexToBigInteger()))
+            Erc1056Contract.IdentityOwner.encode(Solidity.Address(address.hexToBigInteger()))
         val rawResult = rpc.ethCall(registry, encodedCall)
         return rawResult.substring(rawResult.length - 40).prepend0xPrefix()
     }
@@ -66,14 +65,13 @@ class EthrDID(
     suspend fun changeOwner(newOwner: String, txOptions: TransactionOptions? = null): String {
         val owner = lookupOwner()
 
-        val encodedCall = EthereumDIDRegistry.ChangeOwner.encode(
+        val encodedCall = Erc1056Contract.ChangeOwner.encode(
             Solidity.Address(address.hexToBigInteger()),
             Solidity.Address(newOwner.hexToBigInteger())
         )
 
         return signAndSendContractCall(owner, encodedCall, txOptions)
     }
-
 
     suspend fun addDelegate(
         delegate: String,
@@ -82,7 +80,7 @@ class EthrDID(
     ): String {
         val owner = lookupOwner()
 
-        val encodedCall = EthereumDIDRegistry.AddDelegate.encode(
+        val encodedCall = Erc1056Contract.AddDelegate.encode(
             Solidity.Address(this.address.hexToBigInteger()),
             Solidity.Bytes32(options.delegateType.name.toByteArray(utf8)),
             Solidity.Address(delegate.hexToBigInteger()),
@@ -98,7 +96,7 @@ class EthrDID(
         txOptions: TransactionOptions? = null
     ): String {
         val owner = this.lookupOwner()
-        val encodedCall = EthereumDIDRegistry.RevokeDelegate.encode(
+        val encodedCall = Erc1056Contract.RevokeDelegate.encode(
             Solidity.Address(this.address.hexToBigInteger()),
             Solidity.Bytes32(delegateType.name.toByteArray(utf8)),
             Solidity.Address(delegate.hexToBigInteger())
@@ -114,7 +112,7 @@ class EthrDID(
         txOptions: TransactionOptions? = null
     ): String {
         val owner = this.lookupOwner()
-        val encodedCall = EthereumDIDRegistry.SetAttribute.encode(
+        val encodedCall = Erc1056Contract.SetAttribute.encode(
             Solidity.Address(this.address.hexToBigInteger()),
             Solidity.Bytes32(key.toByteArray(utf8)),
             Solidity.Bytes(value.toByteArray(utf8)),

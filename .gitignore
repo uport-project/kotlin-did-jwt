@@ -1,7 +1,6 @@
 # repo-specific config
 publish.properties
 
-
 # Created by https://www.gitignore.io/api/linux,macos,gradle,windows,android,androidstudio
 
 ### Android ###
@@ -237,6 +236,5 @@ gradle-app.setting
 
 # # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
 # gradle/wrapper/gradle-wrapper.properties
-
 
 # End of https://www.gitignore.io/api/linux,macos,gradle,windows,android,androidstudio

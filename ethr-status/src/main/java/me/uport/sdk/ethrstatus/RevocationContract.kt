@@ -1,4 +1,4 @@
-@file:Suppress("UndocumentedPublicFunction", "UndocumentedPublicClass", "unused")
+@file:Suppress("unused")
 
 package me.uport.sdk.ethrstatus
 
@@ -10,7 +10,7 @@ import pm.gnosis.model.SolidityBase
  *
  * This class was generated using the bivrost tools
  */
-class RevocationContract {
+internal class RevocationContract {
     object Revoked {
         private const val METHOD_ID: String = "e46e3846"
 

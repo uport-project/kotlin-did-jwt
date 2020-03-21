@@ -7,7 +7,7 @@ This is the Kotlin implementation of the basic JWT methods for DID-JWTs
 
 [FAQ and helpdesk support](http://bit.ly/uPort_helpdesk)
 
-# did-jwt
+## did-jwt
 
 The kotlin-did-JWT library allows you to sign and verify
 [JSON Web Tokens (JWT)](https://tools.ietf.org/html/rfc7519) using ES256K, and ES256K-R algorithms. 
@@ -21,10 +21,8 @@ of the signing identity of the claim, which is passed as the `iss` attribute of 
 We currently support the following DID methods:
 
 - [`ethr`](https://github.com/uport-project/ethr-did-resolver)
-- [`uport`](https://github.com/uport-project/uport-did-resolver)
 - [`web`](https://github.com/uport-project/https-did-resolver)
 - [`https`](https://github.com/uport-project/https-did-resolver) *DEPRECATED*
-
 
 Defaults are automatically installed but you can customize to fit your needs.
 
@@ -40,7 +38,7 @@ val resolver : DIDResolver = DIDResolver.Builder
 .build()
 ```
 
-Once you've verified that it works, please add a PR adding it to the above list so people can find it.
+Once you've verified that it works, feel free to advertise it in the list above so people can find it.
 
 If your DID method requires a different signing algorithm than what is already supported, 
 please create a PR.
@@ -63,7 +61,7 @@ allprojects {
 In your application `build.gradle` file, add:
 
 ```groovy
-def did_jwt_version = "0.3.6"
+def did_jwt_version = "0.4.0"
 dependencies {
     //...
     implementation "com.github.uport-project.kotlin-did-jwt:jwt:$did_jwt_version"
@@ -90,7 +88,6 @@ val issuerDID = "did:ethr:${signer.getAddress()}"
 val token = jwt.createJWT(payload, issuerDID, signer)
 ```
 
-
 ### 2. Decode a did-JWT
 
 Try decoding the JWT.  You can also do this using [jwt.io](https://jwt.io)
@@ -116,7 +113,6 @@ but that is a more rigid structure and will be phased away in future releases.
 
 ### 3. Verify a did-JWT
 
-
 ```kotlin
 val resolver = EthrDIDResolver.Builder()
                                .addNetwork(EthrDIDNetwork("<name>", "<registryAddress>", "<JsonRPC>"))
@@ -127,6 +123,9 @@ val payload : JwtPayload = JWTTools().verify("<token>", resolver)
 
 If the token is valid, the method returns the decoded payload,
 otherwise throws a `InvalidJWTException` or `JWTEncodingException`
+
+> **This behavior is subject to change in an upcoming release**
+> The verify() method will return a higher level abstraction that will contain the payload and more.
 
 The function requires a DIDResolver which will be used to resolve DIDs during the verification
 
@@ -146,16 +145,17 @@ This same `aud` DID must be supplied to the `verify()` method for the token to b
 Generally your app will have its own DID which should always be passed to the `verify` method
 so that only tokens intended for your app are considered valid. 
 
-
 ## CHANGELOG
 
+* 0.4.0
+    - removed deprecated components ( #46 )
 * 0.3.6
     - fix: okhttp dependency issue (#43)
-    - docs: mark UportDIDResolver as deprecated
-    - refactor: code cleanup, enforcing detekt on PRs  
+    - docs: mark UportDIDResolver as deprecated (f5ffad34)
+    - refactor: code cleanup, enforcing detekt on PRs (#45) 
 * 0.3.5
     - feat: add credential status / revocation support (#35)(#42)
-    - support: bump dependencies (#44)
+    - support: bump dependencies (kotlin 1.3.70, kethereum 0.81.4) (#44)
 * 0.3.4
     - feat: deprecate UniversalResolver singleton (#31)(#34)(#37)
 * 0.3.3

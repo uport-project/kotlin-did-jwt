@@ -1,7 +1,5 @@
 package me.uport.sdk.jwt
 
-import me.uport.mnid.MNID
-
 /**
  * Utilities for dealing with known JWT and DID types and formats
  */
@@ -26,27 +24,18 @@ object JWTUtils {
      * Attempts to normalize a [potentialDID] to a known format.
      *
      * @return This will transform an ethereum address into an ethr-did
-     * and an MNID string into a uport-did
      * Other cases return the original string
      */
     fun normalizeKnownDID(potentialDID: String): String {
 
         val ethPattern = "^(0[xX])*([0-9a-fA-F]{40})".toRegex()
 
-        return when {
-            potentialDID.matches("^did:(.*)?:.*".toRegex()) ->
-                potentialDID
-
-            potentialDID.matches(ethPattern) -> {
-                val it = ethPattern.matchEntire(potentialDID)!!
-                val (_, hexDigits) = it.destructured
-                return "did:ethr:0x$hexDigits"
-            }
-
-            MNID.isMNID(potentialDID) ->
-                "did:uport:$potentialDID"
-
-            else -> potentialDID
+        val matchResult = ethPattern.matchEntire(potentialDID)
+        if (matchResult != null) {
+            val (_, hexDigits) = matchResult.destructured
+            return "did:ethr:0x$hexDigits"
         }
+
+        return potentialDID
     }
 }

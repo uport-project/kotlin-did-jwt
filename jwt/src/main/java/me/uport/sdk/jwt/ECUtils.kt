@@ -22,7 +22,6 @@ import java.security.SignatureException
 internal val CURVE by lazy { CustomNamedCurves.getByName("secp256k1")!! }
 internal val DOMAIN_PARAMS = CURVE.run { ECDomainParameters(curve, g, n, h) }
 
-
 internal data class ECDSASignature internal constructor(val r: BigInteger, val s: BigInteger)
 
 /**

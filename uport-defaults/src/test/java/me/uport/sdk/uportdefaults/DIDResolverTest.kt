@@ -3,18 +3,14 @@ package me.uport.sdk.uportdefaults
 import assertk.assertThat
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
-import me.uport.sdk.core.Networks
 import me.uport.sdk.ethrdid.EthrDIDNetwork
 import me.uport.sdk.ethrdid.EthrDIDResolver
 import me.uport.sdk.httpsdid.WebDIDResolver
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.universaldid.DIDResolver
-import me.uport.sdk.uportdid.UportDIDResolver
 import org.junit.Test
 
-
 class DIDResolverTest {
-
 
     @Test
     fun `can resolve valid dids after adding resolvers`() {
@@ -23,8 +19,6 @@ class DIDResolverTest {
                 EthrDIDResolver.Builder()
                     .addNetwork(EthrDIDNetwork("", "0xregistry", JsonRPC("")))
                     .build()
-            ).addResolver(
-                UportDIDResolver(JsonRPC(Networks.rinkeby.rpcUrl))
             )
             .addResolver(
                 WebDIDResolver()
@@ -37,18 +31,13 @@ class DIDResolverTest {
             "did:https:example.com",
             "did:https:example.ngrok.com#owner",
             "did:web:example.com",
-            "did:web:example.com#owner",
-            "2nQtiQG6Cgm1GYTBaaKAgr76uY7iSexUkqX",
-            "5A8bRWU3F7j3REx3vkJWxdjQPp4tqmxFPmab1Tr",
-            "did:uport:2nQtiQG6Cgm1GYTBaaKAgr76uY7iSexUkqX",
-            "did:uport:2nQtiQG6Cgm1GYTBaaKAgr76uY7iSexUkqX#owner"
+            "did:web:example.com#owner"
         )
 
         dids.forEach {
             assertThat(resolver.canResolve(it)).isTrue()
         }
     }
-
 
     @Test
     fun `fails to resolve valid dids without adding resolvers`() {
@@ -92,7 +81,6 @@ class DIDResolverTest {
             assertThat(resolver.canResolve(it)).isFalse()
         }
     }
-
 
     @Test
     fun `fails on invalid dids`() {

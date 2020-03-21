@@ -1,5 +1,3 @@
-@file:Suppress("MemberVisibilityCanBePrivate", "EXPERIMENTAL_API_USAGE")
-
 package me.uport.sdk.jwt
 
 import assertk.assertThat
@@ -45,7 +43,8 @@ class SerializationTesting {
                 )
             )
         )
-        val serialized = Json.stringify(CompoundTestObject.serializer(), aa)
+        val serialized =
+            Json(JsonConfiguration.Stable).stringify(CompoundTestObject.serializer(), aa)
         assertThat(serialized).isEqualTo("""{"generic":{"hello":"world","missing":null,"some number":4321,"number as string":"1234","boolean":false,"boolean as string":"true","custom object":{"@context":["asdf"]},"obj":{"a":"b","c":null}}}""")
     }
 
