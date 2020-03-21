@@ -28,6 +28,7 @@ import me.uport.sdk.core.HttpClient
 import me.uport.sdk.core.Networks
 import me.uport.sdk.core.hexToBigInteger
 import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDOwnerChanged
+import me.uport.sdk.ethrdid.EthrDIDResolver.Companion.DEFAULT_REGISTRY_ADDRESS
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jsonrpc.model.JsonRpcLogItem
 import me.uport.sdk.jsonrpc.model.exceptions.JSON_RPC_INTERNAL_ERROR_CODE
@@ -804,10 +805,9 @@ class EthrDIDResolverTest {
 
     @Test
     fun `throws when registry is not configured`() {
-        val rpc = mockk<JsonRPC>()
         val resolver =
             EthrDIDResolver.Builder()
-                .addNetwork(EthrDIDNetwork("", "", rpc, "0x1"))
+                .addNetwork(EthrDIDNetwork("", DEFAULT_REGISTRY_ADDRESS, mockk(), "0x1"))
                 .build()
         coAssert {
             resolver.resolve("did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a")

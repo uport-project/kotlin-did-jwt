@@ -1,5 +1,3 @@
-@file:Suppress("LargeClass")
-
 package me.uport.sdk.jwt
 
 import assertk.all
