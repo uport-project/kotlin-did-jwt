@@ -294,25 +294,6 @@ class TimestampTests {
         Unit
     }
 
-    @Suppress("DEPRECATION")
-    @Test
-    fun `fail when nbf missing and iat in the future (deprecated)`() = runBlocking {
-        val tested = JWTTools(TestTimeProvider(NOW))
-        val jwt =
-            "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJpYXQiOjE5MDAsImlzcyI6IjB4Y2YwM2RkMGE4OTRlZjc5Y2I1YjYwMWE0M2M0YjI1ZTNhZTRjNjdlZCJ9.PJ9wHrlcL_ScDretwS8q5izSmi4CZXRTyXyuhmlbVLGI0v2bioqMYLJZS6aMMEN1A6s7HT10BPFFt8XxLdZuvw"
-
-        val (_, decoded, _) = tested.decodeRaw(jwt)
-        assertThat(decoded.containsKey("nbf")).isEqualTo(false)
-        assertThat(decoded["iat"]).isEqualTo(FUTURE)
-
-        coAssert {
-            tested.verify(jwt)
-        }.isFailure().all {
-            isInstanceOf(InvalidJWTException::class)
-            hasMessage("Jwt not valid yet (issued in the future) iat: $FUTURE")
-        }
-    }
-
     @Test
     fun `fail when nbf missing and iat in the future`() = runBlocking {
         val tested = JWTTools(TestTimeProvider(NOW))
