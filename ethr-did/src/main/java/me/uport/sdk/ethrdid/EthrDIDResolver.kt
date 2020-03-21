@@ -9,9 +9,9 @@ import me.uport.sdk.core.hexToBigInteger
 import me.uport.sdk.core.hexToByteArray
 import me.uport.sdk.core.prepend0xPrefix
 import me.uport.sdk.core.toBase64
-import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDAttributeChanged
-import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDDelegateChanged
-import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDOwnerChanged
+import me.uport.sdk.ethrdid.Erc1056Contract.Events.DIDAttributeChanged
+import me.uport.sdk.ethrdid.Erc1056Contract.Events.DIDDelegateChanged
+import me.uport.sdk.ethrdid.Erc1056Contract.Events.DIDOwnerChanged
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jsonrpc.model.exceptions.JsonRpcException
 import me.uport.sdk.signer.Signer
@@ -79,7 +79,8 @@ open class EthrDIDResolver private constructor(registryMap: RegistryMap, clock: 
         val registryAddress = ethNetworkConfig.registryAddress
 
         require(registryAddress.isNotBlank()) {
-            "The registry address configured for network `$networkIdentifier` is blank."
+            "The registryAddress configured for network `${ethNetworkConfig.name}` is blank. " +
+                    "Please check the configuration you use in your EthrDIDResolver.Builder"
         }
 
         val normalizedDid = normalizeDid(did)
@@ -102,7 +103,7 @@ open class EthrDIDResolver private constructor(registryMap: RegistryMap, clock: 
         registryAddress: String
     ): String {
         val encodedCall =
-            EthereumDIDRegistry.Changed.encode(Solidity.Address(identity.hexToBigInteger()))
+            Erc1056Contract.Changed.encode(Solidity.Address(identity.hexToBigInteger()))
         return try {
             rpc.ethCall(registryAddress, encodedCall)
         } catch (err: JsonRpcException) {

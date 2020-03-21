@@ -1,4 +1,4 @@
-@file:Suppress("UndocumentedPublicFunction", "UndocumentedPublicClass", "MagicNumber")
+@file:Suppress("MagicNumber")
 
 package me.uport.sdk.ethrdid
 
@@ -15,7 +15,7 @@ import java.math.BigInteger
  * To generate the full interface use the
  * [bivrost](https://github.com/gnosis/bivrost-kotlin) tool on `/abi/EthereumDIDRegistry.json`
  */
-class EthereumDIDRegistry {
+internal class Erc1056Contract {
 
     object Changed {
         private const val METHOD_ID: String = "f96d0f9f"

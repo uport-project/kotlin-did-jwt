@@ -1,4 +1,4 @@
-@file:Suppress("EXPERIMENTAL_API_USAGE")
+@file:Suppress("unused")
 
 package me.uport.sdk.universaldid
 

@@ -1,6 +1,5 @@
 @file:Suppress(
     "KDocUnresolvedReference",
-    "EXPERIMENTAL_API_USAGE",
     "ThrowsCount",
     "MagicNumber"
 )

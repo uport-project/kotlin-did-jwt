@@ -27,7 +27,7 @@ import kotlinx.coroutines.runBlocking
 import me.uport.sdk.core.HttpClient
 import me.uport.sdk.core.Networks
 import me.uport.sdk.core.hexToBigInteger
-import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDOwnerChanged
+import me.uport.sdk.ethrdid.Erc1056Contract.Events.DIDOwnerChanged
 import me.uport.sdk.ethrdid.EthrDIDResolver.Companion.DEFAULT_REGISTRY_ADDRESS
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jsonrpc.model.JsonRpcLogItem
@@ -386,7 +386,7 @@ class EthrDIDResolverTest {
         val identity = "0xf3beac30c498d9e26865f34fcaa57dbb935b0d74"
         val owner = identity
 
-        val event = EthereumDIDRegistry.Events.DIDAttributeChanged.Arguments(
+        val event = Erc1056Contract.Events.DIDAttributeChanged.Arguments(
             identity = Solidity.Address(identity.hexToBigInteger()),
             name = Solidity.Bytes32("did/pub/Secp256k1/veriKey/base64".toByteArray()),
             value = Solidity.Bytes("0x02b97c30de767f084ce3080168ee293053ba33b235d7116a3263d29f1450936b71".hexToByteArray()),
@@ -804,15 +804,19 @@ class EthrDIDResolverTest {
     }
 
     @Test
-    fun `throws when registry is not configured`() {
+    fun `throws when registry address is not configured`() {
         val resolver =
             EthrDIDResolver.Builder()
-                .addNetwork(EthrDIDNetwork("", DEFAULT_REGISTRY_ADDRESS, mockk(), "0x1"))
+                .addNetwork(EthrDIDNetwork("", "", mockk(), "0x1"))
                 .build()
         coAssert {
             resolver.resolve("did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a")
         }.isFailure().all {
             isInstanceOf(IllegalArgumentException::class)
+            hasMessage(
+                "The registryAddress configured for network `` is blank. " +
+                        "Please check the configuration you use in your EthrDIDResolver.Builder"
+            )
         }
     }
 
@@ -820,7 +824,7 @@ class EthrDIDResolverTest {
     fun `parses attribute changed event with trailing null chars`() = runBlocking {
         val resolver = EthrDIDResolver.Builder().build()
 
-        val event = EthereumDIDRegistry.Events.DIDAttributeChanged.Arguments(
+        val event = Erc1056Contract.Events.DIDAttributeChanged.Arguments(
             identity = Solidity.Address(BigInteger("1318742768210968905798991064222156353846287247782")),
             name = Solidity.Bytes32("0x6469642f7075622f736563703235366b312f766572694b65792f686578000000".hexToByteArray()),
             value = Solidity.Bytes("0x0295dda1dca7f80e308ef60155ddeac00e46b797fd40ef407f422e88d2467a27eb".hexToByteArray()),
@@ -856,7 +860,7 @@ class EthrDIDResolverTest {
         } throws JsonRpcException(JSON_RPC_INTERNAL_ERROR_CODE, "fake error")
 
         val resolver = EthrDIDResolver.Builder()
-            .addNetwork(EthrDIDNetwork("", "0xregistry", rpc, "0x1")).build()
+            .addNetwork(EthrDIDNetwork("", DEFAULT_REGISTRY_ADDRESS, rpc, "0x1")).build()
         coAssert {
             resolver.lastChanged("0xb9c5714089478a327f09197987f16f9e5d936e8a", rpc, "0xregistry")
         }.isFailure().all {

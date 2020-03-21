@@ -1,5 +1,3 @@
-@file:Suppress("EXPERIMENTAL_API_USAGE")
-
 package me.uport.sdk.jwt.model
 
 import kotlinx.serialization.Serializable
@@ -26,6 +24,6 @@ class JwtHeader(
             jsonAdapter.parse(serializer(), headerString)
 
         private val jsonAdapter =
-            Json(JsonConfiguration(isLenient = true, ignoreUnknownKeys = true))
+            Json(JsonConfiguration.Stable.copy(isLenient = true, ignoreUnknownKeys = true))
     }
 }
