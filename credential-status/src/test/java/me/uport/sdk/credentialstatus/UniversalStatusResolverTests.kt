@@ -1,6 +1,6 @@
 @file:Suppress("UndocumentedPublicFunction", "UndocumentedPublicClass")
 
-package me.uport.sdk.credential_status
+package me.uport.sdk.credentialstatus
 
 import assertk.all
 import assertk.assertThat
