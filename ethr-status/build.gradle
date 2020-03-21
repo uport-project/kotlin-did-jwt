@@ -6,7 +6,6 @@ apply plugin: "com.jfrog.bintray"
 
 project.ext.description = "Ethr implementation of credential-status"
 
-
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     api "com.github.uport-project.kotlin-common:jsonrpc:$uport_kotlin_common_version"

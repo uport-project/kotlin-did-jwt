@@ -1,7 +1,5 @@
 @file:Suppress(
     "KDocUnresolvedReference",
-    "EXPERIMENTAL_API_USAGE",
-    "DEPRECATION",
     "ThrowsCount",
     "MagicNumber"
 )
@@ -36,7 +34,6 @@ import me.uport.sdk.universaldid.PublicKeyEntry
 import me.uport.sdk.universaldid.PublicKeyType.Companion.EcdsaPublicKeySecp256k1
 import me.uport.sdk.universaldid.PublicKeyType.Companion.Secp256k1SignatureVerificationKey2018
 import me.uport.sdk.universaldid.PublicKeyType.Companion.Secp256k1VerificationKey2018
-import me.uport.sdk.universaldid.UniversalDID
 import org.kethereum.crypto.toAddress
 import org.kethereum.extensions.toBigInteger
 import org.kethereum.model.PUBLIC_KEY_SIZE
@@ -205,36 +202,6 @@ class JWTTools(
         } catch (ex: JsonException) {
             throw JWTEncodingException("cannot parse the JWT($token)", ex)
         }
-    }
-
-
-    /**
-     * Verifies a jwt [token]
-     * @param token the jwt token to be verified
-     * @param auth if this param is `true` the public key list that this token is checked against is filtered to the
-     *          entries in the `authentication` entries in the DID document of the issuer of the token.
-     * @param audience the audience that should be able to verify this token. This is usually a DID but can also be a
-     *          callback URL for situations where the token represents a response or a bearer token.
-     * @throws InvalidJWTException when the current time is not within the time range of payload `iat` and `exp`
-     *          , when no public key matches are found in the DID document
-     *          , when the `audience` does not match the intended audience (`aud` field)
-     * @return a [JwtPayload] if the verification is successful and `null` if it fails
-     */
-    @Suppress("DEPRECATION")
-    @Deprecated(
-        "Verifying a jwt token using the Universal Resolver is deprecated " +
-                "in favor of using a local resolver passed in as a method parameter." +
-                "This will be removed in the next major release.",
-        ReplaceWith(
-            """verify(token: String, auth: Boolean = false, audience: String? = null, resolver: DIDResolver)"""
-        )
-    )
-    suspend fun verify(
-        token: String,
-        auth: Boolean = false,
-        audience: String? = null
-    ): JwtPayload {
-        return verify(token, UniversalDID, auth, audience)
     }
 
     /**

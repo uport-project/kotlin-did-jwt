@@ -1,4 +1,4 @@
-@file:Suppress("EXPERIMENTAL_API_USAGE")
+@file:Suppress("unused")
 
 package me.uport.sdk.universaldid
 
@@ -127,7 +127,6 @@ data class PublicKeyType(val name: String) {
 
         override fun deserialize(decoder: Decoder): PublicKeyType =
             PublicKeyType(decoder.decodeString())
-
 
         //////////////////////////////
         //some known key types

@@ -14,16 +14,13 @@ import me.uport.sdk.universaldid.DIDDocument
  */
 class UniversalStatusResolver : StatusResolver {
 
-
     private val resolvers = mapOf<String, StatusResolver>().toMutableMap()
-
 
     /**
      * This universal resolver can't be used for any one particular resolver but for all [StatusResolver]s
      * that have been added using [registerResolver]
      */
     override val method: String = ""
-
 
     /**
      * Looks for a [StatusResolver] that can check status using the provided [method]
@@ -42,7 +39,6 @@ class UniversalStatusResolver : StatusResolver {
 
         return resolver.checkStatus(credential, didDoc)
     }
-
 
     /**
      * Register a resolver for a particular [method]

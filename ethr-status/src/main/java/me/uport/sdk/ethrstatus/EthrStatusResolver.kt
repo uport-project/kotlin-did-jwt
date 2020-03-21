@@ -12,7 +12,6 @@ import org.kethereum.keccakshortcut.keccak
 import pm.gnosis.model.Solidity
 import java.math.BigInteger
 
-
 /**
  * Ethr Implementation of the [StatusResolver]
  * This class enables users check the revocation status of a credential

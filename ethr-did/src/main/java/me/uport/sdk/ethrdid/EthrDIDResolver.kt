@@ -9,9 +9,9 @@ import me.uport.sdk.core.hexToBigInteger
 import me.uport.sdk.core.hexToByteArray
 import me.uport.sdk.core.prepend0xPrefix
 import me.uport.sdk.core.toBase64
-import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDAttributeChanged
-import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDDelegateChanged
-import me.uport.sdk.ethrdid.EthereumDIDRegistry.Events.DIDOwnerChanged
+import me.uport.sdk.ethrdid.Erc1056Contract.Events.DIDAttributeChanged
+import me.uport.sdk.ethrdid.Erc1056Contract.Events.DIDDelegateChanged
+import me.uport.sdk.ethrdid.Erc1056Contract.Events.DIDOwnerChanged
 import me.uport.sdk.jsonrpc.JsonRPC
 import me.uport.sdk.jsonrpc.model.exceptions.JsonRpcException
 import me.uport.sdk.signer.Signer
@@ -42,34 +42,11 @@ import java.util.*
  *
  * Example ethr did: "did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a"
  */
-open class EthrDIDResolver : DIDResolver {
+open class EthrDIDResolver private constructor(registryMap: RegistryMap, clock: ITimeProvider) :
+    DIDResolver {
 
-    private val _registryMap: RegistryMap
-    private val _timeProvider: ITimeProvider
-
-    private constructor(registryMap: RegistryMap, clock: ITimeProvider) {
-        _timeProvider = clock
-        this._registryMap = registryMap
-    }
-
-    @Deprecated(
-        "Constructing the resolver directly has been deprecated " +
-                "in favor of the Builder pattern that can supply multi-network configurations." +
-                "This will be removed in the next major release.",
-        ReplaceWith(
-            """EthrDIDResolver.Builder().addNetwork(EthrDIDNetwork("", registryAddress, rpc, "0x1")).build()""",
-            "me.uport.sdk.ethrdid.EthrDIDResolver.Companion.DEFAULT_REGISTRY_ADDRESS"
-        )
-    )
-    constructor(
-        rpc: JsonRPC,
-        registryAddress: String = DEFAULT_REGISTRY_ADDRESS,
-        timeProvider: ITimeProvider = SystemTimeProvider
-    ) {
-        val net = EthrDIDNetwork(DEFAULT_NETWORK_NAME, registryAddress, rpc, "0x1")
-        this._timeProvider = timeProvider
-        this._registryMap = RegistryMap().registerNetwork(net)
-    }
+    private val _registryMap: RegistryMap = registryMap
+    private val _timeProvider: ITimeProvider = clock
 
     override val method = "ethr"
 
@@ -102,7 +79,8 @@ open class EthrDIDResolver : DIDResolver {
         val registryAddress = ethNetworkConfig.registryAddress
 
         require(registryAddress.isNotBlank()) {
-            "The registry address configured for network `$networkIdentifier` is blank."
+            "The registryAddress configured for network `${ethNetworkConfig.name}` is blank. " +
+                    "Please check the configuration you use in your EthrDIDResolver.Builder"
         }
 
         val normalizedDid = normalizeDid(did)
@@ -125,7 +103,7 @@ open class EthrDIDResolver : DIDResolver {
         registryAddress: String
     ): String {
         val encodedCall =
-            EthereumDIDRegistry.Changed.encode(Solidity.Address(identity.hexToBigInteger()))
+            Erc1056Contract.Changed.encode(Solidity.Address(identity.hexToBigInteger()))
         return try {
             rpc.ethCall(registryAddress, encodedCall)
         } catch (err: JsonRpcException) {
@@ -189,7 +167,6 @@ open class EthrDIDResolver : DIDResolver {
                 }
 
             }
-
 
         } while (lastChange != BigInteger.ZERO)
 

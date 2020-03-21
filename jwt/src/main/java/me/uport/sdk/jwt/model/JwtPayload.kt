@@ -1,5 +1,3 @@
-@file:Suppress("EXPERIMENTAL_API_USAGE")
-
 package me.uport.sdk.jwt.model
 
 import kotlinx.serialization.ContextualSerialization
@@ -83,6 +81,6 @@ data class JwtPayload(
             jsonAdapter.parse(serializer(), payloadString)
 
         private val jsonAdapter =
-            Json(JsonConfiguration(isLenient = true, ignoreUnknownKeys = true))
+            Json(JsonConfiguration.Stable.copy(isLenient = true, ignoreUnknownKeys = true))
     }
 }
