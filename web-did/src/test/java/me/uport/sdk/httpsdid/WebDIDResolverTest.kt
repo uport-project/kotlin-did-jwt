@@ -18,7 +18,6 @@ import me.uport.sdk.universaldid.DIDDocumentImpl
 import me.uport.sdk.universaldid.DidResolverError
 import me.uport.sdk.universaldid.PublicKeyEntry
 import me.uport.sdk.universaldid.PublicKeyType
-import me.uport.sdk.universaldid.UniversalDID
 import org.junit.Test
 import java.io.IOException
 
@@ -152,22 +151,4 @@ class WebDIDResolverTest {
         val response = tested.resolve("did:web:example.com")
         assertThat(response).isEqualTo(exampleDidDoc)
     }
-
-    @Test
-    fun `resolves documents through universal resolver`() = runBlocking {
-
-        val http = mockk<HttpClient>()
-        val tested = WebDIDResolver(http)
-
-        coEvery { http.urlGet(any()) } returns exampleDidDocString
-
-        UniversalDID.registerResolver(tested)
-
-        val responseWeb = UniversalDID.resolve("did:web:example.com")
-        assertThat(responseWeb).isEqualTo(exampleDidDoc)
-
-        val responseHttps = UniversalDID.resolve("did:https:example.com")
-        assertThat(responseHttps).isEqualTo(exampleDidDoc)
-    }
-
 }
