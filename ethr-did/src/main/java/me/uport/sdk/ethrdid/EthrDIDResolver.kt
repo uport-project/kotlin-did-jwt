@@ -190,7 +190,6 @@ open class EthrDIDResolver : DIDResolver {
 
             }
 
-
         } while (lastChange != BigInteger.ZERO)
 
         return events

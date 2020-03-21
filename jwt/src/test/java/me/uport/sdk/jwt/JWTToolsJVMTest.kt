@@ -200,7 +200,6 @@ class JWTToolsJVMTest {
         }
     }
 
-
     @Test
     fun `finds public key`() = runBlocking {
 
@@ -235,7 +234,6 @@ class JWTToolsJVMTest {
         val authenticators = JWTTools().resolveAuthenticator(alg, issuer, auth, resolver)
         assertThat(authenticators).isEqualTo(doc.publicKey)
     }
-
 
     @Test
     fun `only list authenticators able to authenticate a user`() = runBlocking {
@@ -294,7 +292,6 @@ class JWTToolsJVMTest {
         assertThat(authenticators).isEqualTo(listOf(doc.publicKey[0], doc.publicKey[1]))
     }
 
-
     @Test
     fun `errors if no suitable public keys exist for authentication`() = runBlocking {
 
@@ -339,7 +336,6 @@ class JWTToolsJVMTest {
         }
     }
 
-
     @Test
     fun `errors if no public keys exist`() = runBlocking {
 
@@ -378,7 +374,6 @@ class JWTToolsJVMTest {
             isInstanceOf(InvalidJWTException::class)
         }
     }
-
 
     @Test
     fun `errors if no supported signature types exist`() = runBlocking {
@@ -471,14 +466,10 @@ class JWTToolsJVMTest {
 
     @Test
     fun `can normalize dids`() {
-        val uportDID = "did:uport:2oeXufHGDpU51bfKBsZDdu7Je9weJ3r7sVG"
-        val mnid = "2oeXufHGDpU51bfKBsZDdu7Je9weJ3r7sVG"
         val ethrDID = "did:ethr:0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4"
         val ethrAddress = "0xe8c91bde7625ab2c0ed9f214deb39440da7e03c4"
         val invalidDID = "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9"
 
-        assertThat(normalizeKnownDID(uportDID)).isEqualTo(uportDID)
-        assertThat(normalizeKnownDID(mnid)).isEqualTo(uportDID)
         assertThat(normalizeKnownDID(ethrDID)).isEqualTo(ethrDID)
         assertThat(normalizeKnownDID(ethrAddress)).isEqualTo(ethrDID)
         assertThat(normalizeKnownDID(invalidDID)).isEqualTo(invalidDID)
@@ -605,5 +596,4 @@ class JWTToolsJVMTest {
         assertThat(decoded["iss"]).isEqualTo("did:ex:ex")
     }
 }
-
 

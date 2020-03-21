@@ -25,7 +25,6 @@ We currently support the following DID methods:
 - [`web`](https://github.com/uport-project/https-did-resolver)
 - [`https`](https://github.com/uport-project/https-did-resolver) *DEPRECATED*
 
-
 Defaults are automatically installed but you can customize to fit your needs.
 
 Support for other DID methods should be simple.
@@ -90,7 +89,6 @@ val issuerDID = "did:ethr:${signer.getAddress()}"
 val token = jwt.createJWT(payload, issuerDID, signer)
 ```
 
-
 ### 2. Decode a did-JWT
 
 Try decoding the JWT.  You can also do this using [jwt.io](https://jwt.io)
@@ -115,7 +113,6 @@ You can also use `jwt.decode("<token>")` to get a `JwtPayload` object instead of
 but that is a more rigid structure and will be phased away in future releases. 
 
 ### 3. Verify a did-JWT
-
 
 ```kotlin
 val resolver = EthrDIDResolver.Builder()
@@ -145,7 +142,6 @@ This same `aud` DID must be supplied to the `verify()` method for the token to b
 
 Generally your app will have its own DID which should always be passed to the `verify` method
 so that only tokens intended for your app are considered valid. 
-
 
 ## CHANGELOG
 

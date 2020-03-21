@@ -49,7 +49,6 @@ class EthrDID(
 
     private val owner: String? = null
 
-
     class DelegateOptions(
         val delegateType: PublicKeyType = PublicKeyType.veriKey,
         val expiresIn: Long = 86400L
@@ -73,7 +72,6 @@ class EthrDID(
 
         return signAndSendContractCall(owner, encodedCall, txOptions)
     }
-
 
     suspend fun addDelegate(
         delegate: String,

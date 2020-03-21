@@ -65,7 +65,6 @@ class WebDIDResolverTest {
         service = emptyList()
     )
 
-
     @Test
     fun `can resolve valid dids`() {
         listOf(
@@ -154,7 +153,6 @@ class WebDIDResolverTest {
         assertThat(response).isEqualTo(exampleDidDoc)
     }
 
-
     @Test
     fun `resolves documents through universal resolver`() = runBlocking {
 
@@ -173,5 +171,3 @@ class WebDIDResolverTest {
     }
 
 }
-
-

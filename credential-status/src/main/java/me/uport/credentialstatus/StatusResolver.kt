@@ -7,7 +7,6 @@ import me.uport.sdk.universaldid.DIDDocument
  **/
 interface CredentialStatus
 
-
 /**
  * Represents a status method entry that could be embedded in a W3C Verifiable Credential.
  * Normally, only credentials that list a status method would need to be verified by it.
@@ -19,7 +18,6 @@ interface CredentialStatus
  *
  */
 data class StatusEntry(val type: String, val id: String)
-
 
 /**
  *

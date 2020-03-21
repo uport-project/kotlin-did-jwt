@@ -21,10 +21,8 @@ dependencies {
     api "com.github.uport-project.kotlin-common:jsonrpc:$uport_kotlin_common_version"
     api "com.github.uport-project.kotlin-common:core:$uport_kotlin_common_version"
     api "com.github.uport-project.kotlin-common:signer-common:$uport_kotlin_common_version"
-    implementation "com.github.uport-project:kmnid:$kmnid_version"
 
     api project(":universal-did")
-    api project(":uport-did")
     api project(":ethr-did")
     api project(":web-did")
     implementation "com.madgag.spongycastle:core:$spongycastle_version"

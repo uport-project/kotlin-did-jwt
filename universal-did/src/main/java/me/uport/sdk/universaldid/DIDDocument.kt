@@ -128,7 +128,6 @@ data class PublicKeyType(val name: String) {
         override fun deserialize(decoder: Decoder): PublicKeyType =
             PublicKeyType(decoder.decodeString())
 
-
         //////////////////////////////
         //some known key types
         //////////////////////////////

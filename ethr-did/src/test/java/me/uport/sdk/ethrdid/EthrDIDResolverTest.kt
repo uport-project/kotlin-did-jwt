@@ -90,7 +90,6 @@ class EthrDIDResolverTest {
         assertThat(lastChanged.hexToBigInteger()).isNotEqualTo(BigInteger.ZERO)
     }
 
-
     @Test
     fun `can parse getLogs response`() = runBlocking {
         val http = mockk<HttpClient>()
@@ -470,7 +469,6 @@ class EthrDIDResolverTest {
             "did:ethr:0x01:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner"
         )
 
-
         val invalidDids = listOf(
             "0xb9c5714089478a327f09197987f16f9e5d936e",
             "B9C5714089478a327F09197987f16f9E5d936E8a",
@@ -601,7 +599,6 @@ class EthrDIDResolverTest {
             )
         } returns """{"jsonrpc":"2.0","id":1,"result":[]}"""
 
-
         val resolver = EthrDIDResolver.Builder()
             .addNetwork(EthrDIDNetwork("mainnet", "mockregistry", rpc, "0x1"))
             .build()
@@ -641,7 +638,6 @@ class EthrDIDResolverTest {
                 any()
             )
         } returns """{"jsonrpc":"2.0","id":1,"result":[]}"""
-
 
         val resolver = EthrDIDResolver.Builder()
             .addNetwork(EthrDIDNetwork("mainnet", "0xregistry", rpc, "0x1"))
@@ -700,7 +696,6 @@ class EthrDIDResolverTest {
                 any()
             )
         } returns """{"jsonrpc":"2.0","id":1,"result":[]}"""
-
 
         val resolver = EthrDIDResolver.Builder()
             .addNetwork(EthrDIDNetwork("__default__", "0xregistry", rpc, "0x01"))
@@ -806,7 +801,6 @@ class EthrDIDResolverTest {
             assertThat(resolver.canResolve(it)).isFalse()
         }
     }
-
 
     @Test
     fun `throws when registry is not configured`() {
