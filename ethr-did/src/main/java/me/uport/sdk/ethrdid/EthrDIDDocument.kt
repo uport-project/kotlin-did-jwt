@@ -35,7 +35,7 @@ data class EthrDIDDocument(
     /**
      * serialize this [EthrDIDDocument] to a JSON string
      */
-    fun toJson() = jsonParser.stringify(serializer(), this)
+    fun toJson() = jsonParser.encodeToString(serializer(), this)
 
     companion object {
         /**
@@ -46,10 +46,13 @@ data class EthrDIDDocument(
         /**
          * Parse a json serialized [EthrDIDDocument] into an object
          */
-        fun fromJson(json: String) = jsonParser.parse(serializer(), json)
+        fun fromJson(json: String) = jsonParser.decodeFromString(serializer(), json)
 
         private val jsonParser =
-            Json(JsonConfiguration.Stable.copy(isLenient = true, ignoreUnknownKeys = true))
+            Json {
+                isLenient = true
+                ignoreUnknownKeys = true
+            }
     }
 }
 

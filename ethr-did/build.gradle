@@ -10,7 +10,8 @@ project.ext.description = "DID resolver for the ethr-did (ERC 1056) lightweight 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$kotlin_serialization_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlin_serialization_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlin_serialization_version"
 
     api "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$bivrost_version"
 
@@ -21,9 +22,9 @@ dependencies {
     api "com.github.komputing.kethereum:crypto:$kethereum_version"
     api "com.github.komputing.kethereum:crypto_impl_spongycastle:$kethereum_version"
 
-    api "com.github.uport-project.kotlin-common:core:$uport_kotlin_common_version"
-    api "com.github.uport-project.kotlin-common:jsonrpc:$uport_kotlin_common_version"
-    api "com.github.uport-project.kotlin-common:signer-common:$uport_kotlin_common_version"
+    api "com.github.friedger.kotlin-common:core:$uport_kotlin_common_version"
+    api "com.github.friedger.kotlin-common:jsonrpc:$uport_kotlin_common_version"
+    api "com.github.friedger.kotlin-common:signer-common:$uport_kotlin_common_version"
 
     api project(":universal-did")
 
@@ -31,5 +32,5 @@ dependencies {
     testImplementation "io.mockk:mockk:$mockk_version"
     testImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"
     testImplementation project(":jwt-test")
-    testImplementation "com.github.uport-project.kotlin-common:test-helpers:$uport_kotlin_common_version"
+    testImplementation "com.github.friedger.kotlin-common:test-helpers:$uport_kotlin_common_version"
 }

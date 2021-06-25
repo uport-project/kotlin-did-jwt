@@ -2,13 +2,14 @@
 
 package me.uport.sdk.universaldid
 
-import kotlinx.serialization.Decoder
-import kotlinx.serialization.Encoder
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonBuilder
 import kotlinx.serialization.json.JsonConfiguration
 
 /**
@@ -49,22 +50,20 @@ data class DIDDocumentImpl(
      * Serializes this [DIDDocument] into a JSON string
      */
     fun toJson(): String = JSON
-        .stringify(serializer(), this)
+        .encodeToString(serializer(), this)
 
     companion object {
 
-        private val JSON = Json(
-            JsonConfiguration.Stable.copy(
-                encodeDefaults = true,
-                isLenient = true,
-                useArrayPolymorphism = false
-            )
-        )
+        private val JSON = Json{
+            encodeDefaults = true
+            isLenient = true
+            useArrayPolymorphism = false
+        }
 
         /**
          * Attempts to deserialize a given [json] string into a [DIDDocument]
          */
-        fun fromJson(json: String) = JSON.parse(serializer(), json)
+        fun fromJson(json: String) = JSON.decodeFromString(serializer(), json)
     }
 
 }
