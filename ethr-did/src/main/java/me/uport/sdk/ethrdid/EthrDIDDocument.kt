@@ -5,7 +5,6 @@ package me.uport.sdk.ethrdid
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import me.uport.sdk.universaldid.AuthenticationEntry
 import me.uport.sdk.universaldid.DIDDocument
 import me.uport.sdk.universaldid.PublicKeyEntry

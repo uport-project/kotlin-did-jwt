@@ -9,7 +9,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
 
     api project(":jwt")
-    api "com.github.friedger.kotlin-common:test-helpers:$uport_kotlin_common_version"
+    api "com.github.uport-project.kotlin-common:test-helpers:$uport_kotlin_common_version"
 
     testImplementation "junit:junit:$junit_version"
     testImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"

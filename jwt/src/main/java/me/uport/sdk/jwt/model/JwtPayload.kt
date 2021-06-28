@@ -1,10 +1,9 @@
 package me.uport.sdk.jwt.model
 
-import kotlinx.serialization.ContextualSerialization
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
+import me.uport.sdk.jsonrpc.model.request.DynamicLookupSerializer
 
 @Serializable
 data class JwtPayload(
@@ -65,7 +64,7 @@ data class JwtPayload(
      */
     @Serializable(with = ArbitraryMapSerializer::class)
     @SerialName("claim")
-    val claims: Map<String, @ContextualSerialization Any>? = null,
+    val claims: Map<String, @Serializable(with = DynamicLookupSerializer::class) Any>? = null,
     /**
      * Specific to Private Chain
      * Also includes dad
@@ -78,9 +77,9 @@ data class JwtPayload(
 ) {
     companion object {
         fun fromJson(payloadString: String): JwtPayload =
-            jsonAdapter.parse(serializer(), payloadString)
+            jsonAdapter.decodeFromString(serializer(), payloadString)
 
         private val jsonAdapter =
-            Json(JsonConfiguration.Stable.copy(isLenient = true, ignoreUnknownKeys = true))
+            Json { isLenient = true; ignoreUnknownKeys = true }
     }
 }

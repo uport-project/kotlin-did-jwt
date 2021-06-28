@@ -19,7 +19,7 @@ buildscript {
         khex_version = "1.0.0"
         khash_version = "1.0.0-RC5"
         kbase58_version = "0.2"
-        uport_kotlin_common_version = "fea940f0ad"
+        uport_kotlin_common_version = "0.4.4"
 
         current_release_version = "0.4.0"
     }
@@ -29,7 +29,6 @@ buildscript {
         mavenCentral()
         gradlePluginPortal()
         maven { url "https://jitpack.io" }
-        maven { url "https://kotlin.bintray.com/kotlinx" }
     }
 
     dependencies {

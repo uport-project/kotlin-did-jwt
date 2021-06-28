@@ -1,22 +1,13 @@
 package me.uport.sdk.jwt.model
 
-import kotlinx.serialization.Decoder
-import kotlinx.serialization.Encoder
-import kotlinx.serialization.ImplicitReflectionSerializer
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.PolymorphicKind
-import kotlinx.serialization.SerialDescriptor
-import kotlinx.serialization.encode
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonConfiguration
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonLiteral
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonObjectSerializer
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.modules.getContextualOrDefault
+import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json.Default.encodeToJsonElement
+import kotlin.reflect.typeOf
 
 /**
  * This handles serialization and deserialization of arbitrary JSON trees represented as
@@ -33,12 +24,10 @@ object ArbitraryMapSerializer : KSerializer<Map<String, Any?>> {
     ////////////////////////
     // converting to Json //
     ////////////////////////
-    @ImplicitReflectionSerializer
     private fun Map<*, *>.toJsonObject(): JsonObject = JsonObject(map {
         it.key.toString() to it.value.toJsonElement()
     }.toMap())
 
-    @ImplicitReflectionSerializer
     private fun Any?.toJsonElement(): JsonElement = when (this) {
         null -> JsonNull
         is Number -> JsonPrimitive(this)
@@ -49,9 +38,8 @@ object ArbitraryMapSerializer : KSerializer<Map<String, Any?>> {
         is Array<*> -> JsonArray(this.map { it.toJsonElement() })
         else -> {
             //supporting classes that declare serializers
-            val jsonParser = Json(JsonConfiguration.Stable)
-            val serializer = jsonParser.context.getContextualOrDefault(this)
-            jsonParser.toJson(serializer, this)
+            val jsonParser = Json
+            jsonParser.encodeToJsonElement(this)
         }
     }
 
@@ -59,7 +47,7 @@ object ArbitraryMapSerializer : KSerializer<Map<String, Any?>> {
     // converting back to primitives (no type info) //
     //////////////////////////////////////////////////
     private fun JsonObject.toPrimitiveMap(): Map<String, Any?> =
-        this.content.map {
+        this.map {
             it.key to it.value.toPrimitive()
         }.toMap()
 
@@ -67,7 +55,7 @@ object ArbitraryMapSerializer : KSerializer<Map<String, Any?>> {
         is JsonNull -> null
         is JsonObject -> this.toPrimitiveMap()
         is JsonArray -> this.map { it.toPrimitive() }
-        is JsonLiteral -> {
+        is JsonPrimitive -> {
             if (isString) {
                 contentOrNull
             } else {
@@ -78,16 +66,19 @@ object ArbitraryMapSerializer : KSerializer<Map<String, Any?>> {
     }
 
     override fun deserialize(decoder: Decoder): Map<String, Any?> {
-        val asJsonObject: JsonObject = decoder.decodeSerializableValue(JsonObjectSerializer)
+        assert(decoder is JsonDecoder) {"Only JsonDecoder supported, found " + decoder::class.java}
+        val asJsonObject: JsonObject = (decoder as JsonDecoder).decodeJsonElement().jsonObject
         return asJsonObject.toPrimitiveMap()
     }
 
+    @ExperimentalSerializationApi
     override val descriptor: SerialDescriptor
-        get() = SerialDescriptor("arbitrary map", PolymorphicKind.OPEN)
+        get() = mapSerialDescriptor(PrimitiveSerialDescriptor("key", PrimitiveKind.STRING),
+        PrimitiveSerialDescriptor("value", PrimitiveKind.STRING))
 
-    @ImplicitReflectionSerializer
     override fun serialize(encoder: Encoder, value: Map<String, Any?>) {
+        assert(encoder is JsonEncoder) {"Only JsonEncoder support, found " + encoder::class.java}
         val asJsonObj: JsonObject = value.toJsonObject()
-        encoder.encode(JsonObjectSerializer, asJsonObj)
+        (encoder as JsonEncoder).encodeJsonElement(asJsonObj)
     }
 }

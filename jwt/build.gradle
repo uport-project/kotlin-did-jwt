@@ -18,9 +18,9 @@ dependencies {
     api "com.github.komputing.khash:sha256:$khash_version"
     api "com.github.komputing:kbase58:$kbase58_version"
 
-    api "com.github.friedger.kotlin-common:jsonrpc:$uport_kotlin_common_version"
-    api "com.github.friedger.kotlin-common:core:$uport_kotlin_common_version"
-    api "com.github.friedger.kotlin-common:signer-common:$uport_kotlin_common_version"
+    api "com.github.uport-project.kotlin-common:jsonrpc:$uport_kotlin_common_version"
+    api "com.github.uport-project.kotlin-common:core:$uport_kotlin_common_version"
+    api "com.github.uport-project.kotlin-common:signer-common:$uport_kotlin_common_version"
 
     api project(":universal-did")
     api project(":ethr-did")
@@ -29,7 +29,7 @@ dependencies {
 
     testImplementation "junit:junit:$junit_version"
     testImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"
-    testImplementation "com.github.friedger.kotlin-common:test-helpers:$uport_kotlin_common_version"
+    testImplementation "com.github.uport-project.kotlin-common:test-helpers:$uport_kotlin_common_version"
     testImplementation "io.mockk:mockk:$mockk_version"
     testImplementation project(":jwt-test")
 }

@@ -11,11 +11,11 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlin_serialization_version"
 
-    api "com.github.friedger.kotlin-common:core:$uport_kotlin_common_version"
+    api "com.github.uport-project.kotlin-common:core:$uport_kotlin_common_version"
     api project(":universal-did")
 
     testImplementation "junit:junit:$junit_version"
     testImplementation "io.mockk:mockk:$mockk_version"
     testImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"
-    testImplementation "com.github.friedger.kotlin-common:test-helpers:$uport_kotlin_common_version"
+    testImplementation "com.github.uport-project.kotlin-common:test-helpers:$uport_kotlin_common_version"
 }

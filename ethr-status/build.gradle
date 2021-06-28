@@ -8,8 +8,8 @@ project.ext.description = "Ethr implementation of credential-status"
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    api "com.github.friedger.kotlin-common:jsonrpc:$uport_kotlin_common_version"
-    api "com.github.friedger.kotlin-common:signer-common:$uport_kotlin_common_version"
+    api "com.github.uport-project.kotlin-common:jsonrpc:$uport_kotlin_common_version"
+    api "com.github.uport-project.kotlin-common:signer-common:$uport_kotlin_common_version"
 
     implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$bivrost_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"

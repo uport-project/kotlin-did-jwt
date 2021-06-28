@@ -480,7 +480,7 @@ class EthrDIDResolverTest {
 
         validDids.forEach {
             val normalizedDid = EthrDIDResolver.normalizeDid(it)
-            assertThat(normalizedDid.toLowerCase()).isEqualTo("did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a")
+            assertThat(normalizedDid.lowercase()).isEqualTo("did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a")
         }
 
         invalidDids.forEach {
@@ -509,7 +509,7 @@ class EthrDIDResolverTest {
             "did:ethr:0x04:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner"
         )
         validNetworkedDIDs.forEach {
-            val normalizedDid = EthrDIDResolver.normalizeDid(it).toLowerCase()
+            val normalizedDid = EthrDIDResolver.normalizeDid(it).lowercase()
             println("normalizing `$it` got `$normalizedDid`")
             assertThat(normalizedDid).isNotEmpty()
             assertThat(normalizedDid).doesNotContain("#owner")
@@ -536,7 +536,7 @@ class EthrDIDResolverTest {
             "did:ethr:0x04:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner"
         )
         validNetworkedDIDs.forEach {
-            val address = EthrDIDResolver.extractAddress(it).toLowerCase()
+            val address = EthrDIDResolver.extractAddress(it).lowercase()
             println("extracting address from `$it` got `$address`")
             assertThat(address).isEqualTo("0xb9c5714089478a327f09197987f16f9e5d936e8a")
         }
@@ -562,7 +562,7 @@ class EthrDIDResolverTest {
             "did:ethr:0x04:0xB9C5714089478a327F09197987f16f9E5d936E8a#owner" to "0x04"
         )
         validNetworkedDIDs.forEach { (did, expectedNetwork) ->
-            val extractedNetwork = EthrDIDResolver.extractNetwork(did).toLowerCase()
+            val extractedNetwork = EthrDIDResolver.extractNetwork(did).lowercase()
             println("extracting network from `$did` got `$extractedNetwork`")
             assertThat(extractedNetwork).isEqualTo(expectedNetwork)
         }

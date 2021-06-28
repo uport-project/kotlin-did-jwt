@@ -22,9 +22,9 @@ dependencies {
     api "com.github.komputing.kethereum:crypto:$kethereum_version"
     api "com.github.komputing.kethereum:crypto_impl_spongycastle:$kethereum_version"
 
-    api "com.github.friedger.kotlin-common:core:$uport_kotlin_common_version"
-    api "com.github.friedger.kotlin-common:jsonrpc:$uport_kotlin_common_version"
-    api "com.github.friedger.kotlin-common:signer-common:$uport_kotlin_common_version"
+    api "com.github.uport-project.kotlin-common:core:$uport_kotlin_common_version"
+    api "com.github.uport-project.kotlin-common:jsonrpc:$uport_kotlin_common_version"
+    api "com.github.uport-project.kotlin-common:signer-common:$uport_kotlin_common_version"
 
     api project(":universal-did")
 
@@ -32,5 +32,5 @@ dependencies {
     testImplementation "io.mockk:mockk:$mockk_version"
     testImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"
     testImplementation project(":jwt-test")
-    testImplementation "com.github.friedger.kotlin-common:test-helpers:$uport_kotlin_common_version"
+    testImplementation "com.github.uport-project.kotlin-common:test-helpers:$uport_kotlin_common_version"
 }

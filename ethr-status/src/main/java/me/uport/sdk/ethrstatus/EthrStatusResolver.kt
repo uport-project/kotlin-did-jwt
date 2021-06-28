@@ -60,7 +60,7 @@ class EthrStatusResolver : StatusResolver {
                 result.hexToBigInteger()
             }
             .filter { it != BigInteger.ZERO }
-            .min()
+            .minOrNull()
             ?: BigInteger.ZERO
 
         return EthrStatus(minRevocationBlock)

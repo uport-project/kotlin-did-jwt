@@ -7,15 +7,7 @@
 package me.uport.sdk.jwt
 
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
-import kotlinx.serialization.json.JsonException
-import me.uport.sdk.core.EthNetwork
-import me.uport.sdk.core.ITimeProvider
-import me.uport.sdk.core.SystemTimeProvider
-import me.uport.sdk.core.clean0xPrefix
-import me.uport.sdk.core.decodeBase64
-import me.uport.sdk.core.hexToByteArray
-import me.uport.sdk.core.toBase64UrlSafe
+import me.uport.sdk.core.*
 import me.uport.sdk.jwt.JWTUtils.normalizeKnownDID
 import me.uport.sdk.jwt.JWTUtils.splitToken
 import me.uport.sdk.jwt.model.ArbitraryMapSerializer
@@ -23,11 +15,7 @@ import me.uport.sdk.jwt.model.JwtHeader
 import me.uport.sdk.jwt.model.JwtHeader.Companion.ES256K
 import me.uport.sdk.jwt.model.JwtHeader.Companion.ES256K_R
 import me.uport.sdk.jwt.model.JwtPayload
-import me.uport.sdk.signer.SIG_RECOVERABLE_SIZE
-import me.uport.sdk.signer.Signer
-import me.uport.sdk.signer.decodeJose
-import me.uport.sdk.signer.normalize
-import me.uport.sdk.signer.utf8
+import me.uport.sdk.signer.*
 import me.uport.sdk.universaldid.DIDDocument
 import me.uport.sdk.universaldid.DIDResolver
 import me.uport.sdk.universaldid.PublicKeyEntry
@@ -134,8 +122,8 @@ class JWTTools(
             mutablePayload["iss"] = issuerDID
         }
 
-        val serializedPayload = Json(JsonConfiguration.Stable)
-            .stringify(ArbitraryMapSerializer, mutablePayload)
+        val serializedPayload = Json
+            .encodeToString(ArbitraryMapSerializer, mutablePayload)
 
         @Suppress("SimplifiableCallChain", "ConvertCallChainIntoSequence")
         val signingInput = listOf(header.toJson(), serializedPayload)
@@ -170,7 +158,7 @@ class JWTTools(
             val header = JwtHeader.fromJson(headerString)
             val payload = JwtPayload.fromJson(payloadString)
             return Triple(header, payload, signatureBytes)
-        } catch (ex: JsonException) {
+        } catch (ex: Exception) {
             throw JWTEncodingException("cannot parse the JWT($token)", ex)
         }
     }
@@ -196,10 +184,10 @@ class JWTTools(
             //Parse Json
             val header = JwtHeader.fromJson(headerString)
 
-            val payload = jsonParser.parse(ArbitraryMapSerializer, payloadString)
+            val payload = jsonParser.decodeFromString(ArbitraryMapSerializer, payloadString)
 
             return Triple(header, payload, signatureBytes)
-        } catch (ex: JsonException) {
+        } catch (ex: Exception) {
             throw JWTEncodingException("cannot parse the JWT($token)", ex)
         }
     }
@@ -283,7 +271,10 @@ class JWTTools(
     }
 
     private val jsonParser =
-        Json(JsonConfiguration.Stable.copy(isLenient = true, ignoreUnknownKeys = true))
+        Json {
+            isLenient = true
+            ignoreUnknownKeys = true
+        }
 
     /**
      * maps known algorithms to the corresponding verification method
@@ -353,7 +344,7 @@ class JWTTools(
             }
         }.map { pubKey ->
             val pubKeyNoPrefix = PublicKey(pubKey).normalize()
-            pubKeyNoPrefix.toAddress().cleanHex.toLowerCase()
+            pubKeyNoPrefix.toAddress().cleanHex.lowercase()
         }
 
         val matches = publicKeys.map { pubKeyEntry ->
@@ -367,7 +358,7 @@ class JWTTools(
             (pubKeyEntry.ethereumAddress?.clean0xPrefix() ?: pubKey.toAddress().cleanHex)
 
         }.filter { ethereumAddress ->
-            ethereumAddress.toLowerCase() in recoveredAddresses
+            ethereumAddress.lowercase() in recoveredAddresses
         }
 
         return matches.isNotEmpty()
