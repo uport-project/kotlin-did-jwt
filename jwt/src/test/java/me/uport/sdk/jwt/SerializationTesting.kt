@@ -2,28 +2,30 @@ package me.uport.sdk.jwt
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import kotlinx.serialization.ContextualSerialization
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
+import me.uport.sdk.jsonrpc.model.request.DynamicLookupSerializer
 import me.uport.sdk.jwt.model.ArbitraryMapSerializer
 import org.junit.Test
 
+@ExperimentalSerializationApi
 class SerializationTesting {
 
     @Serializable
     data class ClassWithSerializer(
-        //test serializtion of annotated types
+        //test serialization of annotated types
         @SerialName("@context")
         val context: List<String>
     )
 
+    @ExperimentalSerializationApi
     @Serializable
     data class CompoundTestObject(
         //use custom serializers for arbitrary map types
         @Serializable(with = ArbitraryMapSerializer::class)
-        val generic: Map<String, @ContextualSerialization Any?>
+        val generic: Map<String, @Serializable(DynamicLookupSerializer::class) Any?>
     )
 
     @Test
@@ -44,7 +46,7 @@ class SerializationTesting {
             )
         )
         val serialized =
-            Json(JsonConfiguration.Stable).stringify(CompoundTestObject.serializer(), aa)
+            Json.encodeToString(CompoundTestObject.serializer(), aa)
         assertThat(serialized).isEqualTo("""{"generic":{"hello":"world","missing":null,"some number":4321,"number as string":"1234","boolean":false,"boolean as string":"true","custom object":{"@context":["asdf"]},"obj":{"a":"b","c":null}}}""")
     }
 
@@ -52,7 +54,7 @@ class SerializationTesting {
     fun `can deserialize known object`() {
         val input =
             """{"generic":{"hello":"world","missing":null,"some number":4321,"number as string":"1234","boolean":false,"boolean as string":"true","custom object":{"@context":["asdf"]},"obj":{"a":"b","c":null}}}"""
-        val parsed = Json(JsonConfiguration.Stable).parse(CompoundTestObject.serializer(), input)
+        val parsed = Json.decodeFromString(CompoundTestObject.serializer(), input)
         assertThat(parsed.generic).isEqualTo(
             mapOf(
                 "hello" to "world",
